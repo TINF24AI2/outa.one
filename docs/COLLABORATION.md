@@ -15,6 +15,7 @@ This is the documentation for what conventions we use, how to get the project ru
 
 <a id="development-setup"></a>
 ## Development setup
+> TBD
 
 <a id="branching-pr-workflow"></a>
 ## Branching & PR workflow
@@ -49,7 +50,7 @@ Write clear, concise commit messages. Use [Conventional Commits](https://www.con
 - test: add unit tests for trail parser
 - chore: update Gradle dependencies
 
-Format: `<type>(<scope>): <short summary>`
+Format: `<type>: <short summary>`
 
 <a id="pull-request-checklist"></a>
 ## Pull request checklist
@@ -72,11 +73,13 @@ The following requirements are enforced via GitHub:
 
 <a id="coding-style"></a>
 ## Coding style
+> TBD
 
 
 <a id="naming-conventions"></a>
 ## Naming conventions
-
+> TBD
 
 <a id="code-structure"></a>
 ## Code Structure
+> TBD
