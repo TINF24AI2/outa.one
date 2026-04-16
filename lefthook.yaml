@@ -1,0 +1,4 @@
+pre-commit:
+  commands:
+    biome-check:
+      run: pnpm biome format
