@@ -23,6 +23,7 @@
 	},
 	"devDependencies": {
 		"@better-auth/cli": "~1.4.21",
+		"@biomejs/biome": "2.4.12",
 		"@chromatic-com/storybook": "^5.1.2",
 		"@inlang/paraglide-js": "^2.15.2",
 		"@playwright/test": "^1.59.1",
