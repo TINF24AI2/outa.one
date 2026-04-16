@@ -19,7 +19,8 @@
 		"db:studio": "drizzle-kit studio",
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build",
-		"format": "npx @biomejs/biome format --write",
+		"format": "pnpx @biomejs/biome format --write .",
+		"lint": "pnpx @biomejs/biome lint",
 		"auth:schema": "better-auth generate --config src/lib/server/auth.ts --output src/lib/server/db/auth.schema.ts --yes"
 	},
 	"devDependencies": {
