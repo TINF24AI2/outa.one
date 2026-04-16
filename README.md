@@ -1,7 +1,7 @@
-# Outa One — Self-Service Software License Management
+# outa.one — Self-Service Software License Management
 A web-based self-service portal (SSP) that allows employees of an IT consulting company to independently retrieve software license keys. Built as part of a university software engineering group project.
 
-The SSP streamlines the internal software procurement process by providing a centralized platform where employees can browse available software products and retrieve license keys - without manual intervention from IT or administration.
+The SSP streamlines the internal software procurement process by providing a centralized platform where employees can obtain available software products and retrieve license keys - without manual intervention from IT or administration.
 
 ## Features
 **Employee**
@@ -19,7 +19,7 @@ The SSP streamlines the internal software procurement process by providing a cen
 ## Tech Stack
 > TBD based on project requirements and team expertise,but initial considerations include:
 
-- **Framework:** `SwetKit` 
+- **Framework:** `SwelteKit` 
 - **Local Storage:** `PostgreSQL Database`
 - **FE Libraries:** `Tailwind CSS`
 
