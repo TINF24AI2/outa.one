@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1776410584592,
+      "tag": "0000_init_migration",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776412382752,
+      "tag": "0001_add_admin_auth_plugin",
+      "breakpoints": true
+    }
+  ]
+}
