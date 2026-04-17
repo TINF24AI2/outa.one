@@ -1,17 +1,17 @@
 <!doctype html>
 
+<!-- biome-ignore lint/a11y/useValidLang: The language here is injected dynamically, so it is fine to use a "non-standard language code" -->
 <html lang="%paraglide.lang%" dir="%paraglide.dir%">
-	<head>
-		<meta charset="utf-8" />
+  <head>
+    <meta charset="utf-8" />
 
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1"
-		/>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-		<meta name="text-scale" content="scale" />
-		%sveltekit.head%
-	</head>
+    <meta name="text-scale" content="scale" />
+    %sveltekit.head%
+  </head>
 
-	<body data-sveltekit-preload-data="hover"><div style="display: contents">%sveltekit.body%</div></body>
+  <body data-sveltekit-preload-data="hover">
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
 </html>
