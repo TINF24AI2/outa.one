@@ -28,7 +28,7 @@ Detailed documentation is located in the [`/docs`](docs) folder, this includes:
 
 | Topic                             | File                                             |
 |-----------------------------------|--------------------------------------------------|
-| Collaboration Guide & Local Setup | [docs/Contributing.md](docs/Contributing.md)   |
+| Collaboration Guide & Local Setup | [docs/contributing.md](docs/contributing.md)   |
 
 
 ## Team
