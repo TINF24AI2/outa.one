@@ -12,7 +12,7 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: 'pg' }),
   emailAndPassword: { enabled: true },
   plugins: [
-    sveltekitCookies(getRequestEvent), // make sure this is the last plugin in the array
     admin(),
+    sveltekitCookies(getRequestEvent), // make sure this is the last plugin in the array
   ],
 });
