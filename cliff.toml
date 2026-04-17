@@ -19,10 +19,10 @@ filter_unconventional = true  # hides commits that don't follow conventional for
 tag_pattern = "v[0-9].*"     # only considers tags starting with v
 
 commit_parsers = [
-  { message = "^feat", group = "🚀 Features" },
-  { message = "^fix", group = "🐞 Bug Fixes" },
-  { message = "^perf", group = "🔥 Performance" },
-  { message = "^refactor", group = "♻️ Refactoring" },
-  { message = "^docs", group = "📖 Documentation" },
+  { message = "^feat", group = "<!-- 0 -->🚀 Features" },
+  { message = "^fix", group = "<!-- 1 -->🐞 Bug Fixes" },
+  { message = "^perf", group = "<!-- 2 -->🔥 Performance" },
+  { message = "^refactor", group = "<!-- 3 -->♻️ Refactoring" },
+  { message = "^docs", group = "<!-- 4 -->📖 Documentation" },
   { message = "^chore|^ci|^build|^test", skip = true },  # skip noise
 ]
