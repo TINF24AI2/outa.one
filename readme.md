@@ -19,7 +19,7 @@ The SSP streamlines the internal software procurement process by providing a cen
 ## Tech Stack
 > TBD based on project requirements and team expertise,but initial considerations include:
 
-- **Framework:** `SwelteKit` 
+- **Framework:** `SvelteKit` 
 - **Local Storage:** `PostgreSQL Database`
 - **FE Libraries:** `Tailwind CSS`
 
@@ -41,7 +41,7 @@ Detailed documentation is located in the [`/docs`](docs) folder, this includes:
 | Developer | [@michelle128n](https://github.com/michelle128n) |
 | Developer | [@Lumalis](https://github.com/Lumalis)
 
-## License
+## Scope
 This project is developed for academic purposes as part of a university software engineering course.
 
 <!-- 
