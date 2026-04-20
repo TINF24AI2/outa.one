@@ -1,10 +1,10 @@
-import { betterAuth } from 'better-auth/minimal';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { sveltekitCookies } from 'better-auth/svelte-kit';
-import { env } from '$env/dynamic/private';
-import { getRequestEvent } from '$app/server';
-import { db } from '$lib/server/db';
+import { betterAuth } from 'better-auth/minimal';
 import { admin } from 'better-auth/plugins';
+import { sveltekitCookies } from 'better-auth/svelte-kit';
+import { getRequestEvent } from '$app/server';
+import { env } from '$env/dynamic/private';
+import { db } from '$lib/server/db';
 
 export const auth = betterAuth({
   baseURL: env.ORIGIN,
