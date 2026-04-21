@@ -1,0 +1,37 @@
+name: Code Quality
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check formatting and linting
+        run: pnpm run ci:check
+
+      # Here we can add a step to run tests in the future
+      # For now, it's commented out since we would need a test database setup and all requires environment variables to be set up correctly.
+      #- name: Run tests
+      #  run: pnpm run test

@@ -25,6 +25,7 @@
     "build-storybook": "storybook build",
     "format": "pnpx @biomejs/biome format --write .",
     "lint": "pnpx @biomejs/biome lint",
+    "ci:check": "biome ci .",
     "auth:schema": "better-auth generate --config src/lib/server/auth.ts --output src/lib/server/db/auth.schema.ts --yes"
   },
   "devDependencies": {
