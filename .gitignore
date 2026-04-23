@@ -30,3 +30,5 @@ project.inlang/cache/
 *storybook.log
 storybook-static
 /.direnv
+
+*.drawio.bkp
