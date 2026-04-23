@@ -1,10 +1,8 @@
 name: Feature Request
 description: File a feature request.
 title: "[Feature]: "
-labels: ["enhancement", "triage", "target start date", "target end date", "issue points"]
+labels: ["enhancement", "triage"]
 projects: ["TINF24AI2/18"]
-assignees:
-  - octocat
 type: feature
 body:
   - type: input
