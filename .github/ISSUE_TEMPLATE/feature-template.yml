@@ -10,7 +10,7 @@ body:
     attributes:
       label: Title of Issue in Product Backlog
       description: What is the title of the issue in the product backlog?
-      placeholder: [Administratoren können neue Produkte und Lizenzschlüssel hochladen]
+      placeholder: "[# Number from Backlogissue]"
     validations:
       required: false
   - type: textarea
