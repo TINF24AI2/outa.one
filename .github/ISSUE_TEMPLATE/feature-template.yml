@@ -6,7 +6,7 @@ projects: ["TINF24AI2/18"]
 type: feature
 body:
   - type: input
-    id: issue title in product backlog
+    id: issue-title
     attributes:
       label: Title of Issue in Product Backlog
       description: What is the title of the issue in the product backlog?
