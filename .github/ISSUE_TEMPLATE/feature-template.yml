@@ -10,7 +10,7 @@ body:
     attributes:
       label: Title of Issue in Product Backlog
       description: What is the title of the issue in the product backlog?
-      placeholder: "[# Number from Backlogissue] Title of issue in product backlog"
+      placeholder: "[# Number from backlog issue] Title of issue in product backlog"
     validations:
       required: true
   - type: textarea
