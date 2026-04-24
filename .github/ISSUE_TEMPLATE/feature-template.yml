@@ -1,0 +1,31 @@
+name: Feature Request
+description: File a feature request.
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+projects: ["TINF24AI2/18"]
+type: feature
+body:
+  - type: input
+    id: issue-title
+    attributes:
+      label: Title of Issue in Product Backlog
+      description: What is the title of the issue in the product backlog?
+      placeholder: [Administratoren können neue Produkte und Lizenzschlüssel hochladen]
+    validations:
+      required: false
+  - type: textarea
+    id: description
+    attributes:
+      label: description
+      description: Description
+      placeholder: Please provide a detailed description of the feature you would like to implement.
+      value: "In this feature, we want to implement...\n ToDo's: \n - [#] ... \n - [#] ... \n - [#] ..."
+    validations:
+      required: true
+  - type: upload
+    id: screenshots
+    attributes:
+      label: Upload screenshots
+      description: If applicable, add screenshots to help you understand what you want to do/did.
+    validations:
+      required: false
