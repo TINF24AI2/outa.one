@@ -1,53 +1,62 @@
 # outa.one – Self-Service Software License Management
+
 A web-based self-service portal (SSP) that allows employees of an IT consulting company to independently retrieve software license keys. Built as part of a university software engineering group project.
 
 The SSP streamlines the internal software procurement process by providing a centralized platform where employees can obtain available software products and retrieve license keys - without manual intervention from IT or administration.
 
 ## Features
+
 **Employee**
+
 - Browse available software products and license types
 - Request and retrieve license keys (with optional confirmation step)
 - View personal license history
 - Login and authentication
 
 **Administrator**
+
 - Upload and manage products and license keys
 - Manually assign license keys to users
 - Manage user accounts and roles
 - View audit logs and generate reports on license usage
 
 ## Tech Stack
+
 > TBD based on project requirements and team expertise,but initial considerations include:
 
-- **Framework:** `SvelteKit` 
+- **Framework:** `SvelteKit`
 - **Local Storage:** `PostgreSQL Database`
-- **FE Libraries:** `Tailwind CSS`
+- **FE Libraries:** `Tailwind CSS`, `shadcn-svelte`, `lucide-icons`
+- **Server-side Libraries:** `Drizzle ORM`, `Better Auth`, `Paraglide`
 
 ## Further Documentation
+
 Detailed documentation is located in the [`/docs`](docs) folder, this includes:
 
-| Topic                             | File                                             |
-|-----------------------------------|--------------------------------------------------|
-| Collaboration Guide & Local Setup | [docs/contributing.md](docs/contributing.md)   |
+| Topic                                    | File                                         |
+| ---------------------------------------- | -------------------------------------------- |
+| Collaboration Guide & Local Setup        | [docs/contributing.md](docs/contributing.md) |
 | Software Architecture & Design Decisions | [docs/architecture.md](docs/architecture.md) |
-| Database Schema & ER Diagrams | [docs/database.md](docs/database.md) |
-| Design Mockups & UI/UX Decisions | [docs/design.md](docs/design.md) |
-
+| Database Schema & ER Diagrams            | [docs/database.md](docs/database.md)         |
+| Design Mockups & UI/UX Decisions         | [docs/design.md](docs/design.md)             |
+| Development Guide / Reference            | [docs/development.md](docs/development.md)   |
 
 ## Team
-| Role | Contributor |
-|---|---|
-| Product Owner | [@fowl-ow](https://github.com/fowl-ow) |
-| Scrum Master | [@nicolekaefer](https://github.com/nicolekaefer) |
-| Developer | [@zFlxw](https://github.com/zFlxw) |
-| Developer | [@nikmtl](https://github.com/nikmtl) |
-| Developer | [@michelle128n](https://github.com/michelle128n) |
-| Developer | [@Lumalis](https://github.com/Lumalis)
+
+| Role          | Contributor                                      |
+| ------------- | ------------------------------------------------ |
+| Product Owner | [@fowl-ow](https://github.com/fowl-ow)           |
+| Scrum Master  | [@nicolekaefer](https://github.com/nicolekaefer) |
+| Developer     | [@zFlxw](https://github.com/zFlxw)               |
+| Developer     | [@nikmtl](https://github.com/nikmtl)             |
+| Developer     | [@michelle128n](https://github.com/michelle128n) |
+| Developer     | [@Lumalis](https://github.com/Lumalis)           |
 
 ## Scope
+
 This project is developed for academic purposes as part of a university software engineering course.
 
-<!-- 
+<!--
 
 Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
