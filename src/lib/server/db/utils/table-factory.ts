@@ -6,7 +6,7 @@ const baseColumns = {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 };
 
-const baseColumnsWithUpate = {
+const baseColumnsWithUpdate = {
   ...baseColumns,
   updatedAt: timestamp('updated_at', { withTimezone: true })
     .defaultNow()
@@ -52,13 +52,13 @@ export const defineTableWithUpdate = <TName extends string, TColumns extends Rec
   name: TName,
   columns: TColumns,
   extraConfig?: (
-    self: BuildExtraConfigColumns<typeof name, typeof baseColumnsWithUpate & TColumns, 'pg'>,
+    self: BuildExtraConfigColumns<typeof name, typeof baseColumnsWithUpdate & TColumns, 'pg'>,
   ) => PgTableExtraConfigValue[],
 ) => {
   return pgTable(
     name,
     {
-      ...baseColumnsWithUpate,
+      ...baseColumnsWithUpdate,
       ...columns,
     },
     (table) => {
