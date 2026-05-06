@@ -1,6 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { APIError } from 'better-auth/api';
 import { eq } from 'drizzle-orm';
+import { m } from '$lib/paraglide/messages.js';
 import { auth } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { user } from '$lib/server/db/schema';
@@ -34,15 +35,15 @@ export const actions: Actions = {
     const confirmPassword = formData.get('confirmPassword')?.toString() ?? '';
 
     if (password !== confirmPassword) {
-      return fail(400, { message: 'Passwords do not match' });
+      return fail(400, { message: m.auth_signup_error_password_mismatch() });
     }
     if (password.length < 8) {
-      return fail(400, { message: 'Password must be at least 8 characters' });
+      return fail(400, { message: m.auth_password_min_length() });
     }
 
     const invite = await getValidInvite(token);
     if (!invite) {
-      return fail(400, { message: 'This invite link is no longer valid' });
+      return fail(400, { message: m.auth_signup_error_invite_invalid() });
     }
 
     try {
@@ -55,9 +56,9 @@ export const actions: Actions = {
       await consumeInvite(token);
     } catch (error) {
       if (error instanceof APIError) {
-        return fail(400, { message: error.message || 'Failed to create account' });
+        return fail(400, { message: m.auth_signup_error_failed() });
       }
-      return fail(500, { message: 'An unexpected error occurred' });
+      return fail(500, { message: m.auth_error_unexpected() });
     }
 
     redirect(302, '/signup/success');

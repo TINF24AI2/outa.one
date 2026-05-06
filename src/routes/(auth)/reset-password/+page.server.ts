@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { APIError } from 'better-auth/api';
+import { m } from '$lib/paraglide/messages.js';
 import { auth } from '$lib/server/auth';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -22,19 +23,19 @@ export const actions: Actions = {
     const confirmPassword = formData.get('confirmPassword')?.toString() ?? '';
 
     if (password.length < 8) {
-      return fail(400, { token, fieldErrors: { password: 'Must be at least 8 characters' } });
+      return fail(400, { token, fieldErrors: { password: m.auth_password_min_length() } });
     }
     if (password !== confirmPassword) {
-      return fail(400, { token, fieldErrors: { confirmPassword: 'Passwords do not match' } });
+      return fail(400, { token, fieldErrors: { confirmPassword: m.auth_reset_error_password_mismatch() } });
     }
 
     try {
       await auth.api.resetPassword({ body: { token, newPassword: password } });
     } catch (error) {
       if (error instanceof APIError) {
-        return fail(400, { token, message: 'This reset link is invalid or has expired.' });
+        return fail(400, { token, message: m.auth_reset_error_token_invalid() });
       }
-      return fail(500, { token, message: 'An unexpected error occurred' });
+      return fail(500, { token, message: m.auth_error_unexpected() });
     }
 
     return { success: true };

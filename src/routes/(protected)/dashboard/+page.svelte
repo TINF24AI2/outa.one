@@ -3,6 +3,7 @@ import { enhance } from '$app/forms';
 import Navigation from '$lib/components/app/navigation.svelte';
 import { Button } from '$lib/components/ui/button';
 import { Input } from '$lib/components/ui/input';
+import { m } from '$lib/paraglide/messages.js';
 import type { ActionData, PageData } from './$types';
 
 let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -37,28 +38,28 @@ let inviteEmail = $state('');
               id="invite-email"
               name="email"
               type="email"
-              placeholder="user@company.com"
+              placeholder={m.auth_login_email_placeholder()}
               bind:value={inviteEmail}
             />
           </div>
           <label>
             <input type="checkbox" name="grantAdmin" class="rounded" />
-            admin rights
+            {m.dashboard_invite_admin_rights()}
           </label>
           <Button type="submit" disabled={inviteLoading} class="w-fit">
             {inviteLoading
-              ? "Generating invite..."
-              : "Generate Invite"}
+              ? m.dashboard_invite_submit_loading()
+              : m.dashboard_invite_submit()}
           </Button>
         </form>
 
         {#if form?.inviteUrl}
           <div class="mt-4 rounded-lg border bg-white p-3 text-sm">
             <p class="text-muted-foreground mb-1 text-xs">
-              Invite link for {form.email}
+              {m.dashboard_invite_link_label({ email: form.email ?? "" })}
               {#if form.role === "admin"}
                 <span class="text-primary font-medium">
-                  admin
+                  {m.role_admin()}
                 </span>
               {/if}:
             </p>

@@ -35,7 +35,7 @@ let accountOpen = $state(false);
     >
       <img
         src={logo}
-        alt={m.sidebar_logo_alt()}
+        alt={m.navigation_logo_alt()}
         class="h-5 w-5 object-contain brightness-0 invert"
       />
     </div>
@@ -71,7 +71,7 @@ let accountOpen = $state(false);
         type="submit"
       >
         <LogOut class="h-4 w-4" />
-        {m.sidebar_logout()}
+        {m.navigation_logout()}
       </Button>
     </form>
   </div>
@@ -109,7 +109,7 @@ let accountOpen = $state(false);
               type="submit"
             >
               <LogOut class="h-4 w-4" />
-              {m.sidebar_logout()}
+              {m.navigation_logout()}
             </Button>
           </form>
         </div>
@@ -121,7 +121,7 @@ let accountOpen = $state(false);
       class="text-muted-foreground hover:text-foreground flex flex-col items-center gap-0.5 px-4 py-2 text-xs transition-colors"
     >
       <CircleUserRound class="h-6 w-6" />
-      <span>Account</span>
+      <span>{m.navigation_account()}</span>
     </button>
   </div>
 </nav>

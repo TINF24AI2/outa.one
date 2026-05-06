@@ -1,4 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
+import { m } from '$lib/paraglide/messages.js';
 import { auth } from '$lib/server/auth';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -15,7 +16,7 @@ export const actions: Actions = {
     const email = formData.get('email')?.toString() ?? '';
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return fail(400, { fieldError: 'Enter a valid email address' });
+      return fail(400, { fieldError: m.auth_forgot_error_email_invalid() });
     }
 
     try {

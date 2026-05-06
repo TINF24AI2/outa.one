@@ -2,6 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { APIError } from 'better-auth/api';
 import { inArray } from 'drizzle-orm';
 import { DEMO_EMAILS } from '$lib/demo-users';
+import { m } from '$lib/paraglide/messages.js';
 import { auth } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { user } from '$lib/server/db/schema';
@@ -26,10 +27,13 @@ export const actions: Actions = {
     } catch (error) {
       if (error instanceof APIError) {
         return fail(400, {
-          fieldErrors: { email: 'Invalid email or password', password: 'Invalid email or password' },
+          fieldErrors: {
+            email: m.auth_login_error_invalid_credentials(),
+            password: m.auth_login_error_invalid_credentials(),
+          },
         });
       }
-      return fail(500, { message: 'An unexpected error occurred' });
+      return fail(500, { message: m.auth_error_unexpected() });
     }
 
     redirect(302, '/dashboard');

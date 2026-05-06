@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
+import { m } from '$lib/paraglide/messages.js';
 import { auth } from '$lib/server/auth';
 import { createInvite } from '$lib/server/invites';
 import type { Actions, PageServerLoad } from './$types';
@@ -17,7 +18,7 @@ export const actions: Actions = {
 
   generateInvite: async (event) => {
     if (event.locals.user?.role !== 'admin') {
-      return fail(403, { error: 'Forbidden' });
+      return fail(403, { error: m.dashboard_invite_error_forbidden() });
     }
 
     const formData = await event.request.formData();
@@ -25,7 +26,7 @@ export const actions: Actions = {
     const grantAdmin = formData.get('grantAdmin') === 'on';
 
     if (!email?.includes('@')) {
-      return fail(400, { error: 'Valid email is required' });
+      return fail(400, { error: m.dashboard_invite_error_email_invalid() });
     }
 
     const role = grantAdmin ? 'admin' : 'user';
@@ -33,9 +34,8 @@ export const actions: Actions = {
       const invite = await createInvite(email, role);
       const inviteUrl = `${env.ORIGIN}/signup?token=${invite.token}`;
       return { inviteUrl, email, role };
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to generate invite';
-      return fail(400, { error: message });
+    } catch (_error) {
+      return fail(400, { error: m.dashboard_invite_error_failed() });
     }
   },
 };
