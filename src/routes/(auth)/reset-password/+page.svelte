@@ -8,6 +8,7 @@ import { Button } from '$lib/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
 import { Input } from '$lib/components/ui/input';
 import { Label } from '$lib/components/ui/label';
+import { m } from '$lib/paraglide/messages.js';
 import type { ActionData, PageData } from './$types';
 
 let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -29,14 +30,14 @@ const serverFieldErrors = $derived(
 function validate() {
   const errors: typeof fieldErrors = {};
   if (!password) {
-    errors.password = 'Password is required';
+    errors.password = m.auth_reset_error_password_required();
   } else if (password.length < 8) {
-    errors.password = 'Must be at least 8 characters';
+    errors.password = m.auth_password_min_length();
   }
   if (!confirmPassword) {
-    errors.confirmPassword = 'Please confirm your password';
+    errors.confirmPassword = m.auth_reset_error_confirm_required();
   } else if (password !== confirmPassword) {
-    errors.confirmPassword = 'Passwords do not match';
+    errors.confirmPassword = m.auth_reset_error_password_mismatch();
   }
   return errors;
 }
@@ -60,14 +61,13 @@ $effect(() => {
         >
           <CircleCheckBig class="h-7 w-7 text-green-600" />
         </div>
-        <CardTitle class="text-xl">Password reset!</CardTitle>
+        <CardTitle class="text-xl">{m.auth_reset_success_title()}</CardTitle>
         <CardDescription>
-          Your password has been successfully reset. You can now sign in with
-          your new password.
+          {m.auth_reset_success_description()}
         </CardDescription>
       </CardHeader>
       <CardContent class="text-muted-foreground text-center text-sm">
-        Redirecting to login page…
+        {m.auth_reset_redirecting()}
       </CardContent>
     </Card>
   {:else}
@@ -78,12 +78,12 @@ $effect(() => {
         >
           <img
             src={logo}
-            alt="Outa Logo"
+            alt={m.auth_reset_logo_alt()}
             class="h-8 w-8 object-contain brightness-0 invert"
           />
         </div>
-        <CardTitle class="text-xl">Reset password</CardTitle>
-        <CardDescription>Enter your new password below</CardDescription>
+        <CardTitle class="text-xl">{m.auth_reset_title()}</CardTitle>
+        <CardDescription>{m.auth_reset_description()}</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -109,7 +109,7 @@ $effect(() => {
           <input type="hidden" name="token" value={data.token} />
 
           <div class="flex flex-col gap-1.5">
-            <Label for="password">New password</Label>
+            <Label for="password">{m.auth_reset_password_label()}</Label>
             <div class="relative">
               <Input
                 id="password"
@@ -127,7 +127,9 @@ $effect(() => {
                 type="button"
                 onclick={() => (showPassword = !showPassword)}
                 class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-label={showPassword
+                  ? m.auth_login_hide_password()
+                  : m.auth_login_show_password()}
               >
                 {#if showPassword}<EyeOff class="h-4 w-4" />{:else}<Eye
                     class="h-4 w-4"
@@ -140,13 +142,13 @@ $effect(() => {
               </p>
             {:else}
               <p class="text-muted-foreground text-xs">
-                Must be at least 8 characters
+                {m.auth_password_min_length()}
               </p>
             {/if}
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <Label for="confirmPassword">Confirm password</Label>
+            <Label for="confirmPassword">{m.auth_reset_confirm_label()}</Label>
             <div class="relative">
               <Input
                 id="confirmPassword"
@@ -165,7 +167,9 @@ $effect(() => {
                 type="button"
                 onclick={() => (showConfirm = !showConfirm)}
                 class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
-                aria-label={showConfirm ? "Hide password" : "Show password"}
+                aria-label={showConfirm
+                  ? m.auth_login_hide_password()
+                  : m.auth_login_show_password()}
               >
                 {#if showConfirm}<EyeOff class="h-4 w-4" />{:else}<Eye
                     class="h-4 w-4"
@@ -187,7 +191,7 @@ $effect(() => {
           {/if}
 
           <Button type="submit" class="w-full" disabled={loading}>
-            {loading ? "Resetting…" : "Reset password"}
+            {loading ? m.auth_reset_submit_loading() : m.auth_reset_submit()}
           </Button>
         </form>
 
@@ -197,7 +201,7 @@ $effect(() => {
             href="/login"
             class="text-muted-foreground h-auto p-0 text-sm"
           >
-            Back to login
+            {m.auth_reset_back_to_login()}
           </Button>
         </div>
       </CardContent>

@@ -3,6 +3,7 @@ import { LogOut } from '@lucide/svelte';
 import { enhance } from '$app/forms';
 import logo from '$lib/assets/logo.svg';
 import { Button } from '$lib/components/ui/button';
+import { m } from '$lib/paraglide/messages.js';
 
 type Props = {
   user: { name: string; email: string; role?: string | null };
@@ -11,7 +12,7 @@ type Props = {
 
 let { user, children }: Props = $props();
 
-const roleLabel = $derived(user.role === 'admin' ? 'Admin' : 'Employee');
+const roleLabel = $derived(user.role === 'admin' ? m.role_admin() : m.role_employee());
 
 const initials = $derived(
   user.name
@@ -26,11 +27,17 @@ const initials = $derived(
 <aside class="bg-background flex w-64 shrink-0 flex-col border-r">
   <!-- App header -->
   <div class="flex items-center gap-3 border-b px-4 py-3">
-    <div class="bg-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-xl">
-      <img src={logo} alt="Outa" class="h-5 w-5 object-contain brightness-0 invert" />
+    <div
+      class="bg-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+    >
+      <img
+        src={logo}
+        alt={m.sidebar_logo_alt()}
+        class="h-5 w-5 object-contain brightness-0 invert"
+      />
     </div>
     <div class="min-w-0">
-      <p class="truncate text-sm font-semibold">License Portal</p>
+      <p class="truncate text-sm font-semibold">{m.app_license_portal()}</p>
       <p class="text-muted-foreground truncate text-xs">{roleLabel}</p>
     </div>
   </div>
@@ -43,7 +50,9 @@ const initials = $derived(
   <!-- User footer -->
   <div class="space-y-2 border-t px-4 py-4">
     <div class="flex items-center gap-3">
-      <div class="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold">
+      <div
+        class="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+      >
         {initials}
       </div>
       <div class="min-w-0">
@@ -53,9 +62,13 @@ const initials = $derived(
     </div>
 
     <form method="post" action="?/signOut" use:enhance>
-      <Button variant="ghost" class="w-full justify-start gap-2 px-2" type="submit">
+      <Button
+        variant="ghost"
+        class="w-full justify-start gap-2 px-2"
+        type="submit"
+      >
         <LogOut class="h-4 w-4" />
-        Logout
+        {m.sidebar_logout()}
       </Button>
     </form>
   </div>

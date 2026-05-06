@@ -9,6 +9,7 @@ import { Input } from '$lib/components/ui/input';
 import { Label } from '$lib/components/ui/label';
 import { Separator } from '$lib/components/ui/separator';
 import { DEMO_PASSWORD, DEMO_USERS } from '$lib/demo-users';
+import { m } from '$lib/paraglide/messages.js';
 import type { ActionData, PageData } from './$types';
 
 let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -21,7 +22,7 @@ let fieldErrors = $state<{ email?: string; password?: string }>({});
 type FieldErrors = { email?: string; password?: string };
 
 const demoUsers = DEMO_USERS.map((u) => ({
-  role: u.role === 'admin' ? 'Admin' : 'Employee',
+  role: u.role === 'admin' ? m.role_admin() : m.role_employee(),
   email: u.email,
 }));
 
@@ -30,12 +31,12 @@ const serverFieldErrors = $derived((form?.fieldErrors ?? {}) as FieldErrors);
 function validate() {
   const errors: typeof fieldErrors = {};
   if (!email.trim()) {
-    errors.email = 'Email is required';
+    errors.email = m.auth_login_error_email_required();
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-    errors.email = 'Enter a valid email address';
+    errors.email = m.auth_login_error_email_invalid();
   }
   if (!password) {
-    errors.password = 'Password is required';
+    errors.password = m.auth_login_error_password_required();
   }
   return errors;
 }
@@ -51,12 +52,12 @@ function validate() {
       >
         <img
           src={logo}
-          alt="Outa Logo"
+          alt={m.auth_login_logo_alt()}
           class="h-8 w-8 object-contain brightness-0 invert"
         />
       </div>
-      <CardTitle class="text-xl">Welcome back</CardTitle>
-      <CardDescription>Sign in to access the License Portal</CardDescription>
+      <CardTitle class="text-xl">{m.auth_login_title()}</CardTitle>
+      <CardDescription>{m.auth_login_description()}</CardDescription>
     </CardHeader>
 
     <CardContent>
@@ -80,12 +81,12 @@ function validate() {
         class="flex flex-col gap-4"
       >
         <div class="flex flex-col gap-1.5">
-          <Label for="email">Email address</Label>
+          <Label for="email">{m.auth_login_email_label()}</Label>
           <Input
             id="email"
             name="email"
             type="email"
-            placeholder="you@company.com"
+            placeholder={m.auth_login_email_placeholder()}
             autocomplete="email"
             bind:value={email}
             aria-invalid={!!(fieldErrors.email || serverFieldErrors.email)}
@@ -98,7 +99,7 @@ function validate() {
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <Label for="password">Password</Label>
+          <Label for="password">{m.auth_login_password_label()}</Label>
           <div class="relative">
             <Input
               id="password"
@@ -116,7 +117,9 @@ function validate() {
               type="button"
               onclick={() => (showPassword = !showPassword)}
               class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-label={showPassword
+                ? m.auth_login_hide_password()
+                : m.auth_login_show_password()}
             >
               {#if showPassword}<EyeOff class="h-4 w-4" />{:else}<Eye
                   class="h-4 w-4"
@@ -137,7 +140,7 @@ function validate() {
         {/if}
 
         <Button type="submit" class="w-full" disabled={loading}>
-          {loading ? "Signing in…" : "Sign in"}
+          {loading ? m.auth_login_submit_loading() : m.auth_login_submit()}
         </Button>
       </form>
 
@@ -147,7 +150,7 @@ function validate() {
           class="primary h-auto p-0 text-sm"
           href="/forgot-password"
         >
-          Forgot your password?
+          {m.auth_login_forgot_password()}
         </Button>
       </div>
     </CardContent>
@@ -156,7 +159,7 @@ function validate() {
       <CardFooter class="flex-col gap-3">
         <Separator />
         <p class="text-muted-foreground text-xs font-medium tracking-wide">
-          Demo Credentials
+          {m.auth_login_demo_title()}
         </p>
         <div class="w-full space-y-2">
           {#each demoUsers as { role, email: demoEmail }}
@@ -167,7 +170,8 @@ function validate() {
           {/each}
         </div>
         <p class="text-muted-foreground text-xs font-medium tracking-wide">
-          Password: <span class="font-mono">{DEMO_PASSWORD}</span>
+          {m.auth_login_demo_password_label()}
+          <span class="font-mono">{DEMO_PASSWORD}</span>
         </p>
       </CardFooter>
     {/if}

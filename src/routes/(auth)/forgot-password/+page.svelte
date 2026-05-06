@@ -6,6 +6,7 @@ import { Button } from '$lib/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
 import { Input } from '$lib/components/ui/input';
 import { Label } from '$lib/components/ui/label';
+import { m } from '$lib/paraglide/messages.js';
 import type { ActionData } from './$types';
 
 let { form }: { form: ActionData } = $props();
@@ -15,8 +16,8 @@ let email = $state('');
 let fieldError = $state('');
 
 function validate() {
-  if (!email.trim()) return 'Email address is required';
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return 'Enter a valid email address';
+  if (!email.trim()) return m.auth_forgot_error_email_required();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return m.auth_forgot_error_email_invalid();
   return '';
 }
 </script>
@@ -32,20 +33,19 @@ function validate() {
         >
           <CircleCheckBig class="h-7 w-7 text-green-600" />
         </div>
-        <CardTitle class="text-xl">Check your email</CardTitle>
+        <CardTitle class="text-xl">{m.auth_forgot_success_title()}</CardTitle>
         <CardDescription>
-          We've sent password reset instructions to<br />
+          {m.auth_forgot_success_description()}<br />
           <span class="text-foreground font-semibold">{form.email}</span>
         </CardDescription>
       </CardHeader>
       <CardContent class="flex flex-col gap-4">
         <p class="text-muted-foreground items-center px-4 py-3 text-sm">
-          If you don't receive an email within a few minutes, please check your
-          spam folder or try again.
+          {m.auth_forgot_success_notice()}
         </p>
         <Button href="/login" class="w-full">
           <MoveLeft class="mr-2 h-4 w-4" />
-          Back to login
+          {m.auth_forgot_back_to_login()}
         </Button>
         <Button
           variant="link"
@@ -54,7 +54,7 @@ function validate() {
             window.location.reload();
           }}
         >
-          Use a different email address
+          {m.auth_forgot_use_different_email()}
         </Button>
       </CardContent>
     </Card>
@@ -66,14 +66,12 @@ function validate() {
         >
           <img
             src={logo}
-            alt="Outa Logo"
+            alt={m.auth_forgot_logo_alt()}
             class="h-8 w-8 object-contain brightness-0 invert"
           />
         </div>
-        <CardTitle class="text-xl">Forgot password?</CardTitle>
-        <CardDescription
-          >No worries, we'll send you reset instructions</CardDescription
-        >
+        <CardTitle class="text-xl">{m.auth_forgot_title()}</CardTitle>
+        <CardDescription>{m.auth_forgot_description()}</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -97,7 +95,7 @@ function validate() {
           class="flex flex-col gap-4"
         >
           <div class="flex flex-col gap-1.5">
-            <Label for="email">Email address</Label>
+            <Label for="email">{m.auth_forgot_email_label()}</Label>
             <div class="relative">
               <Mail
                 class="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
@@ -106,7 +104,7 @@ function validate() {
                 id="email"
                 name="email"
                 type="email"
-                placeholder="you@company.com"
+                placeholder={m.auth_forgot_email_placeholder()}
                 autocomplete="email"
                 bind:value={email}
                 aria-invalid={!!(fieldError || form?.fieldError)}
@@ -121,7 +119,7 @@ function validate() {
           </div>
 
           <Button type="submit" class="w-full" disabled={loading}>
-            {loading ? "Sending…" : "Send reset instructions"}
+            {loading ? m.auth_forgot_submit_loading() : m.auth_forgot_submit()}
           </Button>
         </form>
 
@@ -132,7 +130,7 @@ function validate() {
             class="text-muted-foreground h-auto p-0 text-sm"
           >
             <MoveLeft class="mr-1.5 h-3.5 w-3.5" />
-            Back to login
+            {m.auth_forgot_back_to_login()}
           </Button>
         </div>
       </CardContent>

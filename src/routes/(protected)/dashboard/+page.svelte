@@ -4,6 +4,7 @@ import Sidebar from '$lib/components/app/sidebar.svelte';
 import { Button } from '$lib/components/ui/button';
 import { Input } from '$lib/components/ui/input';
 import { Label } from '$lib/components/ui/label';
+import { m } from '$lib/paraglide/messages.js';
 import type { ActionData, PageData } from './$types';
 
 let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -28,7 +29,7 @@ let inviteEmail = $state('');
             inviteLoading = true;
             return async ({ update }) => {
               inviteLoading = false;
-              inviteEmail = '';
+              inviteEmail = "";
               await update();
             };
           }}
@@ -38,24 +39,30 @@ let inviteEmail = $state('');
               id="invite-email"
               name="email"
               type="email"
-              placeholder="user@company.com"
+              placeholder={m.dashboard_invite_placeholder_email()}
               bind:value={inviteEmail}
             />
           </div>
           <label>
             <input type="checkbox" name="grantAdmin" class="rounded" />
-            admin rights
+            {m.dashboard_invite_admin_rights()}
           </label>
           <Button type="submit" disabled={inviteLoading} class="w-fit">
-            {inviteLoading ? 'Generating…' : 'Generate invite link'}
+            {inviteLoading
+              ? m.dashboard_invite_button_loading()
+              : m.dashboard_invite_button()}
           </Button>
         </form>
 
         {#if form?.inviteUrl}
           <div class="mt-4 rounded-lg border bg-white p-3 text-sm">
             <p class="text-muted-foreground mb-1 text-xs">
-              Invite link for {form.email}
-              {#if form.role === 'admin'}<span class="text-primary font-medium">(admin)</span>{/if}:
+              {m.dashboard_invite_link_for({ email: form.email })}
+              {#if form.role === "admin"}
+                <span class="text-primary font-medium">
+                  {m.dashboard_invite_role_admin()}
+                </span>
+              {/if}:
             </p>
             <p class="break-all font-mono text-xs">{form.inviteUrl}</p>
           </div>

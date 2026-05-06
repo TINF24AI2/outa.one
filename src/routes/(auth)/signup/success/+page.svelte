@@ -3,6 +3,7 @@ import { CircleCheckBig } from '@lucide/svelte';
 import { onMount } from 'svelte';
 import { goto } from '$app/navigation';
 import { Card, CardContent } from '$lib/components/ui/card';
+import { m } from '$lib/paraglide/messages.js';
 
 let countdown = $state(5);
 
@@ -30,14 +31,15 @@ onMount(() => {
       </div>
 
       <div>
-        <h1 class="text-xl font-semibold">Account created!</h1>
+        <h1 class="text-xl font-semibold">{m.auth_signup_success_title()}</h1>
         <p class="text-muted-foreground mt-2 text-sm">
-          Your account has been successfully created. You can now sign in with
-          your credentials.
+          {m.auth_signup_success_description()}
         </p>
       </div>
 
-      <p class="text-muted-foreground text-sm">Redirecting {countdown}</p>
+      <p class="text-muted-foreground text-sm">
+        {m.auth_signup_success_redirecting({ countdown })}
+      </p>
     </CardContent>
   </Card>
 </div>
