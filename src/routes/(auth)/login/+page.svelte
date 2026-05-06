@@ -161,12 +161,16 @@ function validate() {
         <p class="text-muted-foreground text-xs font-medium tracking-wide">
           {m.auth_login_demo_title()}
         </p>
-        <div class="w-full space-y-2">
+        <div class="w-full space-y-1">
           {#each demoUsers as { role, email: demoEmail }}
-            <div class="flex items-center justify-between text-sm">
-              <span class="text-muted-foreground">{role}:</span>
+            <button
+              type="button"
+              onclick={() => { email = demoEmail; password = DEMO_PASSWORD; }}
+              class="hover:bg-muted flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors"
+            >
+              <span class="text-muted-foreground">{role}</span>
               <span class="font-mono text-xs">{demoEmail}</span>
-            </div>
+            </button>
           {/each}
         </div>
         <p class="text-muted-foreground text-xs font-medium tracking-wide">
