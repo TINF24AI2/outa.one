@@ -80,7 +80,7 @@ function validate() {
         }}
         class="flex flex-col gap-4"
       >
-        <div class="flex flex-col gap-1.5">
+        <div class="flex flex-col gap-2">
           <Label for="email">{m.auth_login_email_label()}</Label>
           <Input
             id="email"
@@ -98,7 +98,7 @@ function validate() {
           {/if}
         </div>
 
-        <div class="flex flex-col gap-1.5">
+        <div class="flex flex-col gap-2">
           <Label for="password">{m.auth_login_password_label()}</Label>
           <div class="relative">
             <Input

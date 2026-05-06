@@ -108,7 +108,7 @@ $effect(() => {
         >
           <input type="hidden" name="token" value={data.token} />
 
-          <div class="flex flex-col gap-1.5">
+          <div class="flex flex-col gap-2">
             <Label for="password">{m.auth_reset_password_label()}</Label>
             <div class="relative">
               <Input
@@ -147,7 +147,7 @@ $effect(() => {
             {/if}
           </div>
 
-          <div class="flex flex-col gap-1.5">
+          <div class="flex flex-col gap-2">
             <Label for="confirmPassword">{m.auth_reset_confirm_label()}</Label>
             <div class="relative">
               <Input

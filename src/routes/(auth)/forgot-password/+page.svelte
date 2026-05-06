@@ -94,7 +94,7 @@ function validate() {
           }}
           class="flex flex-col gap-4"
         >
-          <div class="flex flex-col gap-1.5">
+          <div class="flex flex-col gap-2">
             <Label for="email">{m.auth_forgot_email_label()}</Label>
             <div class="relative">
               <Mail

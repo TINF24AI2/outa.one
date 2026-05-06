@@ -117,7 +117,7 @@ function validate() {
         >
           <input type="hidden" name="token" value={data.token} />
 
-          <div class="flex flex-col gap-1.5">
+          <div class="flex flex-col gap-2">
             <Label for="name">{m.auth_signup_name_label()}</Label>
             <Input
               id="name"
@@ -133,7 +133,7 @@ function validate() {
             {/if}
           </div>
 
-          <div class="flex flex-col gap-1.5">
+          <div class="flex flex-col gap-2">
             <Label for="password">{m.auth_signup_password_label()}</Label>
             <div class="relative">
               <Input
@@ -168,7 +168,7 @@ function validate() {
             {/if}
           </div>
 
-          <div class="flex flex-col gap-1.5">
+          <div class="flex flex-col gap-2">
             <Label for="confirmPassword">{m.auth_signup_confirm_label()}</Label>
             <div class="relative">
               <Input
