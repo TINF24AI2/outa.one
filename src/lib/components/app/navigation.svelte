@@ -30,14 +30,8 @@ let accountOpen = $state(false);
 <aside class="bg-background hidden md:flex w-64 shrink-0 flex-col border-r">
   <!-- App header -->
   <div class="flex items-center gap-3 border-b px-4 py-3">
-    <div
-      class="bg-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
-    >
-      <img
-        src={logo}
-        alt={m.navigation_logo_alt()}
-        class="h-5 w-5 object-contain brightness-0 invert"
-      />
+    <div class="bg-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-xl">
+      <img src={logo} alt={m.navigation_logo_alt()} class="h-5 w-5 object-contain brightness-0 invert" />
     </div>
     <div class="min-w-0">
       <p class="truncate text-sm font-semibold">{m.app_license_portal()}</p>
@@ -46,7 +40,7 @@ let accountOpen = $state(false);
   </div>
 
   <!-- Nav slot -->
-  <nav class="flex-1">
+  <nav class="flex flex-col h-full gap-1 py-4 px-2">
     {@render children?.()}
   </nav>
 
@@ -65,11 +59,7 @@ let accountOpen = $state(false);
     </div>
 
     <form method="post" action="?/signOut" use:enhance>
-      <Button
-        variant="ghost"
-        class="w-full justify-start gap-2 px-2"
-        type="submit"
-      >
+      <Button variant="ghost" class="w-full justify-start gap-2 px-2" type="submit">
         <LogOut class="h-4 w-4" />
         {m.navigation_logout()}
       </Button>
@@ -87,27 +77,17 @@ let accountOpen = $state(false);
   <div class="relative">
     {#if accountOpen}
       <!-- Click-outside backdrop -->
-      <button
-        class="fixed inset-0 z-40"
-        onclick={() => (accountOpen = false)}
-        aria-label="Close account menu"
-      ></button>
+      <button class="fixed inset-0 z-40" onclick={() => (accountOpen = false)} aria-label="Close account menu"></button>
 
       <!-- Popup -->
-      <div
-        class="absolute bottom-full mb-3 right-0 z-50 min-w-52 rounded-xl border bg-popover shadow-lg"
-      >
+      <div class="absolute bottom-full mb-3 right-0 z-50 min-w-52 rounded-xl border bg-popover shadow-lg">
         <div class="px-4 py-3">
           <p class="text-sm font-semibold leading-tight">{user.name}</p>
           <p class="text-muted-foreground text-xs">{user.email}</p>
         </div>
         <div class="border-t px-2 py-2">
           <form method="post" action="?/signOut" use:enhance>
-            <Button
-              variant="ghost"
-              class="w-full justify-start gap-2 px-2 h-9"
-              type="submit"
-            >
+            <Button variant="ghost" class="w-full justify-start gap-2 px-2 h-9" type="submit">
               <LogOut class="h-4 w-4" />
               {m.navigation_logout()}
             </Button>
