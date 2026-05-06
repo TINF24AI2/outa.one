@@ -1,6 +1,6 @@
 <script lang="ts">
 import { enhance } from '$app/forms';
-import Sidebar from '$lib/components/app/sidebar.svelte';
+import Navigation from '$lib/components/app/navigation.svelte';
 import { Button } from '$lib/components/ui/button';
 import { Input } from '$lib/components/ui/input';
 import type { ActionData, PageData } from './$types';
@@ -14,10 +14,10 @@ let inviteEmail = $state('');
 </script>
 
 <div class="flex h-screen overflow-hidden">
-  <Sidebar user={data.user} />
+  <Navigation user={data.user} />
 
   <!-- THIS IS FOR TESTING INVITES - THIS IS A TEMPORARY SOLUTION -->
-  <main>
+  <main class="pb-16 md:pb-0">
     {#if isAdmin}
       <div>
         <form
