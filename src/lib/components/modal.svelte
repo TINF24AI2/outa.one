@@ -16,9 +16,9 @@ $effect(() => {
 </script>
 
 <Dialog bind:open>
-    <DialogContent
-        class={`max-w-md bg-white text-black rounded-xl p-6 shadow-xl ${className}`}
-    >
-        {@render children?.()}
-    </DialogContent>
+  <DialogContent
+    class={`max-w-md bg-white text-black rounded-xl p-6 shadow-xl ${className}`}
+  >
+    {@render children?.()}
+  </DialogContent>
 </Dialog>

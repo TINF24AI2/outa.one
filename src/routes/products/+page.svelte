@@ -26,13 +26,17 @@ let open = $state(false);
     Add new Product
 </Button>
 
-<Modal bind:open class="bg-slate-900 text-white h-auto">
+<Modal bind:open class="bg-white text-black h-auto">
     <div class="w-full max-w-md">
         <Field.Set>
             <Field.Legend>Create Product</Field.Legend>
+            <Field.Separator class="w-full" />
             <Field.Group>
                 <Field.Field>
-                    <Field.Label for="productname">Product Name</Field.Label>
+                    <Field.Label for="productname"
+                        >Product Name <span class="text-destructive">*</span
+                        ></Field.Label
+                    >
                     <Input id="productname" type="text" />
                 </Field.Field>
                 <Field.Field>
@@ -41,24 +45,29 @@ let open = $state(false);
                 </Field.Field>
                 <Field.Field>
                     <Field.Label for="maxlicenses"
-                        >Max Licenses per User</Field.Label
+                        >Max Licenses per User<span class="text-destructive"
+                            >*</span
+                        ></Field.Label
                     >
                     <Input id="maxlicenses" type="number" />
                     <Field.Description
                         >How many keys one user can aquire.</Field.Description
                     >
                 </Field.Field>
-                <Field.Field>
-                    <Label for="reqapproval">Reqires Approval</Label>
-                    <Description
-                        >Lisence requests need admin approval before assignment.</Description
-                    >
+                <Field.Field class="flex-row align-middle">
+                    <div class="flex-col">
+                        <Label for="reqapproval">Reqires Approval</Label>
+                        <Description
+                            >Lisence requests need admin approval before
+                            assignment.</Description
+                        >
+                    </div>
                     <Switch id="reqapproval"></Switch>
                 </Field.Field>
-                <Field.Field class="">
-                    <Button>Cancel</Button>
-                    <Button>Add Product</Button>
-                </Field.Field>
+                <div class="flex justify-between gap-3">
+                    <Button variant="secondary" class="flex-1">Cancel</Button>
+                    <Button class="flex-1">Add Product</Button>
+                </div>
             </Field.Group>
         </Field.Set>
     </div>

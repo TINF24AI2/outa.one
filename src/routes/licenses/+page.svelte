@@ -1,15 +1,24 @@
 <script lang="ts">
 import upload from '$lib/assets/upload.svg';
+import { cn } from '$lib/utils.js';
 import { Button } from '$lib/components/ui/button/index.js';
 import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 import * as Field from '$lib/components/ui/field/index.js';
 import Input from '$lib/components/ui/input/input.svelte';
-import plus from '$lib/assets/plus.svg';
 import Modal from '$lib/components/modal.svelte';
+import Combobox from '$lib/components/product-combobox.svelte';
 import Label from '$lib/components/ui/label/label.svelte';
 import Switch from '$lib/components/ui/switch/switch.svelte';
 import { Description } from '$lib/components/ui/dialog';
+const products = [
+  { value: 'sveltekit', label: 'SvelteKit' },
+  { value: 'next.js', label: 'Next.js' },
+  { value: 'nuxt.js', label: 'Nuxt.js' },
+  { value: 'remix', label: 'Remix' },
+  { value: 'astro', label: 'Astro' },
+];
 let open = $state(false);
+let productValue = $state('');
 </script>
 
 <svelte:head>
@@ -27,30 +36,60 @@ let open = $state(false);
     Upload Keys
 </Button>
 
-<Modal bind:open class="bg-slate-900 text-white h-auto">
+<Modal bind:open class="bg-white text-black h-auto">
     <div class="w-full max-w-md">
-        <Field.Set>
-            <Field.Legend>Add License</Field.Legend>
-            <Field.Group>
-                <Field.Field>
-                    <Field.Label for="productname">Product Name *</Field.Label>
-                    <Input id="productname" type="text" />
+        <Field.Set class="gap-6">
+            <Field.Group class="gap-1">
+                <Field.Legend class="mb-0">Add License</Field.Legend>
+                <Field.Description class="text-xs text-muted-foreground"
+                    >Add a new lisence for a product</Field.Description
+                >
+            </Field.Group>
+            <Field.Separator class="w-full" />
+            <Field.Group class="gap-5">
+                <Field.Field class="gap-2">
+                    <Field.Label for="productname"
+                        >Product Name <span class="text-red-600">*</span
+                        ></Field.Label
+                    >
+                    <Combobox
+                        id="productname"
+                        bind:value={productValue}
+                        options={products}
+                        placeholder="Select a product..."
+                        contentClass="w-full"
+                    />
                 </Field.Field>
-                <Field.Field>
-                    <Field.Label for="usagevolume">Usage Volume *</Field.Label>
-                    <Input id="usagevolumen" type="number" />
-                    <Field.Description
+                <Field.Field class="gap-2">
+                    <Field.Label for="usagevolume"
+                        >Usage Volume <span class="text-destructive">*</span
+                        ></Field.Label
+                    >
+                    <Input
+                        id="usagevolumen"
+                        type="number"
+                        min="0"
+                        placeholder="1"
+                    />
+                    <Field.Description class="text-xs text-muted-foreground"
                         >How often this key can be used. Set to 0 for unlimited.</Field.Description
                     >
                 </Field.Field>
-                <Field.Field>
-                    <Field.Label for="key">Key *</Field.Label>
-                    <Input id="key" type="text" />
+                <Field.Field class="gap-2">
+                    <Field.Label for="key"
+                        >Key <span class="text-destructive">*</span
+                        ></Field.Label
+                    >
+                    <Input
+                        id="key"
+                        type="text"
+                        placeholder="XXXX-XXXX-XXXX-XXXX"
+                    />
                 </Field.Field>
-                <Field.Field class="">
-                    <Button>Cancel</Button>
-                    <Button>Add Lisencse</Button>
-                </Field.Field>
+                <div class="flex justify-between gap-3">
+                    <Button variant="secondary" class="flex-1">Cancel</Button>
+                    <Button class="flex-1">Add License</Button>
+                </div>
             </Field.Group>
         </Field.Set>
     </div>
