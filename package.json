@@ -26,7 +26,8 @@
     "format": "pnpm biome format --write .",
     "lint": "pnpm biome lint",
     "ci:check": "pnpm biome ci .",
-    "auth:schema": "better-auth generate --config src/lib/server/auth.ts --output src/lib/server/db/auth.schema.ts --yes"
+    "auth:schema": "better-auth generate --config src/lib/server/auth.ts --output src/lib/server/db/auth.schema.ts --yes",
+    "db:seedDemoUsers": "tsx src/lib/scripts/seed-demo-users.server.ts"
   },
   "devDependencies": {
     "@better-auth/cli": "~1.4.21",
