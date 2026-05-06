@@ -1,6 +1,20 @@
 import { relations } from 'drizzle-orm';
 import { boolean, index, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
+export const invite = pgTable(
+  'invite',
+  {
+    id: text('id').primaryKey(),
+    email: text('email').notNull(),
+    token: text('token').notNull().unique(),
+    role: text('role').default('user').notNull(),
+    expiresAt: timestamp('expires_at').notNull(),
+    usedAt: timestamp('used_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [index('invite_token_idx').on(table.token)],
+);
+
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),

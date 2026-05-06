@@ -1,13 +1,11 @@
 <script lang="ts">
 import logo from '$lib/assets/logo.svg';
+import { m } from '$lib/paraglide/messages.js';
 </script>
 
 <svelte:head>
-  <title>Outa - Welcome</title>
-  <meta
-    name="description"
-    content="Self service software license keys portal."
-  />
+  <title>{m.home_meta_title()}</title>
+  <meta name="description" content={m.home_meta_description()} />
 </svelte:head>
 
 <div class="min-h-screen bg-slate-50/30 px-4 py-8 sm:px-6 lg:px-8">
@@ -21,13 +19,19 @@ import logo from '$lib/assets/logo.svg';
         <div
           class="flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-600 ring-1 ring-white/20"
         >
-          <img src={logo} alt="Logo" class="h-9 w-9 object-contain" />
+          <img
+            src={logo}
+            alt={m.home_logo_alt()}
+            class="h-9 w-9 object-contain"
+          />
         </div>
 
         <div class="min-w-0">
-          <h1 class="text-2xl font-semibold tracking-tight">Welcome back</h1>
+          <h1 class="text-2xl font-semibold tracking-tight">
+            {m.home_title()}
+          </h1>
           <p class="mt-2 text-sm text-gray-500">
-            A self-service software license keys portal is being created here
+            {m.home_subtitle()}
           </p>
         </div>
       </div>
