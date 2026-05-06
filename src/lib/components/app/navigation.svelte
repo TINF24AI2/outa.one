@@ -1,5 +1,5 @@
 <script lang="ts">
-import { LogOut, CircleUserRound } from '@lucide/svelte';
+import { CircleUserRound, LogOut } from '@lucide/svelte';
 import { enhance } from '$app/forms';
 import logo from '$lib/assets/logo.svg';
 import { Button } from '$lib/components/ui/button';
@@ -30,7 +30,9 @@ let accountOpen = $state(false);
 <aside class="bg-background hidden md:flex w-64 shrink-0 flex-col border-r">
   <!-- App header -->
   <div class="flex items-center gap-3 border-b px-4 py-3">
-    <div class="bg-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-xl">
+    <div
+      class="bg-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+    >
       <img
         src={logo}
         alt={m.sidebar_logo_alt()}
@@ -63,7 +65,11 @@ let accountOpen = $state(false);
     </div>
 
     <form method="post" action="?/signOut" use:enhance>
-      <Button variant="ghost" class="w-full justify-start gap-2 px-2" type="submit">
+      <Button
+        variant="ghost"
+        class="w-full justify-start gap-2 px-2"
+        type="submit"
+      >
         <LogOut class="h-4 w-4" />
         {m.sidebar_logout()}
       </Button>
@@ -72,7 +78,9 @@ let accountOpen = $state(false);
 </aside>
 
 <!-- Mobile bottom nav -->
-<nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background border-t flex items-center justify-around px-2 py-1">
+<nav
+  class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background border-t flex items-center justify-around px-2 py-1"
+>
   {@render children?.()}
 
   <!-- Account button -->
@@ -86,14 +94,20 @@ let accountOpen = $state(false);
       ></button>
 
       <!-- Popup -->
-      <div class="absolute bottom-full mb-3 right-0 z-50 min-w-52 rounded-xl border bg-popover shadow-lg">
+      <div
+        class="absolute bottom-full mb-3 right-0 z-50 min-w-52 rounded-xl border bg-popover shadow-lg"
+      >
         <div class="px-4 py-3">
           <p class="text-sm font-semibold leading-tight">{user.name}</p>
           <p class="text-muted-foreground text-xs">{user.email}</p>
         </div>
         <div class="border-t px-2 py-2">
           <form method="post" action="?/signOut" use:enhance>
-            <Button variant="ghost" class="w-full justify-start gap-2 px-2 h-9" type="submit">
+            <Button
+              variant="ghost"
+              class="w-full justify-start gap-2 px-2 h-9"
+              type="submit"
+            >
               <LogOut class="h-4 w-4" />
               {m.sidebar_logout()}
             </Button>
