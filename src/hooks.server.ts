@@ -1,3 +1,4 @@
+import { spawn } from 'node:child_process';
 import type { Handle, ServerInit } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
@@ -15,6 +16,22 @@ export const init: ServerInit = async () => {
   const migrationClient = postgres(env.DATABASE_URL, { max: 1 });
   await migrate(drizzle(migrationClient), { migrationsFolder: './drizzle' });
   await migrationClient.end();
+
+  await new Promise<void>((resolve, reject) => {
+    const child = spawn('pnpm', ['run', 'db:seedDemoUsers'], {
+      stdio: 'inherit',
+      shell: true,
+    });
+
+    child.on('error', reject);
+    child.on('exit', (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`db:seedDemoUsers exited with code ${code}`));
+      }
+    });
+  });
 };
 
 const handleParaglide: Handle = ({ event, resolve }) =>
