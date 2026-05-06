@@ -45,7 +45,7 @@ Protected routes read `event.locals.user` to check authentication and role.
 
 | Group | Path | Access |
 |---|---|---|
-| `(auth)` | `/login`, `/signup` | Public — redirects to `/dashboard` if already logged in |
+| `(auth)` | `/login`, `/signup`, `/forgot-password`, `/reset-password` | Public — redirects to `/dashboard` if already logged in |
 | `(protected)` | `/dashboard`, … | Requires session — see `(protected)/+layout.server.ts` |
 
 The protected layout redirects to `/login` when `event.locals.user` is absent:
@@ -109,6 +109,75 @@ Reads `token` from the query string and validates it against the `invite` table 
 4. If the invite carries `role: 'admin'`, immediately updates the new user row: `db.update(user).set({ role: 'admin' })`.
 5. Calls `consumeInvite(token)` — sets `usedAt` so the token cannot be reused.
 6. Redirects to `/signup/success`.
+
+---
+
+## Password Reset
+
+**Routes:** `GET/POST /forgot-password`, `GET/POST /reset-password`  
+**Files:** `src/routes/(auth)/forgot-password/`, `src/routes/(auth)/reset-password/`  
+**Email template:** `src/lib/server/email-templates.ts`  
+**Mailer:** `src/lib/server/mail.ts`
+
+### Flow
+
+```
+/login → "Forgot password?" → /forgot-password
+  → POST (email) → auth.api.requestPasswordReset → email sent
+  → "Check your email" success state
+
+email link → /reset-password?token=<token>
+  → POST (token + new password) → auth.api.resetPassword
+  → "Password reset!" success state → redirect /login (3 s)
+```
+
+### Forgot password (`/forgot-password`)
+
+**Load** — Redirects to `/dashboard` if already logged in.
+
+**Form action**
+
+1. Validates email format; returns `fail(400, { fieldError })` on invalid input.
+2. Calls `auth.api.requestPasswordReset({ body: { email, redirectTo: origin + '/reset-password' } })`.
+3. Always returns `{ success: true, email }` — even for unknown addresses — to prevent email enumeration.
+
+The page renders two states via `{#if form?.success}`:
+- **Initial** — email input + "Send reset instructions" button + back to login link.
+- **Success** — "Check your email" card showing the submitted address, a fallback note about spam, and a "Use a different email address" link that reloads the page.
+
+### Reset password (`/reset-password?token=<token>`)
+
+**Load** — Reads `token` from the query string; redirects to `/forgot-password` if absent.
+
+**Form action**
+
+1. Validates password ≥ 8 characters and both fields match.
+2. Calls `auth.api.resetPassword({ body: { token, newPassword } })`.
+3. On `APIError` → `fail(400, { message: 'This reset link is invalid or has expired.' })`.
+4. On success → `{ success: true }`.
+
+The page renders two states:
+- **Form** — new password + confirm password fields (show/hide toggle), inline validation errors, "Reset password" button, and back to login link.
+- **Success** — "Password reset!" card with a 3-second `$effect` timer that calls `goto('/login')`.
+
+### Email
+  
+Template (`resetPasswordEmail(url)` in `email-templates.ts`) renders a branded HTML email with:
+- outa.one logo + wordmark header
+- "Reset password" CTA button
+- Fallback plain-text URL in a highlighted box
+- 1-hour expiry notice
+- Footer disclaimer
+
+**Environment variables required:**
+
+| Variable | Local default | Notes |
+|---|---|---|
+| `SMTP_HOST` | `localhost` | Mailpit / production SMTP host |
+| `SMTP_PORT` | `1025` | Mailpit / production SMTP port |
+| `SMTP_USER` | `test` | SMTP credentials |
+| `SMTP_PASSWORD` | `test` | SMTP credentials |
+| `MAIL_FROM` | `outa.one <hey@outa.one>` | `From` header on all outgoing mail |
 
 ---
 
