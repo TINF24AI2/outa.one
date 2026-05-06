@@ -1,10 +1,21 @@
-import type { Handle } from '@sveltejs/kit';
+import type { Handle, ServerInit } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import { migrate } from 'drizzle-orm/postgres-js/migrator';
+import postgres from 'postgres';
 import { building } from '$app/environment';
+import { env } from '$env/dynamic/private';
 import { getTextDirection } from '$lib/paraglide/runtime';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 import { auth } from '$lib/server/auth';
+
+export const init: ServerInit = async () => {
+  console.log('Migrating Database...');
+  const migrationClient = postgres(env.DATABASE_URL, { max: 1 });
+  await migrate(drizzle(migrationClient), { migrationsFolder: './drizzle' });
+  await migrationClient.end();
+};
 
 const handleParaglide: Handle = ({ event, resolve }) =>
   paraglideMiddleware(event.request, ({ request, locale }) => {
