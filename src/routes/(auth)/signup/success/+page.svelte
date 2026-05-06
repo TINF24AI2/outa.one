@@ -5,7 +5,7 @@ import { goto } from '$app/navigation';
 import { Card, CardContent } from '$lib/components/ui/card';
 import { m } from '$lib/paraglide/messages.js';
 
-let countdown = $state(5);
+let countdown = $state(4);
 
 onMount(() => {
   const interval = setInterval(() => {
