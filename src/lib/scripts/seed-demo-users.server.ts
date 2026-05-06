@@ -3,32 +3,14 @@
  * Run with: pnpm db:seed
  * Requires DATABASE_URL to be set (loaded from .env automatically).
  */
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { DEMO_PASSWORD, DEMO_USERS } from '$lib/demo-users';
 import { account, user } from '$lib/server/db/auth.schema';
+import { loadEnv } from './utils';
 
-// Load .env from project root
-try {
-  const envContent = readFileSync(resolve(process.cwd(), '.env'), 'utf-8');
-  for (const line of envContent.split('\n')) {
-    const trimmed = line.trim();
-    if (trimmed && !trimmed.startsWith('#')) {
-      const eq_idx = trimmed.indexOf('=');
-      if (eq_idx > 0) {
-        const key = trimmed.slice(0, eq_idx).trim();
-        const val = trimmed
-          .slice(eq_idx + 1)
-          .trim()
-          .replace(/^["']|["']$/g, '');
-        if (!process.env[key]) process.env[key] = val;
-      }
-    }
-  }
-} catch {}
+loadEnv();
 
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) throw new Error('DATABASE_URL is not set');
