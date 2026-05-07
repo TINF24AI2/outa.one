@@ -12,8 +12,8 @@ export const load: PageServerLoad = async (event) => {
   if (event.locals.user) {
     redirect(302, '/dashboard');
   }
-  const existing = await db.select({ id: user.id }).from(user).where(inArray(user.email, DEMO_EMAILS));
-  return { hasDemoUsers: existing.length === DEMO_EMAILS.length };
+  // const existing = await db.select({ id: user.id }).from(user).where(inArray(user.email, DEMO_EMAILS));
+  return { hasDemoUsers: false };
 };
 
 export const actions: Actions = {

@@ -1,6 +1,12 @@
 packages:
   - '.'
 
+allowBuilds:
+  '@prisma/client': true
+  better-sqlite3: true
+  esbuild: true
+  lefthook: true
+
 onlyBuiltDependencies:
   - esbuild
   - lefthook

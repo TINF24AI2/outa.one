@@ -11,6 +11,9 @@ import { Separator } from '$lib/components/ui/separator';
 import { DEMO_PASSWORD, DEMO_USERS } from '$lib/demo-users';
 import { m } from '$lib/paraglide/messages.js';
 import type { ActionData, PageData } from './$types';
+import InviteUser from '$lib/components/app/invite-user.svelte';
+import EditUser from '$lib/components/app/edit-user.svelte';
+import DeleteUser from '$lib/components/app/delete-user.svelte';
 
 let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -41,6 +44,10 @@ function validate() {
   return errors;
 }
 </script>
+
+<InviteUser></InviteUser>
+<EditUser></EditUser>
+<DeleteUser></DeleteUser>
 
 <div
   class="bg-muted/40 flex min-h-screen items-center justify-center px-4 py-12"
@@ -165,7 +172,10 @@ function validate() {
           {#each demoUsers as { role, email: demoEmail }}
             <button
               type="button"
-              onclick={() => { email = demoEmail; password = DEMO_PASSWORD; }}
+              onclick={() => {
+                email = demoEmail;
+                password = DEMO_PASSWORD;
+              }}
               class="hover:bg-muted flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors"
             >
               <span class="text-muted-foreground">{role}</span>
