@@ -24,7 +24,9 @@ export const license = defineTableWithUpdate(
   {
     key: text('key').notNull(),
     usageVolume: integer('usageVolume').notNull(),
-    productId: uuid().references(() => product.id, { onDelete: 'cascade' }),
+    productId: uuid()
+      .notNull()
+      .references(() => product.id, { onDelete: 'cascade' }),
   },
   (table) => [unique().on(table.productId, table.key), index('license_productId_idx').on(table.productId)],
 );
