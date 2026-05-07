@@ -88,5 +88,17 @@
   "dashboard_invite_link_label": "Invite link for {email}",
   "dashboard_invite_error_forbidden": "Forbidden",
   "dashboard_invite_error_email_invalid": "Valid email is required",
-  "dashboard_invite_error_failed": "Failed to generate invite"
+  "dashboard_invite_error_failed": "Failed to generate invite",
+  "users_title": "Users",
+  "users_subtitle": "Manage users and their permissions",
+  "users_invite_button": "Invite User",
+  "users_table_name": "Name",
+  "users_table_email": "Email",
+  "users_table_role": "Role",
+  "users_table_licenses_held": "Licenses Held",
+  "users_table_last_active": "Last Active",
+  "users_table_actions": "Actions",
+  "users_action_viewLicenses": "View licenses",
+  "users_action_edit": "Edit user",
+  "users_action_remove": "Remove user"
 }
