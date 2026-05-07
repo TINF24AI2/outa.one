@@ -32,7 +32,7 @@ let {
 }: Props = $props();
 
 let open = $state(false);
-let triggerRef = $state<HTMLButtonElement>(null!);
+let triggerRef = $state<HTMLButtonElement | undefined>(undefined);
 
 const selectedValue = $derived(options.find((o) => o.value === value)?.label);
 
@@ -42,52 +42,49 @@ const selectedValue = $derived(options.find((o) => o.value === value)?.label);
 function closeAndFocusTrigger() {
   open = false;
   tick().then(() => {
-    triggerRef.focus();
+    triggerRef?.focus();
   });
 }
 </script>
 
 <Popover.Root bind:open>
-    <Popover.Trigger bind:ref={triggerRef}>
-        {#snippet child({ props })}
-            <Button
-                {...props}
-                {id}
-                variant="outline"
-                class={cn("w-full justify-between text-left", className)}
-                role="combobox"
-                aria-expanded={open}
+  <Popover.Trigger bind:ref={triggerRef}>
+    {#snippet child({ props })}
+      <Button
+        {...props}
+        {id}
+        variant="outline"
+        class={cn("w-full justify-between text-left", className)}
+        role="combobox"
+        aria-expanded={open}
+      >
+        {selectedValue || placeholder}
+        <ChevronsUpDownIcon class="opacity-50" />
+      </Button>
+    {/snippet}
+  </Popover.Trigger>
+  <Popover.Content class={cn("w-full p-0", contentClass)}>
+    <Command.Root>
+      <Command.Input placeholder="Search..." />
+      <Command.List>
+        <Command.Empty>No option found.</Command.Empty>
+        <Command.Group>
+          {#each options as option (option.value)}
+            <Command.Item
+              value={option.value}
+              onSelect={() => {
+                value = option.value;
+                closeAndFocusTrigger();
+              }}
             >
-                {selectedValue || placeholder}
-                <ChevronsUpDownIcon class="opacity-50" />
-            </Button>
-        {/snippet}
-    </Popover.Trigger>
-    <Popover.Content class={cn("w-full p-0", contentClass)}>
-        <Command.Root>
-            <Command.Input placeholder="Search..." />
-            <Command.List>
-                <Command.Empty>No option found.</Command.Empty>
-                <Command.Group>
-                    {#each options as option (option.value)}
-                        <Command.Item
-                            value={option.value}
-                            onSelect={() => {
-                                value = option.value;
-                                closeAndFocusTrigger();
-                            }}
-                        >
-                            <CheckIcon
-                                class={cn(
-                                    value !== option.value &&
-                                        "text-transparent",
-                                )}
-                            />
-                            {option.label}
-                        </Command.Item>
-                    {/each}
-                </Command.Group>
-            </Command.List>
-        </Command.Root>
-    </Popover.Content>
+              <CheckIcon
+                class={cn(value !== option.value && "text-transparent")}
+              />
+              {option.label}
+            </Command.Item>
+          {/each}
+        </Command.Group>
+      </Command.List>
+    </Command.Root>
+  </Popover.Content>
 </Popover.Root>
