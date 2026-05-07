@@ -1,5 +1,7 @@
 <script lang="ts">
-import upload from '$lib/assets/upload.svg';
+import MinusIcon from '@lucide/svelte/icons/minus';
+import PlusIcon from '@lucide/svelte/icons/plus';
+import UploadIcon from '@lucide/svelte/icons/upload';
 import Modal from '$lib/components/modal.svelte';
 import Combobox from '$lib/components/product-combobox.svelte';
 import { Button } from '$lib/components/ui/button/index.js';
@@ -11,6 +13,7 @@ const products = [{ value: 'example1', label: 'example2' }];
 
 let open = $state(false);
 let productValue = $state('');
+let usageVolume = $state(1);
 
 function addLicense() {
   // Add Database Connection
@@ -27,12 +30,7 @@ function addLicense() {
 </svelte:head>
 
 <Button onclick={() => (open = true)}>
-    <img
-        src={upload}
-        alt="Upload"
-        class="inline-block w-4 h-4 mr-2 text-white"
-        style="filter: brightness(0) invert(1);"
-    />
+    <UploadIcon />
     Upload Keys
 </Button>
 
@@ -40,7 +38,7 @@ function addLicense() {
     <div class="w-full max-w-md">
         <Field.Set class="gap-6">
             <Field.Group class="gap-1">
-                <Field.Legend class="mb-0">Add License</Field.Legend>
+                <Field.Legend class="mb-0 pb-1">Add License</Field.Legend>
                 <Field.Description class="text-xs text-muted-foreground"
                     >Add a new lisence for a product</Field.Description
                 >
@@ -58,6 +56,7 @@ function addLicense() {
                         options={products}
                         placeholder="Select a product..."
                         contentClass="w-full"
+                        class="cursor-pointer"
                     />
                 </Field.Field>
                 <Field.Field class="gap-2">
@@ -65,12 +64,29 @@ function addLicense() {
                         >Usage Volume <span class="text-destructive">*</span
                         ></Field.Label
                     >
-                    <Input
-                        id="usagevolumen"
-                        type="number"
-                        min="0"
-                        placeholder="1"
-                    />
+                    <div class="border-input focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-3 flex h-10 overflow-hidden rounded-md border shadow-xs">
+                        <input
+                            id="usagevolume"
+                            type="number"
+                            min="0"
+                            bind:value={usageVolume}
+                            class="w-full min-w-0 bg-transparent px-2.5 py-1 text-base outline-none md:text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                        />
+                        <div class="flex flex-col p-1 hight-10">
+                            <button
+                                type="button"
+                                onclick={() => usageVolume++}
+                                class="flex flex-1 items-center justify-center px-2 text-sm leading-none text-muted-foreground cursor-pointer"
+                                aria-label="Increase"
+                            ><PlusIcon class="size-4" /></button>
+                            <button
+                                type="button"
+                                onclick={() => usageVolume = Math.max(0, usageVolume - 1)}
+                                class="flex flex-1 items-center justify-center px-2 text-sm leading-none text-muted-foreground cursor-pointer"
+                                aria-label="Decrease"
+                            ><MinusIcon class="size-4" /></button>
+                        </div>
+                    </div>
                     <Field.Description class="text-xs text-muted-foreground"
                         >How often this key can be used. Set to 0 for unlimited.</Field.Description
                     >

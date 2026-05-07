@@ -1,5 +1,6 @@
 <script lang="ts">
-import plus from '$lib/assets/plus.svg';
+import MinusIcon from '@lucide/svelte/icons/minus';
+import PlusIcon from '@lucide/svelte/icons/plus';
 import Modal from '$lib/components/modal.svelte';
 import { Button } from '$lib/components/ui/button/index.js';
 import { Description } from '$lib/components/ui/dialog';
@@ -10,6 +11,7 @@ import Switch from '$lib/components/ui/switch/switch.svelte';
 import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 
 let open = $state(false);
+let maxLicenses = $state<number | undefined>(undefined);
 
 function addProduct() {
   // Add Database Connection
@@ -23,12 +25,7 @@ function addProduct() {
 </svelte:head>
 
 <Button onclick={() => (open = true)}>
-    <img
-        src={plus}
-        alt="Add"
-        class="inline-block w-4 h-4 mr-2 text-white"
-        style="filter: brightness(0) invert(1);"
-    />
+    <PlusIcon />
     Add new Product
 </Button>
 
@@ -43,27 +40,45 @@ function addProduct() {
                         >Product Name <span class="text-destructive">*</span
                         ></Field.Label
                     >
-                    <Input id="productname" type="text" />
+                    <Input id="productname" type="text" placeholder="e.g., Adobe Creative Cloud" />
                 </Field.Field>
                 <Field.Field class="gap-2">
                     <Field.Label for="description">Description</Field.Label>
-                    <Textarea id="description" class="resize-none"></Textarea>
+                    <Textarea id="description" class="resize-none" placeholder="Brief description of the product..."></Textarea>
                 </Field.Field>
                 <Field.Field class="gap-2">
-                    <Field.Label for="maxlicenses"
-                        >Max Licenses per User<span class="text-destructive"
-                            >*</span
-                        ></Field.Label
-                    >
-                    <Input id="maxlicenses" type="number" />
-                    <Field.Description
-                        >How many keys one user can aquire.</Field.Description
+                    <Field.Label for="maxlicenses">Max Licenses per User</Field.Label>
+                    <div class="border-input focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-3 flex h-10 overflow-hidden rounded-md border shadow-xs">
+                        <input
+                            id="maxlicenses"
+                            type="number"
+                            min="0"
+                            bind:value={maxLicenses}
+                            class="w-full min-w-0 bg-transparent px-2.5 py-1 text-base outline-none md:text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                        />
+                        <div class="flex flex-col p-1">
+                            <button
+                                type="button"
+                                onclick={() => maxLicenses = (maxLicenses ?? 0) + 1}
+                                class="flex flex-1 items-center justify-center px-2 text-sm leading-none text-muted-foreground cursor-pointer"
+                                aria-label="Increase"
+                            ><PlusIcon class="size-4" /></button>
+                            <button
+                                type="button"
+                                onclick={() => maxLicenses = Math.max(0, (maxLicenses ?? 0) - 1)}
+                                class="flex flex-1 items-center justify-center px-2 text-sm leading-none text-muted-foreground cursor-pointer"
+                                aria-label="Decrease"
+                            ><MinusIcon class="size-4" /></button>
+                        </div>
+                    </div>
+                    <Field.Description class="text-xs text-muted-foreground"
+                        >How many keys one user can aquire</Field.Description
                     >
                 </Field.Field>
                 <Field.Field class="flex-row align-center gap-2">
                     <div class="flex-col">
-                        <Label for="reqapproval">Requires Approval</Label>
-                        <Description
+                        <Label for="reqapproval" class="pb-1">Requires Approval</Label>
+                        <Description class="text-xs text-muted-foreground"
                             >Lisence requests need admin approval before
                             assignment</Description
                         >
