@@ -31,7 +31,7 @@ let {
 }: Props = $props();
 
 let open = $state(false);
-let triggerRef = $state<HTMLButtonElement>(null!);
+let triggerRef = $state<HTMLButtonElement | null>(null);
 
 const selectedValue = $derived(options.find((o) => o.value === value)?.label);
 
