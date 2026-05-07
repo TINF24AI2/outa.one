@@ -9,6 +9,7 @@ import Input from '$lib/components/ui/input/input.svelte';
 import Label from '$lib/components/ui/label/label.svelte';
 import Switch from '$lib/components/ui/switch/switch.svelte';
 import Textarea from '$lib/components/ui/textarea/textarea.svelte';
+import { m } from '$lib/paraglide/messages.js';
 
 let open = $state(false);
 let maxLicenses = $state<number | undefined>(undefined);
@@ -20,34 +21,34 @@ function addProduct() {
 </script>
 
 <svelte:head>
-    <title>Outa - Products</title>
-    <meta name="producs" content="Self service software license keys portal." />
+    <title>{m.products_meta_title()}</title>
+    <meta name="products" content={m.meta_description()} />
 </svelte:head>
 
 <Button onclick={() => (open = true)}>
     <PlusIcon />
-    Add new Product
+    {m.products_add_button()}
 </Button>
 
 <Modal bind:open class="bg-white text-black h-auto">
     <div class="w-full max-w-md">
         <Field.Set class="gap-6">
-            <Field.Legend>Create Product</Field.Legend>
+            <Field.Legend>{m.products_popup_add_create_legend()}</Field.Legend>
             <Field.Separator class="-mx-6" />
             <Field.Group class="gap-5">
                 <Field.Field class="gap-2">
                     <Field.Label for="productname"
-                        >Product Name <span class="text-destructive">*</span
+                        >{m.products_popup_add_name_label()} <span class="text-destructive">*</span
                         ></Field.Label
                     >
-                    <Input id="productname" type="text" placeholder="e.g., Adobe Creative Cloud" />
+                    <Input id="productname" type="text" placeholder={m.products_popup_add_name_placeholder()} />
                 </Field.Field>
                 <Field.Field class="gap-2">
-                    <Field.Label for="description">Description</Field.Label>
-                    <Textarea id="description" class="resize-none" placeholder="Brief description of the product..."></Textarea>
+                    <Field.Label for="description">{m.products_popup_add_description_label()}</Field.Label>
+                    <Textarea id="description" class="resize-none" placeholder={m.products_popup_add_description_placeholder()}></Textarea>
                 </Field.Field>
                 <Field.Field class="gap-2">
-                    <Field.Label for="maxlicenses">Max Licenses per User</Field.Label>
+                    <Field.Label for="maxlicenses">{m.products_popup_add_max_licenses_label()}</Field.Label>
                     <div class="border-input focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-3 flex h-10 overflow-hidden rounded-md border shadow-xs">
                         <input
                             id="maxlicenses"
@@ -61,26 +62,25 @@ function addProduct() {
                                 type="button"
                                 onclick={() => maxLicenses = (maxLicenses ?? 0) + 1}
                                 class="flex flex-1 items-center justify-center px-2 text-sm leading-none text-muted-foreground cursor-pointer"
-                                aria-label="Increase"
+                                aria-label={m.common_increase()}
                             ><PlusIcon class="size-4" /></button>
                             <button
                                 type="button"
                                 onclick={() => maxLicenses = Math.max(0, (maxLicenses ?? 0) - 1)}
                                 class="flex flex-1 items-center justify-center px-2 text-sm leading-none text-muted-foreground cursor-pointer"
-                                aria-label="Decrease"
+                                aria-label={m.common_decrease()}
                             ><MinusIcon class="size-4" /></button>
                         </div>
                     </div>
                     <Field.Description class="text-xs text-muted-foreground"
-                        >How many keys one user can aquire</Field.Description
+                        >{m.products_popup_add_max_licenses_description()}</Field.Description
                     >
                 </Field.Field>
                 <Field.Field class="flex-row align-center gap-2">
                     <div class="flex-col">
-                        <Label for="reqapproval" class="pb-1">Requires Approval</Label>
+                        <Label for="reqapproval" class="pb-1">{m.products_popup_add_requires_approval_label()}</Label>
                         <Description class="text-xs text-muted-foreground"
-                            >Lisence requests need admin approval before
-                            assignment</Description
+                            >{m.products_popup_add_requires_approval_description()}</Description
                         >
                     </div>
                     <Switch id="reqapproval" class="self-center"></Switch>
@@ -89,10 +89,10 @@ function addProduct() {
                     <Button
                         variant="secondary"
                         class="flex-1 "
-                        onclick={() => (open = false)}>Cancel</Button
+                        onclick={() => (open = false)}>{m.products_popup_add_cancel()}</Button
                     >
                     <Button class="flex-1" onclick={addProduct}
-                        >Add Product</Button
+                        >{m.products_popup_add_submit()}</Button
                     >
                 </div>
             </Field.Group>
