@@ -1,0 +1,1 @@
+ALTER TABLE "license" ALTER COLUMN "productId" SET NOT NULL;
