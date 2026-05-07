@@ -1,10 +1,12 @@
 <script lang="ts">
-  import { KeyRound, SquarePen, UserPlus, UserX } from '@lucide/svelte';
+  import { KeyRound } from '@lucide/svelte';
   import PageHeader from '$lib/components/app/page-header.svelte';
   import { Button } from '$lib/components/ui/button';
   import * as Table from '$lib/components/ui/table';
   import { m } from '$lib/paraglide/messages';
   import { getLocale } from '$lib/paraglide/runtime';
+  import DeleteUser from '$lib/components/app/delete-user.svelte';
+  import EditUser from '$lib/components/app/edit-user.svelte';
   import InviteUser from '$lib/components/app/invite-user.svelte';
 
   let { data } = $props();
@@ -49,43 +51,39 @@
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {#each data.users as u}
+          {#each data.users as user}
             <Table.Row>
               <Table.Cell class="pl-6 py-3">
                 <div class="flex items-center gap-3">
                   <div
                     class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700"
                   >
-                    {getInitials(u.name)}
+                    {getInitials(user.name)}
                   </div>
-                  <span class="font-semibold text-gray-900">{u.name}</span>
+                  <span class="font-semibold text-gray-900">{user.name}</span>
                 </div>
               </Table.Cell>
-              <Table.Cell class="text-gray-500">{u.email}</Table.Cell>
+              <Table.Cell class="text-gray-500">{user.email}</Table.Cell>
               <Table.Cell>
                 <span
                   class={`inline-flex items-center rounded px-2.5 py-0.5 text-xs font-medium border ${
-                    u.role === 'admin'
+                    user.managedRole === 'admin'
                       ? 'border-blue-200 bg-blue-50 text-blue-700'
                       : 'border-gray-300 bg-white text-gray-700'
                   }`}
                 >
-                  {u.role === 'admin' ? m.role_admin() : m.role_employee()}
+                  {user.managedRole === 'admin' ? m.role_admin() : m.role_employee()}
                 </span>
               </Table.Cell>
               <Table.Cell class="text-gray-700">0</Table.Cell>
-              <Table.Cell class="text-gray-500">{formatDate(u.lastActive)}</Table.Cell>
+              <Table.Cell class="text-gray-500">{formatDate(user.lastActive)}</Table.Cell>
               <Table.Cell class="pr-6">
                 <div class="flex items-center justify-end gap-0.5">
                   <Button variant="ghost" size="icon-sm" title={m.users_action_viewLicenses()}>
                     <KeyRound class="h-4 w-4 text-gray-500" />
                   </Button>
-                  <Button variant="ghost" size="icon-sm" title={m.users_action_edit()}>
-                    <SquarePen class="h-4 w-4 text-gray-500" />
-                  </Button>
-                  <Button variant="ghost" size="icon-sm" title={m.users_action_remove()}>
-                    <UserX class="h-4 w-4 text-red-500" />
-                  </Button>
+                  <EditUser user={user} />
+                  <DeleteUser user={user} isCurrentUser={user.id === data.user.id} />
                 </div>
               </Table.Cell>
             </Table.Row>
