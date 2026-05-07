@@ -17,21 +17,22 @@ export const init: ServerInit = async () => {
   await migrate(drizzle(migrationClient), { migrationsFolder: './drizzle' });
   await migrationClient.end();
 
-  await new Promise<void>((resolve, reject) => {
-    const child = spawn('pnpm', ['run', 'db:seedDemoUsers'], {
-      stdio: 'inherit',
-      shell: true,
-    });
-
-    child.on('error', reject);
-    child.on('exit', (code) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(new Error(`db:seedDemoUsers exited with code ${code}`));
-      }
-    });
-  });
+  await Promise.all([
+    new Promise<void>((resolve, reject) => {
+      const child = spawn('pnpm', ['run', 'db:seedDemoUsers'], { stdio: 'inherit', shell: true });
+      child.on('error', reject);
+      child.on('exit', (code) =>
+        code === 0 ? resolve() : reject(new Error(`db:seedDemoUsers exited with code ${code}`)),
+      );
+    }),
+    new Promise<void>((resolve, reject) => {
+      const child = spawn('pnpm', ['run', 'db:seedDemoProductsAndLicenses'], { stdio: 'inherit', shell: true });
+      child.on('error', reject);
+      child.on('exit', (code) =>
+        code === 0 ? resolve() : reject(new Error(`db:seedDemoProductsAndLicenses exited with code ${code}`)),
+      );
+    }),
+  ]);
 };
 
 const handleParaglide: Handle = ({ event, resolve }) =>
