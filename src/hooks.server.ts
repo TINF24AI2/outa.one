@@ -11,28 +11,28 @@ import { getTextDirection } from '$lib/paraglide/runtime';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 import { auth } from '$lib/server/auth';
 
-// export const init: ServerInit = async () => {
-//   console.log('Migrating Database...');
-//   const migrationClient = postgres(env.DATABASE_URL, { max: 1 });
-//   await migrate(drizzle(migrationClient), { migrationsFolder: './drizzle' });
-//   await migrationClient.end();
+export const init: ServerInit = async () => {
+  console.log('Migrating Database...');
+  const migrationClient = postgres(env.DATABASE_URL, { max: 1 });
+  await migrate(drizzle(migrationClient), { migrationsFolder: './drizzle' });
+  await migrationClient.end();
 
-//   await new Promise<void>((resolve, reject) => {
-//     const child = spawn('pnpm', ['run', 'db:seedDemoUsers'], {
-//       stdio: 'inherit',
-//       shell: true,
-//     });
+  await new Promise<void>((resolve, reject) => {
+    const child = spawn('pnpm', ['run', 'db:seedDemoUsers'], {
+      stdio: 'inherit',
+      shell: true,
+    });
 
-//     child.on('error', reject);
-//     child.on('exit', (code) => {
-//       if (code === 0) {
-//         resolve();
-//       } else {
-//         reject(new Error(`db:seedDemoUsers exited with code ${code}`));
-//       }
-//     });
-//   });
-// };
+    child.on('error', reject);
+    child.on('exit', (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`db:seedDemoUsers exited with code ${code}`));
+      }
+    });
+  });
+};
 
 const handleParaglide: Handle = ({ event, resolve }) =>
   paraglideMiddleware(event.request, ({ request, locale }) => {
