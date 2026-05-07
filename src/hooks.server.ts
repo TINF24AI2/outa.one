@@ -26,10 +26,10 @@ export const init: ServerInit = async () => {
       );
     }),
     new Promise<void>((resolve, reject) => {
-      const child = spawn('pnpm', ['run', 'db:seedProducts'], { stdio: 'inherit', shell: true });
+      const child = spawn('pnpm', ['run', 'db:seedDemoProductsAndLicenses'], { stdio: 'inherit', shell: true });
       child.on('error', reject);
       child.on('exit', (code) =>
-        code === 0 ? resolve() : reject(new Error(`db:seedProducts exited with code ${code}`)),
+        code === 0 ? resolve() : reject(new Error(`db:seedDemoProductsAndLicenses exited with code ${code}`)),
       );
     }),
   ]);
