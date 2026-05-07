@@ -4,6 +4,7 @@ import PageHeader from '$lib/components/app/page-header.svelte';
 import { Button } from '$lib/components/ui/button';
 import * as Table from '$lib/components/ui/table';
 import { m } from '$lib/paraglide/messages';
+import { getLocale } from '$lib/paraglide/runtime';
 
 let { data } = $props();
 
@@ -18,13 +19,12 @@ function getInitials(name: string): string {
 
 function formatDate(date: Date | string | null): string {
   if (!date) return '—';
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat(getLocale(), {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
-    hour12: true,
   }).format(new Date(date));
 }
 </script>
@@ -79,7 +79,7 @@ function formatDate(date: Date | string | null): string {
               <Table.Cell class="text-gray-500">{formatDate(u.lastActive)}</Table.Cell>
               <Table.Cell class="pr-6">
                 <div class="flex items-center justify-end gap-0.5">
-                  <Button variant="ghost" size="icon-sm" title={m.users_action_reset_password()}>
+                  <Button variant="ghost" size="icon-sm" title={m.users_action_viewLicenses()}>
                     <KeyRound class="h-4 w-4 text-gray-500" />
                   </Button>
                   <Button variant="ghost" size="icon-sm" title={m.users_action_edit()}>

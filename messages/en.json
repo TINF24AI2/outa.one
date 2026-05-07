@@ -98,7 +98,7 @@
   "users_table_licenses_held": "Licenses Held",
   "users_table_last_active": "Last Active",
   "users_table_actions": "Actions",
-  "users_action_reset_password": "Reset password",
+  "users_action_viewLicenses": "View licenses",
   "users_action_edit": "Edit user",
   "users_action_remove": "Remove user"
 }
