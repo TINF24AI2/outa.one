@@ -1,40 +1,38 @@
 <script lang="ts">
-import { KeyRound, SquarePen, UserPlus, UserX } from '@lucide/svelte';
-import PageHeader from '$lib/components/app/page-header.svelte';
-import { Button } from '$lib/components/ui/button';
-import * as Table from '$lib/components/ui/table';
-import { m } from '$lib/paraglide/messages';
-import { getLocale } from '$lib/paraglide/runtime';
+  import { KeyRound, SquarePen, UserPlus, UserX } from '@lucide/svelte';
+  import PageHeader from '$lib/components/app/page-header.svelte';
+  import { Button } from '$lib/components/ui/button';
+  import * as Table from '$lib/components/ui/table';
+  import { m } from '$lib/paraglide/messages';
+  import { getLocale } from '$lib/paraglide/runtime';
+  import InviteUser from '$lib/components/app/invite-user.svelte';
 
-let { data } = $props();
+  let { data } = $props();
 
-function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-}
+  function getInitials(name: string): string {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+  }
 
-function formatDate(date: Date | string | null): string {
-  if (!date) return '—';
-  return new Intl.DateTimeFormat(getLocale(), {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(new Date(date));
-}
+  function formatDate(date: Date | string | null): string {
+    if (!date) return '—';
+    return new Intl.DateTimeFormat(getLocale(), {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    }).format(new Date(date));
+  }
 </script>
 
 <div class="flex flex-col w-full h-full overflow-hidden">
   <PageHeader title={m.users_title()} subtitle={m.users_subtitle()}>
-    <Button href="/users/new">
-      <UserPlus class="w-4 h-4" />
-      {m.users_invite_button()}
-    </Button>
+    <InviteUser />
   </PageHeader>
 
   <div class="flex-1 overflow-auto w-full max-w-7xl mx-auto p-6">

@@ -5,6 +5,7 @@ import * as Dialog from '$lib/components/ui/dialog/index.js';
 import * as Select from '$lib/components/ui/select/index.js';
 import { Input } from '$lib/components/ui/input/index.js';
 import { Label } from '$lib/components/ui/label/index.js';
+import { m } from '$lib/paraglide/messages';
 
 let firstName = 'David';
 let lastName = 'Park';
@@ -16,31 +17,28 @@ let lastName = 'Park';
             type="button"
             class={buttonVariants({ variant: "outline" })}
         >
-            Delete User
+            {m.users_delete_dialog_title()}
         </Dialog.Trigger>
         <Dialog.Content class="sm:max-w-[425px]">
             <Dialog.Header>
-                <Dialog.Title>Delete User</Dialog.Title>
+                <Dialog.Title>{m.users_delete_dialog_title()}</Dialog.Title>
                 <Dialog.Description>
-                    Remove {firstName}
-                    {lastName} from portal
+                    {m.users_delete_dialog_description({ firstName, lastName })}
                 </Dialog.Description>
             </Dialog.Header>
             <div class="grid gap-4">
                 <div class="grid gap-3">
-                    <h3>Effects of this action</h3>
+                    <h3>{m.users_delete_effects_title()}</h3>
                     <ul class="text-xs text-gray-500">
-                        <li>- {firstName} will no longer be able to join</li>
+                        <li>- {m.users_delete_effect_no_access({ firstName })}</li>
                         <li>
-                            - {firstName} can't access any of his/her license keys
-                            anymore
+                            - {m.users_delete_effect_no_licenses({ firstName })}
                         </li>
                         <li>
-                            - all licensed keys from David will be available for
-                            other users
+                            - {m.users_delete_effect_keys_freed({ firstName })}
                         </li>
                         <li>
-                            - {firstName} will remain in the reports and history
+                            - {m.users_delete_effect_remains_in_history({ firstName })}
                         </li>
                     </ul>
                 </div>
@@ -51,10 +49,10 @@ let lastName = 'Park';
                     type="button"
                     class={buttonVariants({ variant: "outline" })}
                 >
-                    Cancel
+                    {m.users_dialog_cancel()}
                 </Dialog.Close>
                 <Button type="submit" class="bg-red-500 hover:bg-red-600"
-                    >Delete</Button
+                    >{m.users_delete_submit()}</Button
                 >
             </Dialog.Footer>
         </Dialog.Content>

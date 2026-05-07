@@ -6,7 +6,7 @@ import * as Select from '$lib/components/ui/select/index.js';
 import { Input } from '$lib/components/ui/input/index.js';
 import { Label } from '$lib/components/ui/label/index.js';
 import { Mail } from '@lucide/svelte';
-import { Description } from '../ui/alert';
+import { m } from '$lib/paraglide/messages';
 
 const roles = [
   { value: 'admin', label: 'Admin' },
@@ -15,7 +15,7 @@ const roles = [
 
 let value = $state('');
 
-const triggerContent = $derived(roles.find((f) => f.value === value)?.label ?? 'Select a role');
+const triggerContent = $derived(roles.find((f) => f.value === value)?.label ?? m.users_role_placeholder());
 
 let email = 'john.doe@company.com';
 </script>
@@ -26,25 +26,25 @@ let email = 'john.doe@company.com';
 			type="button"
 			class={buttonVariants({ variant: "outline" })}
 		>
-			Edit User
+			{m.users_edit_dialog_title()}
 		</Dialog.Trigger>
 		<Dialog.Content class="sm:max-w-[425px]">
 			<Dialog.Header>
-				<Dialog.Title>Edit User</Dialog.Title>
+				<Dialog.Title>{m.users_edit_dialog_title()}</Dialog.Title>
 				<Dialog.Description>
-					Editing {email}
+					{m.users_edit_dialog_description({ email })}
 				</Dialog.Description>
 			</Dialog.Header>
 			<div class="grid gap-4">
 				<div class="grid gap-3">
-					<Label for="roles">Role</Label>
+					<Label for="roles">{m.users_role_label()}</Label>
 					<Select.Root type="single" name="roles" bind:value>
 						<Select.Trigger class="w-full">
 							{triggerContent}
 						</Select.Trigger>
 						<Select.Content>
 							<Select.Group>
-								<Select.Label>Roles</Select.Label>
+								<Select.Label>{m.users_roles_group_label()}</Select.Label>
 								{#each roles as role (role.value)}
 									<Select.Item
 										value={role.value}
@@ -57,8 +57,7 @@ let email = 'john.doe@company.com';
 						</Select.Content>
 					</Select.Root>
 					<Dialog.Description class="text-xs"
-						>Admins have full access to manage produkts, licenses
-						and users</Dialog.Description
+						>{m.users_role_admin_hint()}</Dialog.Description
 					>
 				</div>
 			</div>
@@ -67,9 +66,9 @@ let email = 'john.doe@company.com';
 					type="button"
 					class={buttonVariants({ variant: "outline" })}
 				>
-					Cancel
+					{m.users_dialog_cancel()}
 				</Dialog.Close>
-				<Button type="submit">Save</Button>
+				<Button type="submit">{m.users_edit_submit()}</Button>
 			</Dialog.Footer>
 		</Dialog.Content>
 	</form>
