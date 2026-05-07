@@ -1,32 +1,32 @@
 <script lang="ts">
 import upload from '$lib/assets/upload.svg';
-import { cn } from '$lib/utils.js';
 import { Button } from '$lib/components/ui/button/index.js';
-import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 import * as Field from '$lib/components/ui/field/index.js';
 import Input from '$lib/components/ui/input/input.svelte';
 import Modal from '$lib/components/modal.svelte';
 import Combobox from '$lib/components/product-combobox.svelte';
-import Label from '$lib/components/ui/label/label.svelte';
-import Switch from '$lib/components/ui/switch/switch.svelte';
-import { Description } from '$lib/components/ui/dialog';
-const products = [
-  { value: 'sveltekit', label: 'SvelteKit' },
-  { value: 'next.js', label: 'Next.js' },
-  { value: 'nuxt.js', label: 'Nuxt.js' },
-  { value: 'remix', label: 'Remix' },
-  { value: 'astro', label: 'Astro' },
-];
+
+// Add Database Connection
+const products = [{ value: 'example1', label: 'example2' }];
+
 let open = $state(false);
 let productValue = $state('');
+
+function addLicense() {
+  // Add Database Connection
+  open = false;
+}
 </script>
 
 <svelte:head>
-    <title>Outa - Products</title>
-    <meta name="producs" content="Self service software license keys portal." />
+    <title>Outa - Licenses</title>
+    <meta
+        name="licenses"
+        content="Self service software license keys portal."
+    />
 </svelte:head>
 
-<Button variant="outline" onclick={() => (open = true)}>
+<Button onclick={() => (open = true)}>
     <img
         src={upload}
         alt="Upload"
@@ -45,7 +45,7 @@ let productValue = $state('');
                     >Add a new lisence for a product</Field.Description
                 >
             </Field.Group>
-            <Field.Separator class="w-full" />
+            <Field.Separator class="-mx-6" />
             <Field.Group class="gap-5">
                 <Field.Field class="gap-2">
                     <Field.Label for="productname"
@@ -87,8 +87,14 @@ let productValue = $state('');
                     />
                 </Field.Field>
                 <div class="flex justify-between gap-3">
-                    <Button variant="secondary" class="flex-1">Cancel</Button>
-                    <Button class="flex-1">Add License</Button>
+                    <Button
+                        variant="secondary"
+                        class="flex-1"
+                        onclick={() => (open = false)}>Cancel</Button
+                    >
+                    <Button class="flex-1" onclick={addLicense}
+                        >Add License</Button
+                    >
                 </div>
             </Field.Group>
         </Field.Set>

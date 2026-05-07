@@ -1,5 +1,4 @@
 <script>
-import { Button } from '$lib/components/ui/button/index.js';
 import { Root as Dialog, Content as DialogContent } from '$lib/components/ui/dialog';
 
 let { open = $bindable(false), onClose = undefined, class: className = '', children } = $props();
