@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { license, product } from '$lib/server/db/schema';
@@ -16,20 +16,20 @@ const DEMO_PRODUCTS = [
   {
     name: 'Outa Professional',
     description: 'Full suite of tools for professional developers.',
-    requiresApproval: 'no',
-    maxLicensesPerUser: '5',
+    requiresApproval: false,
+    maxLicensesPerUser: 5,
   },
   {
     name: 'Outa Enterprise',
     description: 'Advanced features for large organizations.',
-    requiresApproval: 'yes',
-    maxLicensesPerUser: '0',
+    requiresApproval: true,
+    maxLicensesPerUser: 0,
   },
   {
     name: 'Outa Starter',
     description: 'Perfect for small teams and individuals.',
-    requiresApproval: 'no',
-    maxLicensesPerUser: '1',
+    requiresApproval: false,
+    maxLicensesPerUser: 1,
   },
 ];
 
@@ -64,7 +64,10 @@ async function seed() {
     const licenseKeys = [`${prefix}-KEY-001`, `${prefix}-KEY-002`, `${prefix}-KEY-003`];
 
     for (const key of licenseKeys) {
-      const [existingLicense] = await db.select().from(license).where(eq(license.key, key));
+      const [existingLicense] = await db
+        .select()
+        .from(license)
+        .where(and(eq(license.key, key), eq(license.productId, productId)));
       if (existingLicense) {
         console.log(`    skip  license: ${key} (already exists)`);
         continue;
