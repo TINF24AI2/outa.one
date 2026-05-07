@@ -5,6 +5,7 @@
 ### Discussed things
 - outa.one (current version)
 - going through the requirements for sprint 0
+
 -> showing backlog, going through each issue
 
 ### Feedback
@@ -17,7 +18,7 @@
 ## Retro
 
 ### Discussed things
-![image ofretro of first sprint with things that went well, need improvement and the solution](<protocols/assets/retro0.jpeg>)
+![image of retro of first sprint with things that went well, need improvement and the solution](<protocols/assets/retro0.jpeg>)
 ### Feedback
 - good
 
@@ -36,6 +37,7 @@
 
 ### Feedback
 - planning poker 
+
 -> use estimate points (look at the workload we plan)
 
 
@@ -43,6 +45,9 @@
 - better structure in planning
 - letting the product owner moderate the planning
 - explain the things we agreed on when working on issues: 
+
 -> use the issue-template
+
 -> fill out target start date, target end date and estimat (points) (the estimat (points) stand for the assessed complexity of each issue. For this, we use the Fibonacci numbers (1, 2, 3, 5, 8, 13, 21, 34 and so on))
+
 -> but also estimate points with the hours of work we think it takes
