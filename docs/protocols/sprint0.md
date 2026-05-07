@@ -18,7 +18,7 @@
 ## Retro
 
 ### Discussed things
-![image of retro of first sprint with things that went well, need improvement and the solution](<protocols/assets/retro0.jpeg>)
+![image of retro of first sprint with things that went well, need improvement and the solution](/docs/protocols/assets/retro0.jpeg)
 ### Feedback
 - good
 
