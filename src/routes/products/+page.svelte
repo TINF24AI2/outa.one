@@ -1,13 +1,14 @@
 <script lang="ts">
-import { Button } from '$lib/components/ui/button/index.js';
-import * as Field from '$lib/components/ui/field/index.js';
-import Input from '$lib/components/ui/input/input.svelte';
 import plus from '$lib/assets/plus.svg';
 import Modal from '$lib/components/modal.svelte';
+import { Button } from '$lib/components/ui/button/index.js';
+import { Description } from '$lib/components/ui/dialog';
+import * as Field from '$lib/components/ui/field/index.js';
+import Input from '$lib/components/ui/input/input.svelte';
 import Label from '$lib/components/ui/label/label.svelte';
 import Switch from '$lib/components/ui/switch/switch.svelte';
 import Textarea from '$lib/components/ui/textarea/textarea.svelte';
-import { Description } from '$lib/components/ui/dialog';
+
 let open = $state(false);
 
 function addProduct() {

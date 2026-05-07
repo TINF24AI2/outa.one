@@ -1,10 +1,10 @@
 <script lang="ts">
 import upload from '$lib/assets/upload.svg';
+import Modal from '$lib/components/modal.svelte';
+import Combobox from '$lib/components/product-combobox.svelte';
 import { Button } from '$lib/components/ui/button/index.js';
 import * as Field from '$lib/components/ui/field/index.js';
 import Input from '$lib/components/ui/input/input.svelte';
-import Modal from '$lib/components/modal.svelte';
-import Combobox from '$lib/components/product-combobox.svelte';
 
 // Add Database Connection
 const products = [{ value: 'example1', label: 'example2' }];
