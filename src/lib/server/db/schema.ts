@@ -1,18 +1,19 @@
-import { relations } from 'drizzle-orm';
-import { boolean, index, integer, pgTable, serial, text, unique, uuid } from 'drizzle-orm/pg-core';
-import { defineTableWithUpdate } from './utils/table-factory';
+import { relations } from "drizzle-orm";
+import { boolean, index, integer, pgTable, serial, text, unique, uuid } from "drizzle-orm/pg-core";
 
-export const task = pgTable('task', {
-  id: serial('id').primaryKey(),
-  title: text('title').notNull(),
-  priority: integer('priority').notNull().default(1),
+import { defineTableWithUpdate } from "./utils/table-factory";
+
+export const task = pgTable("task", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  priority: integer("priority").notNull().default(1),
 });
 
-export const product = defineTableWithUpdate('product', {
-  name: text('name').notNull(),
-  description: text('description'),
-  requiresApproval: boolean('requiresApproval').notNull().default(false),
-  maxLicensesPerUser: integer('maxLicensesPerUser').notNull().default(1),
+export const product = defineTableWithUpdate("product", {
+  name: text("name").notNull(),
+  description: text("description"),
+  requiresApproval: boolean("requiresApproval").notNull().default(false),
+  maxLicensesPerUser: integer("maxLicensesPerUser").notNull().default(1),
 });
 
 export const productRelations = relations(product, ({ many }) => ({
@@ -20,15 +21,15 @@ export const productRelations = relations(product, ({ many }) => ({
 }));
 
 export const license = defineTableWithUpdate(
-  'license',
+  "license",
   {
-    key: text('key').notNull(),
-    usageVolume: integer('usageVolume').notNull(),
+    key: text("key").notNull(),
+    usageVolume: integer("usageVolume").notNull(),
     productId: uuid()
       .notNull()
-      .references(() => product.id, { onDelete: 'cascade' }),
+      .references(() => product.id, { onDelete: "cascade" }),
   },
-  (table) => [unique().on(table.productId, table.key), index('license_productId_idx').on(table.productId)],
+  (table) => [unique().on(table.productId, table.key), index("license_productId_idx").on(table.productId)],
 );
 
 export const licenseRelations = relations(license, ({ one }) => ({
@@ -38,4 +39,4 @@ export const licenseRelations = relations(license, ({ one }) => ({
   }),
 }));
 
-export * from './auth.schema';
+export * from "./auth.schema";

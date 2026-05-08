@@ -1,14 +1,14 @@
-import type { BuildExtraConfigColumns } from 'drizzle-orm';
-import { type PgColumnBuilderBase, type PgTableExtraConfigValue, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
+import type { BuildExtraConfigColumns } from "drizzle-orm";
+import { pgTable, timestamp, uuid, type PgColumnBuilderBase, type PgTableExtraConfigValue } from "drizzle-orm/pg-core";
 
 const baseColumns = {
-  id: uuid('id').primaryKey().defaultRandom(),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 };
 
 const baseColumnsWithUpdate = {
   ...baseColumns,
-  updatedAt: timestamp('updated_at', { withTimezone: true })
+  updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
@@ -25,7 +25,7 @@ export const defineTable = <TName extends string, TColumns extends Record<string
   name: TName,
   columns: TColumns,
   extraConfig?: (
-    self: BuildExtraConfigColumns<typeof name, typeof baseColumns & TColumns, 'pg'>,
+    self: BuildExtraConfigColumns<typeof name, typeof baseColumns & TColumns, "pg">,
   ) => PgTableExtraConfigValue[],
 ) => {
   return pgTable(
@@ -52,7 +52,7 @@ export const defineTableWithUpdate = <TName extends string, TColumns extends Rec
   name: TName,
   columns: TColumns,
   extraConfig?: (
-    self: BuildExtraConfigColumns<typeof name, typeof baseColumnsWithUpdate & TColumns, 'pg'>,
+    self: BuildExtraConfigColumns<typeof name, typeof baseColumnsWithUpdate & TColumns, "pg">,
   ) => PgTableExtraConfigValue[],
 ) => {
   return pgTable(

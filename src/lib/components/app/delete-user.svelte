@@ -1,45 +1,46 @@
 <script lang="ts">
-import { enhance } from '$app/forms';
-import { UserX } from '@lucide/svelte';
-import { Button, buttonVariants } from '$lib/components/ui/button';
-import * as Dialog from '$lib/components/ui/dialog';
-import { m } from '$lib/paraglide/messages';
+  import { UserX } from "@lucide/svelte";
+  import { enhance } from "$app/forms";
 
-type ManagedUser = {
-  id: string;
-  name: string;
-};
+  import { Button, buttonVariants } from "$lib/components/ui/button";
+  import * as Dialog from "$lib/components/ui/dialog";
+  import { m } from "$lib/paraglide/messages";
 
-let { user, isCurrentUser = false }: { user: ManagedUser; isCurrentUser?: boolean } = $props();
-
-const nameParts = $derived.by(() => {
-  const parts = user.name.trim().split(/\s+/).filter(Boolean);
-
-  return {
-    firstName: parts[0] ?? user.name,
-    lastName: parts.slice(1).join(' ') || '',
+  type ManagedUser = {
+    id: string;
+    name: string;
   };
-});
 
-let open = $state(false);
-let loading = $state(false);
-let message = $state<string | null>(null);
+  let { user, isCurrentUser = false }: { user: ManagedUser; isCurrentUser?: boolean } = $props();
 
-$effect(() => {
-  if (open) {
-    message = null;
-    return;
-  }
+  const nameParts = $derived.by(() => {
+    const parts = user.name.trim().split(/\s+/).filter(Boolean);
 
-  loading = false;
-});
+    return {
+      firstName: parts[0] ?? user.name,
+      lastName: parts.slice(1).join(" ") || "",
+    };
+  });
+
+  let open = $state(false);
+  let loading = $state(false);
+  let message = $state<string | null>(null);
+
+  $effect(() => {
+    if (open) {
+      message = null;
+      return;
+    }
+
+    loading = false;
+  });
 </script>
 
 <Dialog.Root bind:open>
   <Dialog.Trigger
     type="button"
-    class={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}
-    title={isCurrentUser ? 'You cannot remove your own account.' : m.users_action_remove()}
+    class={buttonVariants({ variant: "ghost", size: "icon-sm" })}
+    title={isCurrentUser ? "You cannot remove your own account." : m.users_action_remove()}
     disabled={isCurrentUser}
   >
     <UserX class="h-4 w-4 text-red-500" />
@@ -56,12 +57,12 @@ $effect(() => {
           loading = false;
           await update({ reset: false });
 
-          if (result.type === 'success') {
+          if (result.type === "success") {
             open = false;
             return;
           }
 
-          const data = (result.type === 'failure' ? result.data : null) as { message?: string } | null;
+          const data = (result.type === "failure" ? result.data : null) as { message?: string } | null;
           message = data?.message ?? null;
         };
       }}
@@ -94,7 +95,7 @@ $effect(() => {
         {/if}
       </div>
       <Dialog.Footer>
-        <Dialog.Close type="button" class={buttonVariants({ variant: 'outline' })}>
+        <Dialog.Close type="button" class={buttonVariants({ variant: "outline" })}>
           {m.users_dialog_cancel()}
         </Dialog.Close>
         <Button type="submit" variant="destructive" disabled={loading}>

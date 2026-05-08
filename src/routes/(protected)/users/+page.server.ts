@@ -1,22 +1,24 @@
-import { fail, redirect } from '@sveltejs/kit';
-import { sql, eq } from 'drizzle-orm';
-import { env } from '$env/dynamic/private';
-import { m } from '$lib/paraglide/messages.js';
-import { auth } from '$lib/server/auth';
-import { db } from '$lib/server/db';
-import { session, user } from '$lib/server/db/schema';
-import { createInvite } from '$lib/server/invites';
-import type { Actions, PageServerLoad } from './$types';
+import { fail, redirect } from "@sveltejs/kit";
+import { env } from "$env/dynamic/private";
+import { eq, sql } from "drizzle-orm";
+
+import { m } from "$lib/paraglide/messages.js";
+import { auth } from "$lib/server/auth";
+import { db } from "$lib/server/db";
+import { session, user } from "$lib/server/db/schema";
+import { createInvite } from "$lib/server/invites";
+
+import type { Actions, PageServerLoad } from "./$types";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MANAGED_ROLES = new Set(['admin', 'user']);
+const MANAGED_ROLES = new Set(["admin", "user"]);
 
 function isAdminRole(role: string | null | undefined) {
-  return role?.split(',').includes('admin') ?? false;
+  return role?.split(",").includes("admin") ?? false;
 }
 
 function requireAdmin(event: Parameters<NonNullable<Actions[keyof Actions]>>[0]) {
-  if (event.locals.user?.role !== 'admin') {
+  if (event.locals.user?.role !== "admin") {
     return fail(403, { message: m.dashboard_invite_error_forbidden() });
   }
 
@@ -24,33 +26,36 @@ function requireAdmin(event: Parameters<NonNullable<Actions[keyof Actions]>>[0])
 }
 
 async function findManagedUser(userId: string) {
-  const [found] = await db.select({ id: user.id, name: user.name, role: user.role }).from(user).where(eq(user.id, userId));
+  const [found] = await db
+    .select({ id: user.id, name: user.name, role: user.role })
+    .from(user)
+    .where(eq(user.id, userId));
   return found ?? null;
 }
 
 async function countAdmins() {
   const [{ count }] = await db
-    .select({ count: sql<number>`count(*)`.as('count') })
+    .select({ count: sql<number>`count(*)`.as("count") })
     .from(user)
-    .where(eq(user.role, 'admin'));
+    .where(eq(user.role, "admin"));
 
   return Number(count);
 }
 
 export const load: PageServerLoad = async (event) => {
-  if (event.locals.user?.role !== 'admin') {
-    redirect(302, '/dashboard');
+  if (event.locals.user?.role !== "admin") {
+    redirect(302, "/dashboard");
   }
 
   const { users } = await auth.api.listUsers({
     headers: event.request.headers,
-    query: { limit: 100, sortBy: 'name', sortDirection: 'asc' },
+    query: { limit: 100, sortBy: "name", sortDirection: "asc" },
   });
 
   const lastActiveSessions = await db
     .select({
       userId: session.userId,
-      lastActive: sql<Date | null>`MAX(${session.updatedAt})`.as('last_active'),
+      lastActive: sql<Date | null>`MAX(${session.updatedAt})`.as("last_active"),
     })
     .from(session)
     .groupBy(session.userId);
@@ -60,7 +65,7 @@ export const load: PageServerLoad = async (event) => {
   return {
     users: users.map((u) => ({
       ...u,
-      managedRole: isAdminRole(u.role) ? ('admin' as const) : ('user' as const),
+      managedRole: isAdminRole(u.role) ? ("admin" as const) : ("user" as const),
       lastActive: lastActiveMap.get(u.id) ?? null,
     })),
   };
@@ -74,8 +79,8 @@ export const actions: Actions = {
     }
 
     const formData = await event.request.formData();
-    const email = formData.get('email')?.toString().trim().toLowerCase() ?? '';
-    const role = formData.get('role')?.toString() ?? 'user';
+    const email = formData.get("email")?.toString().trim().toLowerCase() ?? "";
+    const role = formData.get("role")?.toString() ?? "user";
 
     if (!EMAIL_REGEX.test(email)) {
       return fail(400, {
@@ -91,7 +96,7 @@ export const actions: Actions = {
       });
     }
 
-    const managedRole = role as 'admin' | 'user';
+    const managedRole = role as "admin" | "user";
 
     try {
       const invite = await createInvite(email, managedRole, 1);
@@ -120,8 +125,8 @@ export const actions: Actions = {
     }
 
     const formData = await event.request.formData();
-    const userId = formData.get('userId')?.toString() ?? '';
-    const role = formData.get('role')?.toString() ?? '';
+    const userId = formData.get("userId")?.toString() ?? "";
+    const role = formData.get("role")?.toString() ?? "";
 
     if (!userId) {
       return fail(400, { message: m.users_error_not_found() });
@@ -134,14 +139,14 @@ export const actions: Actions = {
       });
     }
 
-    const managedRole = role as 'admin' | 'user';
+    const managedRole = role as "admin" | "user";
 
     const targetUser = await findManagedUser(userId);
     if (!targetUser) {
       return fail(404, { message: m.users_error_not_found() });
     }
 
-    if (isAdminRole(targetUser.role) && managedRole !== 'admin') {
+    if (isAdminRole(targetUser.role) && managedRole !== "admin") {
       const adminCount = await countAdmins();
       if (adminCount <= 1) {
         return fail(400, { message: m.users_error_last_admin() });
@@ -166,7 +171,7 @@ export const actions: Actions = {
     }
 
     const formData = await event.request.formData();
-    const userId = formData.get('userId')?.toString() ?? '';
+    const userId = formData.get("userId")?.toString() ?? "";
 
     if (!userId) {
       return fail(400, { message: m.users_error_not_found() });

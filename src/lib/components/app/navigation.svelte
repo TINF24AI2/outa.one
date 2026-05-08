@@ -1,39 +1,41 @@
 <script lang="ts">
-  import { CircleUserRound, LogOut } from '@lucide/svelte';
-  import logo from '$lib/assets/logo.svg';
-  import { Button } from '$lib/components/ui/button';
-  import { m } from '$lib/paraglide/messages.js';
-  import { authClient } from '$lib/authClient';
-  import { goto } from '$app/navigation';
+  import { CircleUserRound, LogOut } from "@lucide/svelte";
+  import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
+
+  import logo from "$lib/assets/logo.svg";
+  import { authClient } from "$lib/authClient";
+  import { Button } from "$lib/components/ui/button";
+  import { m } from "$lib/paraglide/messages.js";
 
   type Props = {
     user: { name: string; email: string; role?: string | null };
-    children?: import('svelte').Snippet;
+    children?: import("svelte").Snippet;
   };
 
   let { user, children }: Props = $props();
 
-  const roleLabel = $derived(user.role === 'admin' ? m.role_admin() : m.role_employee());
+  const roleLabel = $derived(user.role === "admin" ? m.role_admin() : m.role_employee());
 
   const initials = $derived(
     user.name
-      .split(' ')
+      .split(" ")
       .map((n: string) => n[0])
       .slice(0, 2)
-      .join('')
+      .join("")
       .toUpperCase(),
   );
 
   const signOut = async () => {
     await authClient.signOut();
-    await goto('/login');
+    await goto(resolve("/login"));
   };
 
   let accountOpen = $state(false);
 </script>
 
 <!-- Desktop sidebar -->
-<aside class="bg-background hidden md:flex w-64 shrink-0 flex-col border-r">
+<aside class="bg-background hidden w-64 shrink-0 flex-col border-r md:flex">
   <!-- App header -->
   <div class="flex items-center gap-3 border-b px-4 py-3">
     <div class="bg-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-xl">
@@ -46,7 +48,7 @@
   </div>
 
   <!-- Nav slot -->
-  <nav class="flex flex-col h-full gap-1 py-4 px-2">
+  <nav class="flex h-full flex-col gap-1 px-2 py-4">
     {@render children?.()}
   </nav>
 
@@ -73,7 +75,7 @@
 
 <!-- Mobile bottom nav -->
 <nav
-  class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background border-t flex items-center justify-around px-2 py-1"
+  class="bg-background fixed right-0 bottom-0 left-0 z-40 flex items-center justify-around border-t px-2 py-1 md:hidden"
 >
   {@render children?.()}
 
@@ -84,13 +86,13 @@
       <button class="fixed inset-0 z-40" onclick={() => (accountOpen = false)} aria-label="Close account menu"></button>
 
       <!-- Popup -->
-      <div class="absolute bottom-full mb-3 right-0 z-50 min-w-52 rounded-xl border bg-popover shadow-lg">
+      <div class="bg-popover absolute right-0 bottom-full z-50 mb-3 min-w-52 rounded-xl border shadow-lg">
         <div class="px-4 py-3">
-          <p class="text-sm font-semibold leading-tight">{user.name}</p>
+          <p class="text-sm leading-tight font-semibold">{user.name}</p>
           <p class="text-muted-foreground text-xs">{user.email}</p>
         </div>
         <div class="border-t px-2 py-2">
-          <Button variant="ghost" class="w-full justify-start gap-2 px-2 h-9" onclick={signOut}>
+          <Button variant="ghost" class="h-9 w-full justify-start gap-2 px-2" onclick={signOut}>
             <LogOut class="h-4 w-4" />
             {m.navigation_logout()}
           </Button>

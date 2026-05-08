@@ -1,41 +1,40 @@
 <script lang="ts">
-import { CircleCheckBig, Mail, MoveLeft } from '@lucide/svelte';
-import { enhance } from '$app/forms';
-import logo from '$lib/assets/logo.svg';
-import { Button } from '$lib/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
-import { Input } from '$lib/components/ui/input';
-import { Label } from '$lib/components/ui/label';
-import { m } from '$lib/paraglide/messages.js';
-import type { ActionData } from './$types';
+  import { CircleCheckBig, Mail, MoveLeft } from "@lucide/svelte";
+  import { enhance } from "$app/forms";
 
-let { form }: { form: ActionData } = $props();
+  import logo from "$lib/assets/logo.svg";
+  import { Button } from "$lib/components/ui/button";
+  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "$lib/components/ui/card";
+  import { Input } from "$lib/components/ui/input";
+  import { Label } from "$lib/components/ui/label";
+  import { m } from "$lib/paraglide/messages.js";
 
-let loading = $state(false);
-let email = $state('');
-let fieldError = $state('');
+  import type { ActionData } from "./$types";
 
-function validate() {
-  if (!email.trim()) return m.auth_forgot_error_email_required();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return m.auth_forgot_error_email_invalid();
-  return '';
-}
+  let { form }: { form: ActionData } = $props();
+
+  let loading = $state(false);
+  let email = $state("");
+  let fieldError = $state("");
+
+  function validate() {
+    if (!email.trim()) return m.auth_forgot_error_email_required();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return m.auth_forgot_error_email_invalid();
+    return "";
+  }
 </script>
 
-<div
-  class="bg-muted/40 flex min-h-screen items-center justify-center px-4 py-12"
->
+<div class="bg-muted/40 flex min-h-screen items-center justify-center px-4 py-12">
   {#if form?.success}
     <Card class="w-full max-w-sm">
       <CardHeader class="items-center justify-items-center text-center">
-        <div
-          class="mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-green-100"
-        >
+        <div class="mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
           <CircleCheckBig class="h-7 w-7 text-green-600" />
         </div>
         <CardTitle class="text-xl">{m.auth_forgot_success_title()}</CardTitle>
         <CardDescription>
-          {m.auth_forgot_success_description()}<br />
+          {m.auth_forgot_success_description()}
+          <br />
           <span class="text-foreground font-semibold">{form.email}</span>
         </CardDescription>
       </CardHeader>
@@ -61,14 +60,8 @@ function validate() {
   {:else}
     <Card class="w-full max-w-sm">
       <CardHeader class="items-center justify-items-center text-center">
-        <div
-          class="bg-primary mb-2 flex h-14 w-14 items-center justify-center rounded-2xl"
-        >
-          <img
-            src={logo}
-            alt={m.auth_forgot_logo_alt()}
-            class="h-8 w-8 object-contain brightness-0 invert"
-          />
+        <div class="bg-primary mb-2 flex h-14 w-14 items-center justify-center rounded-2xl">
+          <img src={logo} alt={m.auth_forgot_logo_alt()} class="h-8 w-8 object-contain brightness-0 invert" />
         </div>
         <CardTitle class="text-xl">{m.auth_forgot_title()}</CardTitle>
         <CardDescription>{m.auth_forgot_description()}</CardDescription>
@@ -97,9 +90,7 @@ function validate() {
           <div class="flex flex-col gap-2">
             <Label for="email">{m.auth_forgot_email_label()}</Label>
             <div class="relative">
-              <Mail
-                class="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
-              />
+              <Mail class="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <Input
                 id="email"
                 name="email"
@@ -124,11 +115,7 @@ function validate() {
         </form>
 
         <div class="mt-4 text-center">
-          <Button
-            variant="link"
-            href="/login"
-            class="text-muted-foreground h-auto p-0 text-sm"
-          >
+          <Button variant="link" href="/login" class="text-muted-foreground h-auto p-0 text-sm">
             <MoveLeft class="mr-1.5 h-3.5 w-3.5" />
             {m.auth_forgot_back_to_login()}
           </Button>

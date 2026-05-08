@@ -1,57 +1,54 @@
 <script lang="ts">
-import { enhance } from '$app/forms';
-import { SquarePen } from '@lucide/svelte';
-import { Button, buttonVariants } from '$lib/components/ui/button';
-import * as Dialog from '$lib/components/ui/dialog';
-import * as Select from '$lib/components/ui/select';
-import { Label } from '$lib/components/ui/label';
-import { m } from '$lib/paraglide/messages';
+  import { SquarePen } from "@lucide/svelte";
+  import { enhance } from "$app/forms";
 
-type ManagedUser = {
-  id: string;
-  email: string;
-  managedRole: 'admin' | 'user';
-};
+  import { Button, buttonVariants } from "$lib/components/ui/button";
+  import * as Dialog from "$lib/components/ui/dialog";
+  import { Label } from "$lib/components/ui/label";
+  import * as Select from "$lib/components/ui/select";
+  import { m } from "$lib/paraglide/messages";
 
-let { user }: { user: ManagedUser } = $props();
+  type ManagedUser = {
+    id: string;
+    email: string;
+    managedRole: "admin" | "user";
+  };
 
-const roles = [
-  { value: 'admin', label: m.role_admin() },
-  { value: 'user', label: m.role_employee() },
-];
+  let { user }: { user: ManagedUser } = $props();
 
-let open = $state(false);
-let loading = $state(false);
-let value = $state<'admin' | 'user'>('user');
-let message = $state<string | null>(null);
-let fieldErrors = $state<{ role?: string }>({});
+  const roles = [
+    { value: "admin", label: m.role_admin() },
+    { value: "user", label: m.role_employee() },
+  ];
 
-const triggerContent = $derived(roles.find((role) => role.value === value)?.label ?? m.users_role_placeholder());
+  let open = $state(false);
+  let loading = $state(false);
+  let value = $derived(user.managedRole);
+  let message = $state<string | null>(null);
+  let fieldErrors = $state<{ role?: string }>({});
 
-$effect(() => {
-  value = user.managedRole;
-});
+  const triggerContent = $derived(roles.find((role) => role.value === value)?.label ?? m.users_role_placeholder());
 
-$effect(() => {
-  if (!open) {
-    loading = false;
-    return;
-  }
+  $effect(() => {
+    if (!open) {
+      loading = false;
+      return;
+    }
 
-  message = null;
-  fieldErrors = {};
-});
+    message = null;
+    fieldErrors = {};
+  });
 </script>
 
 <Dialog.Root bind:open>
   <Dialog.Trigger
     type="button"
-    class={buttonVariants({ variant: 'ghost', size: 'icon-sm' })}
+    class={buttonVariants({ variant: "ghost", size: "icon-sm" })}
     title={m.users_action_edit()}
   >
     <SquarePen class="h-4 w-4 text-gray-500" />
   </Dialog.Trigger>
-  <Dialog.Content class="sm:max-w-[425px]">
+  <Dialog.Content class="sm:max-w-106.25">
     <form
       method="post"
       action="?/updateUser"
@@ -64,11 +61,12 @@ $effect(() => {
           loading = false;
           await update({ reset: false });
 
-          const data = (result.type === 'success' || result.type === 'failure' ? result.data : null) as
-            | { message?: string; fieldErrors?: { role?: string } }
-            | null;
+          const data = (result.type === "success" || result.type === "failure" ? result.data : null) as {
+            message?: string;
+            fieldErrors?: { role?: string };
+          } | null;
 
-          if (result.type === 'success') {
+          if (result.type === "success") {
             open = false;
             return;
           }
@@ -115,7 +113,7 @@ $effect(() => {
         {/if}
       </div>
       <Dialog.Footer>
-        <Dialog.Close type="button" class={buttonVariants({ variant: 'outline' })}>
+        <Dialog.Close type="button" class={buttonVariants({ variant: "outline" })}>
           {m.users_dialog_cancel()}
         </Dialog.Close>
         <Button type="submit" disabled={loading}>{m.users_edit_submit()}</Button>

@@ -1,60 +1,54 @@
 <script lang="ts">
-import { Eye, EyeOff } from '@lucide/svelte';
-import { enhance } from '$app/forms';
-import logo from '$lib/assets/logo.svg';
-import { Alert, AlertDescription } from '$lib/components/ui/alert';
-import { Button } from '$lib/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '$lib/components/ui/card';
-import { Input } from '$lib/components/ui/input';
-import { Label } from '$lib/components/ui/label';
-import { Separator } from '$lib/components/ui/separator';
-import { DEMO_PASSWORD, DEMO_USERS } from '$lib/demo-users';
-import { m } from '$lib/paraglide/messages.js';
-import type { ActionData, PageData } from './$types';
+  import { Eye, EyeOff } from "@lucide/svelte";
+  import { enhance } from "$app/forms";
 
-let { data, form }: { data: PageData; form: ActionData } = $props();
+  import logo from "$lib/assets/logo.svg";
+  import { Alert, AlertDescription } from "$lib/components/ui/alert";
+  import { Button } from "$lib/components/ui/button";
+  import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "$lib/components/ui/card";
+  import { Input } from "$lib/components/ui/input";
+  import { Label } from "$lib/components/ui/label";
+  import { Separator } from "$lib/components/ui/separator";
+  import { DEMO_PASSWORD, DEMO_USERS } from "$lib/demo-users";
+  import { m } from "$lib/paraglide/messages.js";
 
-let loading = $state(false);
-let email = $state('');
-let password = $state('');
-let showPassword = $state(false);
-let fieldErrors = $state<{ email?: string; password?: string }>({});
-type FieldErrors = { email?: string; password?: string };
+  import type { ActionData, PageData } from "./$types";
 
-const demoUsers = DEMO_USERS.map((u) => ({
-  role: u.role === 'admin' ? m.role_admin() : m.role_employee(),
-  email: u.email,
-}));
+  let { data, form }: { data: PageData; form: ActionData } = $props();
 
-const serverFieldErrors = $derived((form?.fieldErrors ?? {}) as FieldErrors);
+  let loading = $state(false);
+  let email = $state("");
+  let password = $state("");
+  let showPassword = $state(false);
+  let fieldErrors = $state<{ email?: string; password?: string }>({});
+  type FieldErrors = { email?: string; password?: string };
 
-function validate() {
-  const errors: typeof fieldErrors = {};
-  if (!email.trim()) {
-    errors.email = m.auth_login_error_email_required();
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-    errors.email = m.auth_login_error_email_invalid();
+  const demoUsers = DEMO_USERS.map((u) => ({
+    role: u.role === "admin" ? m.role_admin() : m.role_employee(),
+    email: u.email,
+  }));
+
+  const serverFieldErrors = $derived((form?.fieldErrors ?? {}) as FieldErrors);
+
+  function validate() {
+    const errors: typeof fieldErrors = {};
+    if (!email.trim()) {
+      errors.email = m.auth_login_error_email_required();
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      errors.email = m.auth_login_error_email_invalid();
+    }
+    if (!password) {
+      errors.password = m.auth_login_error_password_required();
+    }
+    return errors;
   }
-  if (!password) {
-    errors.password = m.auth_login_error_password_required();
-  }
-  return errors;
-}
 </script>
 
-<div
-  class="bg-muted/40 flex min-h-screen items-center justify-center px-4 py-12"
->
+<div class="bg-muted/40 flex min-h-screen items-center justify-center px-4 py-12">
   <Card class="w-full max-w-sm">
     <CardHeader class="items-center justify-items-center text-center">
-      <div
-        class="bg-primary mb-2 flex h-14 w-14 items-center justify-center rounded-2xl"
-      >
-        <img
-          src={logo}
-          alt={m.auth_login_logo_alt()}
-          class="h-8 w-8 object-contain brightness-0 invert"
-        />
+      <div class="bg-primary mb-2 flex h-14 w-14 items-center justify-center rounded-2xl">
+        <img src={logo} alt={m.auth_login_logo_alt()} class="h-8 w-8 object-contain brightness-0 invert" />
       </div>
       <CardTitle class="text-xl">{m.auth_login_title()}</CardTitle>
       <CardDescription>{m.auth_login_description()}</CardDescription>
@@ -108,22 +102,16 @@ function validate() {
               placeholder="••••••••"
               autocomplete="current-password"
               bind:value={password}
-              aria-invalid={!!(
-                fieldErrors.password || serverFieldErrors.password
-              )}
+              aria-invalid={!!(fieldErrors.password || serverFieldErrors.password)}
               class="pr-10"
             />
             <button
               type="button"
               onclick={() => (showPassword = !showPassword)}
               class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
-              aria-label={showPassword
-                ? m.auth_login_hide_password()
-                : m.auth_login_show_password()}
+              aria-label={showPassword ? m.auth_login_hide_password() : m.auth_login_show_password()}
             >
-              {#if showPassword}<EyeOff class="h-4 w-4" />{:else}<Eye
-                  class="h-4 w-4"
-                />{/if}
+              {#if showPassword}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
             </button>
           </div>
           {#if fieldErrors.password || serverFieldErrors.password}
@@ -145,11 +133,7 @@ function validate() {
       </form>
 
       <div class="mt-4 text-center">
-        <Button
-          variant="link"
-          class="primary h-auto p-0 text-sm"
-          href="/forgot-password"
-        >
+        <Button variant="link" class="primary h-auto p-0 text-sm" href="/forgot-password">
           {m.auth_login_forgot_password()}
         </Button>
       </div>
@@ -162,7 +146,7 @@ function validate() {
           {m.auth_login_demo_title()}
         </p>
         <div class="w-full space-y-1">
-          {#each demoUsers as { role, email: demoEmail }}
+          {#each demoUsers as { role, email: demoEmail } (demoEmail)}
             <button
               type="button"
               onclick={() => {

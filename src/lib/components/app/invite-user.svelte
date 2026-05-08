@@ -1,24 +1,25 @@
 <script lang="ts">
-  import { enhance } from '$app/forms';
-  import { Button, buttonVariants } from '$lib/components/ui/button';
-  import * as Dialog from '$lib/components/ui/dialog';
-  import * as Select from '$lib/components/ui/select';
-  import { Input } from '$lib/components/ui/input';
-  import { Label } from '$lib/components/ui/label';
-  import { Mail, UserPlus } from '@lucide/svelte';
-  import { m } from '$lib/paraglide/messages';
+  import { Mail, UserPlus } from "@lucide/svelte";
+  import { enhance } from "$app/forms";
+
+  import { Button, buttonVariants } from "$lib/components/ui/button";
+  import * as Dialog from "$lib/components/ui/dialog";
+  import { Input } from "$lib/components/ui/input";
+  import { Label } from "$lib/components/ui/label";
+  import * as Select from "$lib/components/ui/select";
+  import { m } from "$lib/paraglide/messages";
 
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const roles = [
-    { value: 'admin', label: m.role_admin() },
-    { value: 'user', label: m.role_employee() },
+    { value: "admin", label: m.role_admin() },
+    { value: "user", label: m.role_employee() },
   ];
 
   let open = $state(false);
   let loading = $state(false);
-  let email = $state('');
-  let value = $state<'admin' | 'user'>('user');
+  let email = $state("");
+  let value = $state<"admin" | "user">("user");
   let message = $state<string | null>(null);
   let inviteUrl = $state<string | null>(null);
   let fieldErrors = $state<{ email?: string; role?: string }>({});
@@ -33,7 +34,7 @@
     }
 
     if (!roles.some((role) => role.value === value)) {
-      errors.role = 'Select a valid role.';
+      errors.role = "Select a valid role.";
     }
 
     return errors;
@@ -41,8 +42,8 @@
 
   $effect(() => {
     if (!open) {
-      email = '';
-      value = 'user';
+      email = "";
+      value = "user";
       message = null;
       inviteUrl = null;
       fieldErrors = {};
@@ -52,7 +53,7 @@
 </script>
 
 <Dialog.Root bind:open>
-  <Dialog.Trigger type="button" class={buttonVariants({ variant: 'default' })}>
+  <Dialog.Trigger type="button" class={buttonVariants({ variant: "default" })}>
     <UserPlus />
     {m.users_invite_button()}
   </Dialog.Trigger>
@@ -79,7 +80,7 @@
           loading = false;
           await update({ reset: false });
 
-          const data = (result.type === 'success' || result.type === 'failure' ? result.data : null) as {
+          const data = (result.type === "success" || result.type === "failure" ? result.data : null) as {
             inviteUrl?: string;
             message?: string;
             fieldErrors?: { email?: string; role?: string };
@@ -87,7 +88,7 @@
 
           message = data?.message ?? null;
           fieldErrors = data?.fieldErrors ?? {};
-          inviteUrl = result.type === 'success' ? (data?.inviteUrl ?? null) : null;
+          inviteUrl = result.type === "success" ? (data?.inviteUrl ?? null) : null;
         };
       }}
       class="grid gap-6"
@@ -145,12 +146,12 @@
             <p class="mb-1 text-xs text-gray-500">
               {m.dashboard_invite_link_label({ email: email.trim().toLowerCase() })}
             </p>
-            <p class="break-all font-mono text-xs text-gray-700">{inviteUrl}</p>
+            <p class="font-mono text-xs break-all text-gray-700">{inviteUrl}</p>
           </div>
         {/if}
       </div>
       <Dialog.Footer>
-        <Dialog.Close type="button" class={buttonVariants({ variant: 'outline' })}>
+        <Dialog.Close type="button" class={buttonVariants({ variant: "outline" })}>
           {m.users_dialog_cancel()}
         </Dialog.Close>
         <Button type="submit" disabled={loading}>

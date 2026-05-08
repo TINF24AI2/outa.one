@@ -1,9 +1,10 @@
-import { randomUUID } from 'node:crypto';
-import { eq } from 'drizzle-orm';
-import { db } from '$lib/server/db';
-import { invite, user } from '$lib/server/db/schema';
+import { randomUUID } from "node:crypto";
+import { eq } from "drizzle-orm";
 
-export async function createInvite(email: string, role: 'user' | 'admin' = 'user', expiresInDays = 7) {
+import { db } from "$lib/server/db";
+import { invite, user } from "$lib/server/db/schema";
+
+export async function createInvite(email: string, role: "user" | "admin" = "user", expiresInDays = 7) {
   if (await emailAlreadyRegistered(email)) {
     throw new Error(`${email} already has an account`);
   } else if (await emailAlreadyInvited(email)) {

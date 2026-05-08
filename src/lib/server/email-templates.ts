@@ -1,5 +1,5 @@
-const BRAND_COLOR = '#4353F0';
-const BRAND_LIGHT = '#EEF0FE';
+const BRAND_COLOR = "#4353F0";
+const BRAND_LIGHT = "#EEF0FE";
 
 // Inline SVG of the logo icon (key on document), white strokes on brand bg
 const LOGO_SVG = `<svg width="32" height="32" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">

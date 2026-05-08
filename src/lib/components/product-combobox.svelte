@@ -1,49 +1,49 @@
 <script lang="ts">
-import CheckIcon from '@lucide/svelte/icons/check';
-import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
-import { tick } from 'svelte';
-import * as Command from '$lib/components/ui/command/index.js';
-import * as Popover from '$lib/components/ui/popover/index.js';
-import { cn } from '$lib/utils.js';
+  import CheckIcon from "@lucide/svelte/icons/check";
+  import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
+  import { tick } from "svelte";
 
-interface Option {
-  value: string;
-  label: string;
-}
+  import * as Command from "$lib/components/ui/command/index.js";
+  import * as Popover from "$lib/components/ui/popover/index.js";
+  import { cn } from "$lib/utils.js";
 
-interface Props {
-  options: Option[];
-  placeholder?: string;
-  value?: string;
-  id?: string;
-  class?: string;
-  contentClass?: string;
-  width?: string;
-}
+  interface Option {
+    value: string;
+    label: string;
+  }
 
-let {
-  options,
-  placeholder = 'Select an option...',
-  value = $bindable(''),
-  id,
-  class: className,
-  contentClass,
-}: Props = $props();
+  interface Props {
+    options: Option[];
+    placeholder?: string;
+    value?: string;
+    id?: string;
+    class?: string;
+    contentClass?: string;
+  }
 
-let open = $state(false);
-let triggerRef = $state<HTMLButtonElement | null>(null);
+  let {
+    options,
+    placeholder = "Select an option...",
+    value = $bindable(""),
+    id,
+    class: className,
+    contentClass,
+  }: Props = $props();
 
-const selectedValue = $derived(options.find((o) => o.value === value)?.label);
+  let open = $state(false);
+  let triggerRef = $state<HTMLButtonElement | null>(null);
 
-// We want to refocus the trigger button when the user selects
-// an item from the list so users can continue navigating the
-// rest of the form with the keyboard.
-function closeAndFocusTrigger() {
-  open = false;
-  tick().then(() => {
-    triggerRef?.focus();
-  });
-}
+  const selectedValue = $derived(options.find((o) => o.value === value)?.label);
+
+  // We want to refocus the trigger button when the user selects
+  // an item from the list so users can continue navigating the
+  // rest of the form with the keyboard.
+  function closeAndFocusTrigger() {
+    open = false;
+    tick().then(() => {
+      triggerRef?.focus();
+    });
+  }
 </script>
 
 <Popover.Root bind:open>
@@ -55,9 +55,9 @@ function closeAndFocusTrigger() {
         role="combobox"
         aria-expanded={open}
         class={cn(
-          "border-input focus-visible:border-ring focus-visible:ring-ring/50 aria-expanded:border-ring aria-expanded:ring-ring/50 aria-expanded:ring-3 dark:bg-input/30 flex h-10 w-full min-w-0 items-center justify-between rounded-md border bg-transparent px-2.5 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-3 disabled:pointer-events-none disabled:opacity-50 md:text-sm",
+          "border-input focus-visible:border-ring focus-visible:ring-ring/50 aria-expanded:border-ring aria-expanded:ring-ring/50 dark:bg-input/30 flex h-10 w-full min-w-0 items-center justify-between rounded-md border bg-transparent px-2.5 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-3 disabled:pointer-events-none disabled:opacity-50 aria-expanded:ring-3 md:text-sm",
           !selectedValue && "text-muted-foreground",
-          className
+          className,
         )}
       >
         {selectedValue || placeholder}
@@ -79,9 +79,7 @@ function closeAndFocusTrigger() {
                 closeAndFocusTrigger();
               }}
             >
-              <CheckIcon
-                class={cn(value !== option.value && "text-transparent")}
-              />
+              <CheckIcon class={cn(value !== option.value && "text-transparent")} />
               {option.label}
             </Command.Item>
           {/each}

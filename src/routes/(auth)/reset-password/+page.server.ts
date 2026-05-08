@@ -1,16 +1,18 @@
-import { fail, redirect } from '@sveltejs/kit';
-import { APIError } from 'better-auth/api';
-import { m } from '$lib/paraglide/messages.js';
-import { auth } from '$lib/server/auth';
-import type { Actions, PageServerLoad } from './$types';
+import { fail, redirect } from "@sveltejs/kit";
+import { APIError } from "better-auth/api";
+
+import { m } from "$lib/paraglide/messages.js";
+import { auth } from "$lib/server/auth";
+
+import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async (event) => {
   if (event.locals.user) {
-    redirect(302, '/dashboard');
+    redirect(302, "/dashboard");
   }
-  const token = event.url.searchParams.get('token');
+  const token = event.url.searchParams.get("token");
   if (!token) {
-    redirect(302, '/forgot-password');
+    redirect(302, "/forgot-password");
   }
   return { token };
 };
@@ -18,9 +20,9 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
   default: async (event) => {
     const formData = await event.request.formData();
-    const token = formData.get('token')?.toString() ?? '';
-    const password = formData.get('password')?.toString() ?? '';
-    const confirmPassword = formData.get('confirmPassword')?.toString() ?? '';
+    const token = formData.get("token")?.toString() ?? "";
+    const password = formData.get("password")?.toString() ?? "";
+    const confirmPassword = formData.get("confirmPassword")?.toString() ?? "";
 
     if (password.length < 8) {
       return fail(400, { token, fieldErrors: { password: m.auth_password_min_length() } });

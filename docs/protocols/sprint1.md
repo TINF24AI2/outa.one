@@ -1,13 +1,12 @@
 # Sprint 1
 
-## Review 
+## Review
 
 ### Discussed things
 
 ### Feedback
 
 ### Other notes
-
 
 ## Retro
 
@@ -16,7 +15,6 @@
 ### Feedback
 
 ### Other notes
-
 
 ## Planning
 
