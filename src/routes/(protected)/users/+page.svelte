@@ -39,6 +39,56 @@
 
   <div class="flex-1 overflow-auto w-full max-w-7xl mx-auto p-6">
     <div class="rounded-lg border bg-white">
+
+      <!-- Mobile card list -->
+      <ul class="sm:hidden divide-y">
+        {#each data.users as user}
+          <li class="flex flex-col gap-3 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0">
+                <div
+                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700"
+                >
+                  {getInitials(user.name)}
+                </div>
+                <div class="min-w-0">
+                  <p class="font-semibold text-gray-900 truncate">{user.name}</p>
+                  <p class="text-sm text-gray-500 truncate">{user.email}</p>
+                </div>
+              </div>
+              <span
+                class={`shrink-0 inline-flex items-center rounded px-2.5 py-0.5 text-xs font-medium border ${
+                  user.managedRole === 'admin'
+                    ? 'border-blue-200 bg-blue-50 text-blue-700'
+                    : 'border-gray-300 bg-white text-gray-700'
+                }`}
+              >
+                {user.managedRole === 'admin' ? m.role_admin() : m.role_employee()}
+              </span>
+            </div>
+            <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+              <div>
+                <p class="text-xs text-gray-400">{m.users_table_licenses_held()}</p>
+                <p class="text-gray-700">0</p>
+              </div>
+              <div>
+                <p class="text-xs text-gray-400">{m.users_table_last_active()}</p>
+                <p class="text-gray-500">{formatDate(user.lastActive)}</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-end gap-0.5">
+              <Button variant="ghost" size="icon-sm" title={m.users_action_viewLicenses()}>
+                <KeyRound class="h-4 w-4 text-gray-500" />
+              </Button>
+              <EditUser {user} />
+              <DeleteUser {user} isCurrentUser={user.id === data.user.id} />
+            </div>
+          </li>
+        {/each}
+      </ul>
+
+      <!-- Desktop table -->
+      <div class="hidden sm:block">
       <Table.Root>
         <Table.Header class="bg-gray-100">
           <Table.Row class="[&>th]:text-neutral-500">
@@ -82,14 +132,16 @@
                   <Button variant="ghost" size="icon-sm" title={m.users_action_viewLicenses()}>
                     <KeyRound class="h-4 w-4 text-gray-500" />
                   </Button>
-                  <EditUser user={user} />
-                  <DeleteUser user={user} isCurrentUser={user.id === data.user.id} />
+                  <EditUser {user} />
+                  <DeleteUser {user} isCurrentUser={user.id === data.user.id} />
                 </div>
               </Table.Cell>
             </Table.Row>
           {/each}
         </Table.Body>
       </Table.Root>
+      </div>
+
     </div>
   </div>
 </div>
