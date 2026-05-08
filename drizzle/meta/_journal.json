@@ -1,34 +1,34 @@
 {
-  "version": "7",
-  "dialect": "postgresql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "7",
-      "when": 1778136564997,
-      "tag": "0000_init_migration",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1778181541282,
-      "tag": "0001_dizzy_major_mapleleaf",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1778190538521,
-      "tag": "0002_pink_greymalkin",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1778197437011,
-      "tag": "0003_shallow_jimmy_woo",
-      "breakpoints": true
-    }
-  ]
+	"version": "7",
+	"dialect": "postgresql",
+	"entries": [
+		{
+			"idx": 0,
+			"version": "7",
+			"when": 1778136564997,
+			"tag": "0000_init_migration",
+			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "7",
+			"when": 1778181541282,
+			"tag": "0001_dizzy_major_mapleleaf",
+			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1778190538521,
+			"tag": "0002_pink_greymalkin",
+			"breakpoints": true
+		},
+		{
+			"idx": 3,
+			"version": "7",
+			"when": 1778197437011,
+			"tag": "0003_shallow_jimmy_woo",
+			"breakpoints": true
+		}
+	]
 }

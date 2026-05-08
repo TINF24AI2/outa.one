@@ -1,36 +1,37 @@
 <script lang="ts">
-import type { Snippet } from 'svelte';
-import type { HTMLAttributes } from 'svelte/elements';
-import { cn, type WithElementRef } from '$lib/utils.js';
+	import type { Snippet } from 'svelte';
+	import type { HTMLAttributes } from 'svelte/elements';
 
-let {
-  ref = $bindable(null),
-  class: className,
-  children,
-  errors,
-  ...restProps
-}: WithElementRef<HTMLAttributes<HTMLDivElement>> & {
-  children?: Snippet;
-  errors?: { message?: string }[];
-} = $props();
+	import { cn, type WithElementRef } from '$lib/utils.js';
 
-const hasContent = $derived.by(() => {
-  // has slotted error
-  if (children) return true;
+	let {
+		ref = $bindable(null),
+		class: className,
+		children,
+		errors,
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> & {
+		children?: Snippet;
+		errors?: { message?: string }[];
+	} = $props();
 
-  // no errors
-  if (!errors || errors.length === 0) return false;
+	const hasContent = $derived.by(() => {
+		// has slotted error
+		if (children) return true;
 
-  // has an error but no message
-  if (errors.length === 1 && !errors[0]?.message) {
-    return false;
-  }
+		// no errors
+		if (!errors || errors.length === 0) return false;
 
-  return true;
-});
+		// has an error but no message
+		if (errors.length === 1 && !errors[0]?.message) {
+			return false;
+		}
 
-const isMultipleErrors = $derived(errors && errors.length > 1);
-const singleErrorMessage = $derived(errors && errors.length === 1 && errors[0]?.message);
+		return true;
+	});
+
+	const isMultipleErrors = $derived(errors && errors.length > 1);
+	const singleErrorMessage = $derived(errors && errors.length === 1 && errors[0]?.message);
 </script>
 
 {#if hasContent}
@@ -38,7 +39,7 @@ const singleErrorMessage = $derived(errors && errors.length === 1 && errors[0]?.
 		bind:this={ref}
 		role="alert"
 		data-slot="field-error"
-		class={cn("text-destructive text-sm font-normal", className)}
+		class={cn('text-destructive text-sm font-normal', className)}
 		{...restProps}
 	>
 		{#if children}
