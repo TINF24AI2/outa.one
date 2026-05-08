@@ -17,7 +17,7 @@ We are using the [lucide-svelte](https://lucide.dev/) icon library, which provid
 
 ```svelte
 <script lang="ts">
-	import { Home } from 'lucide-svelte';
+  import { Home } from "lucide-svelte";
 </script>
 
 <Home />
@@ -27,7 +27,7 @@ You can also add additional props to the icon component to customize its appeara
 
 ```svelte
 <script lang="ts">
-	import { Home } from 'lucide-svelte';
+  import { Home } from "lucide-svelte";
 </script>
 
 <Home size={24} color="blue" />

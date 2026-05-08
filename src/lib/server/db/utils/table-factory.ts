@@ -1,17 +1,17 @@
-import type { BuildExtraConfigColumns } from 'drizzle-orm';
-import { pgTable, timestamp, uuid, type PgColumnBuilderBase, type PgTableExtraConfigValue } from 'drizzle-orm/pg-core';
+import type { BuildExtraConfigColumns } from "drizzle-orm";
+import { pgTable, timestamp, uuid, type PgColumnBuilderBase, type PgTableExtraConfigValue } from "drizzle-orm/pg-core";
 
 const baseColumns = {
-	id: uuid('id').primaryKey().defaultRandom(),
-	createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 };
 
 const baseColumnsWithUpdate = {
-	...baseColumns,
-	updatedAt: timestamp('updated_at', { withTimezone: true })
-		.defaultNow()
-		.notNull()
-		.$onUpdate(() => new Date()),
+  ...baseColumns,
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
 };
 
 /**
@@ -22,22 +22,22 @@ const baseColumnsWithUpdate = {
  * @returns The drizzle pgtable object.
  */
 export const defineTable = <TName extends string, TColumns extends Record<string, PgColumnBuilderBase>>(
-	name: TName,
-	columns: TColumns,
-	extraConfig?: (
-		self: BuildExtraConfigColumns<typeof name, typeof baseColumns & TColumns, 'pg'>,
-	) => PgTableExtraConfigValue[],
+  name: TName,
+  columns: TColumns,
+  extraConfig?: (
+    self: BuildExtraConfigColumns<typeof name, typeof baseColumns & TColumns, "pg">,
+  ) => PgTableExtraConfigValue[],
 ) => {
-	return pgTable(
-		name,
-		{
-			...baseColumns,
-			...columns,
-		},
-		(table) => {
-			return extraConfig ? extraConfig(table) : [];
-		},
-	);
+  return pgTable(
+    name,
+    {
+      ...baseColumns,
+      ...columns,
+    },
+    (table) => {
+      return extraConfig ? extraConfig(table) : [];
+    },
+  );
 };
 
 /**
@@ -49,20 +49,20 @@ export const defineTable = <TName extends string, TColumns extends Record<string
  * @returns The drizzle pgtable object.
  */
 export const defineTableWithUpdate = <TName extends string, TColumns extends Record<string, PgColumnBuilderBase>>(
-	name: TName,
-	columns: TColumns,
-	extraConfig?: (
-		self: BuildExtraConfigColumns<typeof name, typeof baseColumnsWithUpdate & TColumns, 'pg'>,
-	) => PgTableExtraConfigValue[],
+  name: TName,
+  columns: TColumns,
+  extraConfig?: (
+    self: BuildExtraConfigColumns<typeof name, typeof baseColumnsWithUpdate & TColumns, "pg">,
+  ) => PgTableExtraConfigValue[],
 ) => {
-	return pgTable(
-		name,
-		{
-			...baseColumnsWithUpdate,
-			...columns,
-		},
-		(table) => {
-			return extraConfig ? extraConfig(table) : [];
-		},
-	);
+  return pgTable(
+    name,
+    {
+      ...baseColumnsWithUpdate,
+      ...columns,
+    },
+    (table) => {
+      return extraConfig ? extraConfig(table) : [];
+    },
+  );
 };

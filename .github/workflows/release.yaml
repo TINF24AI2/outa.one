@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+' # only triggers on semver tags like v1.2.3
+      - "v[0-9]+.[0-9]+.[0-9]+" # only triggers on semver tags like v1.2.3
 
 jobs:
   release:

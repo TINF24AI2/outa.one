@@ -14,8 +14,8 @@ services:
     image: axllent/mailpit
     ports:
       # SMTP
-      - '1025:1025'
+      - "1025:1025"
       # Web UI
-      - '8025:8025'
+      - "8025:8025"
 volumes:
   pgdata:

@@ -1,5 +1,5 @@
-const BRAND_COLOR = '#4353F0';
-const BRAND_LIGHT = '#EEF0FE';
+const BRAND_COLOR = "#4353F0";
+const BRAND_LIGHT = "#EEF0FE";
 
 // Inline SVG of the logo icon (key on document), white strokes on brand bg
 const LOGO_SVG = `<svg width="32" height="32" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -12,7 +12,7 @@ const LOGO_SVG = `<svg width="32" height="32" viewBox="0 0 36 36" fill="none" xm
 const LOGO_DATA_URI = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(LOGO_SVG)}`;
 
 function base(content: string) {
-	return `<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -72,7 +72,7 @@ function base(content: string) {
 }
 
 export function resetPasswordEmail(url: string) {
-	const content = `
+  const content = `
     <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#09090b;letter-spacing:-0.3px;">Reset your password</h1>
     <p style="margin:0 0 24px;font-size:15px;color:#52525b;line-height:1.6;">
       We received a request to reset the password for your account. Click the button below to choose a new password.
@@ -104,5 +104,5 @@ export function resetPasswordEmail(url: string) {
       This link expires in <strong style="color:#71717a;">1 hour</strong> and can only be used once.
     </p>
   `;
-	return base(content);
+  return base(content);
 }

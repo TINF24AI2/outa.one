@@ -1,20 +1,20 @@
 {
-	"useTabs": true,
-	"singleQuote": true,
-	"trailingComma": "all",
-	"printWidth": 120,
-	"plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss", "@ianvs/prettier-plugin-sort-imports"],
-	"overrides": [
-		{
-			"files": "*.svelte",
-			"options": {
-				"parser": "svelte"
-			}
-		}
-	],
-	"importOrder": ["<THIRD_PARTY_MODULES>", "", "^\\$lib/(.*)$", "", "^[./]"],
-	"importOrderParserPlugins": ["typescript", "svelte"],
-	"svelteBracketNewLine": true,
-	"htmlWhitespaceSensitivity": "ignore",
-	"endOfLine": "lf"
+  "useTabs": false,
+  "singleQuote": false,
+  "trailingComma": "all",
+  "printWidth": 120,
+  "plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss", "@ianvs/prettier-plugin-sort-imports"],
+  "overrides": [
+    {
+      "files": "*.svelte",
+      "options": {
+        "parser": "svelte"
+      }
+    }
+  ],
+  "importOrder": ["<THIRD_PARTY_MODULES>", "", "^\\$lib/(.*)$", "", "^[./]"],
+  "importOrderParserPlugins": ["typescript", "svelte"],
+  "svelteBracketNewLine": true,
+  "htmlWhitespaceSensitivity": "ignore",
+  "endOfLine": "lf"
 }

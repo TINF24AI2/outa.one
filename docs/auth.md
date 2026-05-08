@@ -32,8 +32,8 @@ Every request passes through `src/hooks.server.ts`, which runs two hooks in sequ
 
 ```ts
 interface Locals {
-	user?: User;
-	session?: Session;
+  user?: User;
+  session?: Session;
 }
 ```
 
@@ -52,7 +52,7 @@ The protected layout redirects to `/login` when `event.locals.user` is absent:
 
 ```ts
 // src/routes/(protected)/+layout.server.ts
-if (!event.locals.user) redirect(302, '/login');
+if (!event.locals.user) redirect(302, "/login");
 return { user: event.locals.user };
 ```
 
@@ -259,11 +259,11 @@ For development and testing, two pre-built accounts can be seeded into the datab
 **File:** `src/lib/demo-users.ts`
 
 ```ts
-export const DEMO_PASSWORD = 'password';
+export const DEMO_PASSWORD = "password";
 
 export const DEMO_USERS = [
-	{ id: 'demo-employee', name: 'Sarah Johnson', email: 'sarah.johnson@company.com', role: 'user' },
-	{ id: 'demo-admin', name: 'Emily Rodriguez', email: 'emily.rodriguez@company.com', role: 'admin' },
+  { id: "demo-employee", name: "Sarah Johnson", email: "sarah.johnson@company.com", role: "user" },
+  { id: "demo-admin", name: "Emily Rodriguez", email: "emily.rodriguez@company.com", role: "admin" },
 ];
 
 export const DEMO_EMAILS = DEMO_USERS.map((u) => u.email);

@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { Command as CommandPrimitive } from 'bits-ui';
+  import { Command as CommandPrimitive } from "bits-ui";
 
-	import { cn } from '$lib/utils.js';
+  import { cn } from "$lib/utils.js";
 
-	let { ref = $bindable(null), class: className, ...restProps }: CommandPrimitive.SeparatorProps = $props();
+  let { ref = $bindable(null), class: className, ...restProps }: CommandPrimitive.SeparatorProps = $props();
 </script>
 
 <CommandPrimitive.Separator
-	bind:ref
-	data-slot="command-separator"
-	class={cn('bg-border -mx-1 h-px w-auto', className)}
-	{...restProps}
+  bind:ref
+  data-slot="command-separator"
+  class={cn("bg-border -mx-1 h-px w-auto", className)}
+  {...restProps}
 />
