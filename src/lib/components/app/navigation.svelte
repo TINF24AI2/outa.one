@@ -1,29 +1,35 @@
 <script lang="ts">
-import { CircleUserRound, LogOut } from '@lucide/svelte';
-import { enhance } from '$app/forms';
-import logo from '$lib/assets/logo.svg';
-import { Button } from '$lib/components/ui/button';
-import { m } from '$lib/paraglide/messages.js';
+  import { CircleUserRound, LogOut } from '@lucide/svelte';
+  import logo from '$lib/assets/logo.svg';
+  import { Button } from '$lib/components/ui/button';
+  import { m } from '$lib/paraglide/messages.js';
+  import { authClient } from '$lib/authClient';
+  import { goto } from '$app/navigation';
 
-type Props = {
-  user: { name: string; email: string; role?: string | null };
-  children?: import('svelte').Snippet;
-};
+  type Props = {
+    user: { name: string; email: string; role?: string | null };
+    children?: import('svelte').Snippet;
+  };
 
-let { user, children }: Props = $props();
+  let { user, children }: Props = $props();
 
-const roleLabel = $derived(user.role === 'admin' ? m.role_admin() : m.role_employee());
+  const roleLabel = $derived(user.role === 'admin' ? m.role_admin() : m.role_employee());
 
-const initials = $derived(
-  user.name
-    .split(' ')
-    .map((n: string) => n[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase(),
-);
+  const initials = $derived(
+    user.name
+      .split(' ')
+      .map((n: string) => n[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase(),
+  );
 
-let accountOpen = $state(false);
+  const signOut = async () => {
+    await authClient.signOut();
+    await goto('/login');
+  };
+
+  let accountOpen = $state(false);
 </script>
 
 <!-- Desktop sidebar -->
@@ -58,12 +64,10 @@ let accountOpen = $state(false);
       </div>
     </div>
 
-    <form method="post" action="?/signOut" use:enhance>
-      <Button variant="ghost" class="w-full justify-start gap-2 px-2" type="submit">
-        <LogOut class="h-4 w-4" />
-        {m.navigation_logout()}
-      </Button>
-    </form>
+    <Button variant="ghost" class="w-full justify-start gap-2 px-2" onclick={signOut}>
+      <LogOut class="h-4 w-4" />
+      {m.navigation_logout()}
+    </Button>
   </div>
 </aside>
 
@@ -86,12 +90,10 @@ let accountOpen = $state(false);
           <p class="text-muted-foreground text-xs">{user.email}</p>
         </div>
         <div class="border-t px-2 py-2">
-          <form method="post" action="?/signOut" use:enhance>
-            <Button variant="ghost" class="w-full justify-start gap-2 px-2 h-9" type="submit">
-              <LogOut class="h-4 w-4" />
-              {m.navigation_logout()}
-            </Button>
-          </form>
+          <Button variant="ghost" class="w-full justify-start gap-2 px-2 h-9" onclick={signOut}>
+            <LogOut class="h-4 w-4" />
+            {m.navigation_logout()}
+          </Button>
         </div>
       </div>
     {/if}
