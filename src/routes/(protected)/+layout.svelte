@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Menu, Users } from '@lucide/svelte';
+import { FileKey, Menu, Package, Users } from '@lucide/svelte';
 import { page } from '$app/state';
 import Navigation from '$lib/components/app/navigation.svelte';
 
@@ -9,6 +9,8 @@ let pages = $derived(() => {
   if (data.user.role === 'admin') {
     return [
       { name: 'Dashboard', href: '/dashboard', icon: Menu },
+      { name: 'Products', href: '/products', icon: Package },
+      { name: 'Licenses', href: '/licenses', icon: FileKey },
       { name: 'Users', href: '/users', icon: Users },
     ];
   } else {
@@ -30,7 +32,7 @@ let pages = $derived(() => {
             : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
         }`}
       >
-        <navPage.icon />
+        <navPage.icon strokeWidth="1.25" />
         {navPage.name}
       </a>
     {/each}

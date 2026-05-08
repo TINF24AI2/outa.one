@@ -165,7 +165,10 @@ function validate() {
           {#each demoUsers as { role, email: demoEmail }}
             <button
               type="button"
-              onclick={() => { email = demoEmail; password = DEMO_PASSWORD; }}
+              onclick={() => {
+                email = demoEmail;
+                password = DEMO_PASSWORD;
+              }}
               class="hover:bg-muted flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors"
             >
               <span class="text-muted-foreground">{role}</span>

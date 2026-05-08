@@ -14,7 +14,7 @@
     "ignoreUnknown": false
   },
   "formatter": {
-    "enabled": true,
+    "enabled": false,
     "indentStyle": "space",
     "lineWidth": 120
   },
@@ -30,10 +30,10 @@
     }
   },
   "assist": {
-    "enabled": true,
+    "enabled": false,
     "actions": {
       "source": {
-        "organizeImports": "on"
+        "organizeImports": "off"
       }
     }
   },
@@ -48,7 +48,8 @@
           },
           "correctness": {
             "noUnusedVariables": "off",
-            "noUnusedImports": "off"
+            "noUnusedImports": "off",
+            "useImportExtensions": "off"
           }
         }
       }
