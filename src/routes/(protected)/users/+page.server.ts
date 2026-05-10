@@ -6,7 +6,7 @@ import { m } from "$lib/paraglide/messages.js";
 import { auth } from "$lib/server/auth";
 import { db } from "$lib/server/db";
 import { session, user } from "$lib/server/db/schema";
-import { createInvite } from "$lib/server/invites";
+import { createInvite, deleteInviteByEmail } from "$lib/server/invites";
 
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -27,7 +27,7 @@ function requireAdmin(event: Parameters<NonNullable<Actions[keyof Actions]>>[0])
 
 async function findManagedUser(userId: string) {
   const [found] = await db
-    .select({ id: user.id, name: user.name, role: user.role })
+    .select({ id: user.id, name: user.name, role: user.role, email: user.email })
     .from(user)
     .where(eq(user.id, userId));
   return found ?? null;
@@ -197,6 +197,8 @@ export const actions: Actions = {
       headers: event.request.headers,
       body: { userId },
     });
+
+    await deleteInviteByEmail(targetUser.email);
 
     return { message: m.users_delete_success({ name: targetUser.name }) };
   },
