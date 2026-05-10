@@ -66,7 +66,7 @@
       </div>
     </div>
 
-    <Button variant="ghost" class="w-full justify-start gap-2 px-2" onclick={signOut}>
+    <Button variant="ghost" class="w-full justify-start gap-2 px-2 text-gray-700" onclick={signOut}>
       <LogOut class="h-4 w-4" />
       {m.navigation_logout()}
     </Button>
@@ -92,7 +92,7 @@
           <p class="text-muted-foreground text-xs">{user.email}</p>
         </div>
         <div class="border-t px-2 py-2">
-          <Button variant="ghost" class="h-9 w-full justify-start gap-2 px-2" onclick={signOut}>
+          <Button variant="ghost" class="h-9 w-full justify-start gap-2 px-2 text-gray-700" onclick={signOut}>
             <LogOut class="h-4 w-4" />
             {m.navigation_logout()}
           </Button>

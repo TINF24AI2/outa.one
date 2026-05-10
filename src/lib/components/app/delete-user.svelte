@@ -4,6 +4,7 @@
 
   import { Button, buttonVariants } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
+  import { Separator } from "$lib/components/ui/separator";
   import { m } from "$lib/paraglide/messages";
 
   type ManagedUser = {
@@ -45,7 +46,7 @@
   >
     <UserX class="h-4 w-4 text-red-500" />
   </Dialog.Trigger>
-  <Dialog.Content class="sm:max-w-[425px]">
+  <Dialog.Content class="shadow-xl ring-0 sm:max-w-106.25">
     <form
       method="post"
       action="?/removeUser"
@@ -79,6 +80,7 @@
           })}
         </Dialog.Description>
       </Dialog.Header>
+      <div class="-mx-6 -mt-2"><Separator /></div>
       <div class="grid gap-4">
         <div class="grid gap-3">
           <h3>{m.users_delete_effects_title()}</h3>
@@ -94,14 +96,14 @@
           <p class="text-destructive text-sm">{message}</p>
         {/if}
       </div>
-      <Dialog.Footer>
-        <Dialog.Close type="button" class={buttonVariants({ variant: "outline" })}>
+      <div class="flex gap-3">
+        <Dialog.Close type="button" class={`${buttonVariants({ variant: "secondary" })} flex-1`}>
           {m.users_dialog_cancel()}
         </Dialog.Close>
-        <Button type="submit" variant="destructive" disabled={loading}>
+        <Button type="submit" variant="destructive" disabled={loading} class="flex-1">
           {m.users_delete_submit()}
         </Button>
-      </Dialog.Footer>
+      </div>
     </form>
   </Dialog.Content>
 </Dialog.Root>

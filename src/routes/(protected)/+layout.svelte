@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FileKey, Menu, Package, Users } from "@lucide/svelte";
+  import { FileKey, LayoutDashboard, Package, Users } from "@lucide/svelte";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
 
@@ -10,13 +10,13 @@
   let pages = $derived(() => {
     if (data.user.role === "admin") {
       return [
-        { name: "Dashboard", href: resolve("/dashboard"), icon: Menu },
+        { name: "Dashboard", href: resolve("/dashboard"), icon: LayoutDashboard },
         { name: "Products", href: resolve("/products"), icon: Package },
         { name: "Licenses", href: resolve("/licenses"), icon: FileKey },
         { name: "Users", href: resolve("/users"), icon: Users },
       ];
     } else {
-      return [{ name: "Dashboard", href: resolve("/dashboard"), icon: Menu }];
+      return [{ name: "Dashboard", href: resolve("/dashboard"), icon: LayoutDashboard }];
     }
   });
 </script>
@@ -28,13 +28,13 @@
       <a
         href={navPage.href}
         aria-current={isActive ? "page" : undefined}
-        class={`flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium transition-colors ${
+        class={`flex flex-col items-center gap-0.5 px-4 py-2 text-xs transition-colors md:flex-row md:gap-2 md:rounded-md md:px-3 md:py-3 md:text-sm md:font-medium ${
           isActive
-            ? "bg-primary hover:bg-primary/90 text-white hover:text-white"
-            : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+            ? "text-primary md:bg-primary md:hover:bg-primary/90 md:text-white md:hover:text-white"
+            : "text-muted-foreground hover:text-foreground md:text-gray-700 md:hover:bg-gray-100 md:hover:text-gray-900"
         }`}
       >
-        <navPage.icon strokeWidth="1.25" />
+        <navPage.icon class="h-6 w-6 md:h-4 md:w-4" />
         {navPage.name}
       </a>
     {/each}

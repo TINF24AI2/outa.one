@@ -7,6 +7,7 @@
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
   import * as Select from "$lib/components/ui/select";
+  import { Separator } from "$lib/components/ui/separator";
   import { m } from "$lib/paraglide/messages";
 
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -57,7 +58,7 @@
     <UserPlus />
     {m.users_invite_button()}
   </Dialog.Trigger>
-  <Dialog.Content class="sm:max-w-[425px]">
+  <Dialog.Content class="shadow-xl ring-0 sm:max-w-106.25">
     <form
       method="post"
       action="?/inviteUser"
@@ -97,6 +98,7 @@
         <Dialog.Title>{m.users_invite_dialog_title()}</Dialog.Title>
         <Dialog.Description>{m.users_invite_dialog_description()}</Dialog.Description>
       </Dialog.Header>
+      <div class="-mx-6 -mt-2"><Separator /></div>
       <div class="grid gap-4">
         <div class="grid gap-3">
           <Label for="email">{m.auth_login_email_label()}</Label>
@@ -150,15 +152,15 @@
           </div>
         {/if}
       </div>
-      <Dialog.Footer>
-        <Dialog.Close type="button" class={buttonVariants({ variant: "outline" })}>
+      <div class="flex gap-3">
+        <Dialog.Close type="button" class={`${buttonVariants({ variant: "secondary" })} flex-1`}>
           {m.users_dialog_cancel()}
         </Dialog.Close>
-        <Button type="submit" disabled={loading}>
+        <Button type="submit" disabled={loading} class="flex-1">
           <Mail />
           {m.users_invite_submit()}
         </Button>
-      </Dialog.Footer>
+      </div>
     </form>
   </Dialog.Content>
 </Dialog.Root>
