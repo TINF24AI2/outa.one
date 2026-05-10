@@ -31,7 +31,8 @@ export const load: PageServerLoad = async (event) => {
     return { error: "invalid_invite" as const, form };
   }
 
-  const form = await superValidate({ token: invite.token }, zod(signupSchema()));
+  const form = await superValidate(zod(signupSchema()));
+  form.data.token = invite.token;
   return { form, email: invite.email };
 };
 

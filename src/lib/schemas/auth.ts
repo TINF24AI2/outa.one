@@ -4,7 +4,10 @@ import { m } from "$lib/paraglide/messages.js";
 
 export function loginSchema() {
   return z.object({
-    email: z.string().min(1, m.auth_login_error_email_required()).email(m.auth_login_error_email_invalid()),
+    email: z
+      .string()
+      .min(1, m.auth_login_error_email_required())
+      .refine((val) => !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim()), m.auth_login_error_email_invalid()),
     password: z.string().min(1, m.auth_login_error_password_required()),
   });
 }
@@ -25,7 +28,10 @@ export function signupSchema() {
 
 export function forgotPasswordSchema() {
   return z.object({
-    email: z.string().min(1, m.auth_forgot_error_email_required()).email(m.auth_forgot_error_email_invalid()),
+    email: z
+      .string()
+      .min(1, m.auth_forgot_error_email_required())
+      .refine((val) => !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim()), m.auth_forgot_error_email_invalid()),
   });
 }
 

@@ -86,7 +86,7 @@
               </button>
             </div>
             {#if $errors.password}
-              <p class="text-destructive text-xs">{$errors.password}</p>
+              <p class="text-destructive text-xs">{$errors.password?.[0]}</p>
             {:else}
               <p class="text-muted-foreground text-xs">{m.auth_password_min_length()}</p>
             {/if}
@@ -115,7 +115,7 @@
               </button>
             </div>
             {#if $errors.confirmPassword}
-              <p class="text-destructive text-xs">{$errors.confirmPassword}</p>
+              <p class="text-destructive text-xs">{$errors.confirmPassword?.[0]}</p>
             {/if}
           </div>
 

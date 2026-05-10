@@ -54,7 +54,7 @@
             aria-invalid={!!$errors.email}
           />
           {#if $errors.email}
-            <p class="text-destructive text-xs">{$errors.email}</p>
+            <p class="text-destructive text-xs">{$errors.email?.[0]}</p>
           {/if}
         </div>
 
@@ -81,7 +81,7 @@
             </button>
           </div>
           {#if $errors.password}
-            <p class="text-destructive text-xs">{$errors.password}</p>
+            <p class="text-destructive text-xs">{$errors.password?.[0]}</p>
           {/if}
         </div>
 

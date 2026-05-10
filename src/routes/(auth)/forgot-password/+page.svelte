@@ -81,7 +81,7 @@
               />
             </div>
             {#if $errors.email}
-              <p class="text-destructive text-xs">{$errors.email}</p>
+              <p class="text-destructive text-xs">{$errors.email?.[0]}</p>
             {/if}
           </div>
 
