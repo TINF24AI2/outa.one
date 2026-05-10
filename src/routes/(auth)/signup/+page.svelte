@@ -1,6 +1,7 @@
 <script lang="ts">
   import { CircleX, Eye, EyeOff, Link2Off, UserPlus } from "@lucide/svelte";
-  import { enhance } from "$app/forms";
+  import { superForm } from "sveltekit-superforms";
+  import { zod4Client as zodClient } from "sveltekit-superforms/adapters";
 
   import { Alert, AlertDescription } from "$lib/components/ui/alert";
   import { Button } from "$lib/components/ui/button";
@@ -8,42 +9,20 @@
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
   import { m } from "$lib/paraglide/messages.js";
+  import { signupSchema } from "$lib/schemas/auth";
 
-  import type { ActionData, PageData } from "./$types";
+  import type { PageData } from "./$types";
 
-  let { data, form }: { data: PageData; form: ActionData } = $props();
+  let { data }: { data: PageData } = $props();
 
-  let loading = $state(false);
+  const { form, errors, enhance, submitting, message } = superForm(data.form, {
+    validators: zodClient(signupSchema()),
+  });
+
   let showPassword = $state(false);
   let showConfirm = $state(false);
-  let name = $state("");
-  let password = $state("");
-  let confirmPassword = $state("");
-  let fieldErrors = $state<{
-    name?: string;
-    password?: string;
-    confirmPassword?: string;
-  }>({});
 
   const isError = $derived("error" in data);
-
-  function validate() {
-    const errors: typeof fieldErrors = {};
-    if (!name.trim()) {
-      errors.name = m.auth_signup_error_name_required();
-    }
-    if (!password) {
-      errors.password = m.auth_signup_error_password_required();
-    } else if (password.length < 8) {
-      errors.password = m.auth_password_min_length();
-    }
-    if (!confirmPassword) {
-      errors.confirmPassword = m.auth_signup_error_confirm_required();
-    } else if (password !== confirmPassword) {
-      errors.confirmPassword = m.auth_signup_error_password_mismatch();
-    }
-    return errors;
-  }
 </script>
 
 <div class="bg-muted/40 flex min-h-screen items-center justify-center px-4 py-12">
@@ -91,26 +70,8 @@
       </CardHeader>
 
       <CardContent>
-        <form
-          method="post"
-          novalidate
-          use:enhance={({ cancel }) => {
-            const errors = validate();
-            if (Object.keys(errors).length > 0) {
-              fieldErrors = errors;
-              cancel();
-              return;
-            }
-            fieldErrors = {};
-            loading = true;
-            return async ({ update }) => {
-              loading = false;
-              await update();
-            };
-          }}
-          class="flex flex-col gap-4"
-        >
-          <input type="hidden" name="token" value={data.token} />
+        <form method="post" use:enhance class="flex flex-col gap-4">
+          <input type="hidden" name="token" bind:value={$form.token} />
 
           <div class="flex flex-col gap-2">
             <Label for="name">{m.auth_signup_name_label()}</Label>
@@ -120,11 +81,11 @@
               type="text"
               placeholder={m.auth_signup_name_placeholder()}
               autocomplete="name"
-              bind:value={name}
-              aria-invalid={!!fieldErrors.name}
+              bind:value={$form.name}
+              aria-invalid={!!$errors.name}
             />
-            {#if fieldErrors.name}
-              <p class="text-destructive text-xs">{fieldErrors.name}</p>
+            {#if $errors.name}
+              <p class="text-destructive text-xs">{$errors.name}</p>
             {/if}
           </div>
 
@@ -137,8 +98,8 @@
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 autocomplete="new-password"
-                bind:value={password}
-                aria-invalid={!!fieldErrors.password}
+                bind:value={$form.password}
+                aria-invalid={!!$errors.password}
                 class="pr-10"
               />
               <button
@@ -150,12 +111,10 @@
                 {#if showPassword}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
               </button>
             </div>
-            {#if fieldErrors.password}
-              <p class="text-destructive text-xs">{fieldErrors.password}</p>
+            {#if $errors.password}
+              <p class="text-destructive text-xs">{$errors.password}</p>
             {:else}
-              <p class="text-muted-foreground text-xs">
-                {m.auth_password_min_length()}
-              </p>
+              <p class="text-muted-foreground text-xs">{m.auth_password_min_length()}</p>
             {/if}
           </div>
 
@@ -168,8 +127,8 @@
                 type={showConfirm ? "text" : "password"}
                 placeholder="••••••••"
                 autocomplete="new-password"
-                bind:value={confirmPassword}
-                aria-invalid={!!fieldErrors.confirmPassword}
+                bind:value={$form.confirmPassword}
+                aria-invalid={!!$errors.confirmPassword}
                 class="pr-10"
               />
               <button
@@ -181,21 +140,19 @@
                 {#if showConfirm}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
               </button>
             </div>
-            {#if fieldErrors.confirmPassword}
-              <p class="text-destructive text-xs">
-                {fieldErrors.confirmPassword}
-              </p>
+            {#if $errors.confirmPassword}
+              <p class="text-destructive text-xs">{$errors.confirmPassword}</p>
             {/if}
           </div>
 
-          {#if form?.message}
+          {#if $message}
             <Alert variant="destructive">
-              <AlertDescription>{form.message}</AlertDescription>
+              <AlertDescription>{$message}</AlertDescription>
             </Alert>
           {/if}
 
-          <Button type="submit" class="w-full" disabled={loading}>
-            {loading ? m.auth_signup_submit_loading() : m.auth_signup_submit()}
+          <Button type="submit" class="w-full" disabled={$submitting}>
+            {$submitting ? m.auth_signup_submit_loading() : m.auth_signup_submit()}
           </Button>
         </form>
       </CardContent>

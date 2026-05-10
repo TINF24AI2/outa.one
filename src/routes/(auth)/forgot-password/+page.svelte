@@ -1,6 +1,7 @@
 <script lang="ts">
   import { CircleCheckBig, Mail, MoveLeft } from "@lucide/svelte";
-  import { enhance } from "$app/forms";
+  import { superForm } from "sveltekit-superforms";
+  import { zod4Client as zodClient } from "sveltekit-superforms/adapters";
 
   import logo from "$lib/assets/logo.svg";
   import { Button } from "$lib/components/ui/button";
@@ -8,24 +9,19 @@
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
   import { m } from "$lib/paraglide/messages.js";
+  import { forgotPasswordSchema } from "$lib/schemas/auth";
 
-  import type { ActionData } from "./$types";
+  import type { PageData } from "./$types";
 
-  let { form }: { form: ActionData } = $props();
+  let { data }: { data: PageData } = $props();
 
-  let loading = $state(false);
-  let email = $state("");
-  let fieldError = $state("");
-
-  function validate() {
-    if (!email.trim()) return m.auth_forgot_error_email_required();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return m.auth_forgot_error_email_invalid();
-    return "";
-  }
+  const { form, errors, enhance, submitting, message } = superForm(data.form, {
+    validators: zodClient(forgotPasswordSchema()),
+  });
 </script>
 
 <div class="bg-muted/40 flex min-h-screen items-center justify-center px-4 py-12">
-  {#if form?.success}
+  {#if $message?.success}
     <Card class="w-full max-w-sm">
       <CardHeader class="items-center justify-items-center text-center">
         <div class="mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
@@ -35,7 +31,7 @@
         <CardDescription>
           {m.auth_forgot_success_description()}
           <br />
-          <span class="text-foreground font-semibold">{form.email}</span>
+          <span class="text-foreground font-semibold">{$message.email}</span>
         </CardDescription>
       </CardHeader>
       <CardContent class="flex flex-col gap-4">
@@ -68,25 +64,7 @@
       </CardHeader>
 
       <CardContent>
-        <form
-          method="post"
-          novalidate
-          use:enhance={({ cancel }) => {
-            const error = validate();
-            if (error) {
-              fieldError = error;
-              cancel();
-              return;
-            }
-            fieldError = "";
-            loading = true;
-            return async ({ update }) => {
-              loading = false;
-              await update();
-            };
-          }}
-          class="flex flex-col gap-4"
-        >
+        <form method="post" use:enhance class="flex flex-col gap-4">
           <div class="flex flex-col gap-2">
             <Label for="email">{m.auth_forgot_email_label()}</Label>
             <div class="relative">
@@ -97,20 +75,18 @@
                 type="email"
                 placeholder={m.auth_forgot_email_placeholder()}
                 autocomplete="email"
-                bind:value={email}
-                aria-invalid={!!(fieldError || form?.fieldError)}
+                bind:value={$form.email}
+                aria-invalid={!!$errors.email}
                 class="pl-9"
               />
             </div>
-            {#if fieldError || form?.fieldError}
-              <p class="text-destructive text-xs">
-                {fieldError || form?.fieldError}
-              </p>
+            {#if $errors.email}
+              <p class="text-destructive text-xs">{$errors.email}</p>
             {/if}
           </div>
 
-          <Button type="submit" class="w-full" disabled={loading}>
-            {loading ? m.auth_forgot_submit_loading() : m.auth_forgot_submit()}
+          <Button type="submit" class="w-full" disabled={$submitting}>
+            {$submitting ? m.auth_forgot_submit_loading() : m.auth_forgot_submit()}
           </Button>
         </form>
 

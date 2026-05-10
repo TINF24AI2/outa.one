@@ -1,8 +1,9 @@
 <script lang="ts">
   import { CircleCheckBig, Eye, EyeOff } from "@lucide/svelte";
-  import { enhance } from "$app/forms";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
+  import { superForm } from "sveltekit-superforms";
+  import { zod4Client as zodClient } from "sveltekit-superforms/adapters";
 
   import logo from "$lib/assets/logo.svg";
   import { Alert, AlertDescription } from "$lib/components/ui/alert";
@@ -11,42 +12,21 @@
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
   import { m } from "$lib/paraglide/messages.js";
+  import { resetPasswordSchema } from "$lib/schemas/auth";
 
-  import type { ActionData, PageData } from "./$types";
+  import type { PageData } from "./$types";
 
-  let { data, form }: { data: PageData; form: ActionData } = $props();
+  let { data }: { data: PageData } = $props();
 
-  let loading = $state(false);
-  let password = $state("");
-  let confirmPassword = $state("");
+  const { form, errors, enhance, submitting, message } = superForm(data.form, {
+    validators: zodClient(resetPasswordSchema()),
+  });
+
   let showPassword = $state(false);
   let showConfirm = $state(false);
-  let fieldErrors = $state<{ password?: string; confirmPassword?: string }>({});
-
-  const serverFieldErrors = $derived(
-    (form?.fieldErrors ?? {}) as {
-      password?: string;
-      confirmPassword?: string;
-    },
-  );
-
-  function validate() {
-    const errors: typeof fieldErrors = {};
-    if (!password) {
-      errors.password = m.auth_reset_error_password_required();
-    } else if (password.length < 8) {
-      errors.password = m.auth_password_min_length();
-    }
-    if (!confirmPassword) {
-      errors.confirmPassword = m.auth_reset_error_confirm_required();
-    } else if (password !== confirmPassword) {
-      errors.confirmPassword = m.auth_reset_error_password_mismatch();
-    }
-    return errors;
-  }
 
   $effect(() => {
-    if (form?.success) {
+    if ($message && typeof $message === "object" && "success" in $message) {
       const timer = setTimeout(() => goto(resolve("/login")), 3000);
       return () => clearTimeout(timer);
     }
@@ -54,7 +34,7 @@
 </script>
 
 <div class="bg-muted/40 flex min-h-screen items-center justify-center px-4 py-12">
-  {#if form?.success}
+  {#if $message && typeof $message === "object" && "success" in $message}
     <Card class="w-full max-w-sm">
       <CardHeader class="items-center justify-items-center text-center">
         <div class="mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
@@ -80,26 +60,8 @@
       </CardHeader>
 
       <CardContent>
-        <form
-          method="post"
-          novalidate
-          use:enhance={({ cancel }) => {
-            const errors = validate();
-            if (Object.keys(errors).length > 0) {
-              fieldErrors = errors;
-              cancel();
-              return;
-            }
-            fieldErrors = {};
-            loading = true;
-            return async ({ update }) => {
-              loading = false;
-              await update();
-            };
-          }}
-          class="flex flex-col gap-4"
-        >
-          <input type="hidden" name="token" value={data.token} />
+        <form method="post" use:enhance class="flex flex-col gap-4">
+          <input type="hidden" name="token" bind:value={$form.token} />
 
           <div class="flex flex-col gap-2">
             <Label for="password">{m.auth_reset_password_label()}</Label>
@@ -110,8 +72,8 @@
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 autocomplete="new-password"
-                bind:value={password}
-                aria-invalid={!!(fieldErrors.password || serverFieldErrors.password)}
+                bind:value={$form.password}
+                aria-invalid={!!$errors.password}
                 class="pr-10"
               />
               <button
@@ -123,14 +85,10 @@
                 {#if showPassword}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
               </button>
             </div>
-            {#if fieldErrors.password || serverFieldErrors.password}
-              <p class="text-destructive text-xs">
-                {fieldErrors.password ?? serverFieldErrors.password}
-              </p>
+            {#if $errors.password}
+              <p class="text-destructive text-xs">{$errors.password}</p>
             {:else}
-              <p class="text-muted-foreground text-xs">
-                {m.auth_password_min_length()}
-              </p>
+              <p class="text-muted-foreground text-xs">{m.auth_password_min_length()}</p>
             {/if}
           </div>
 
@@ -143,8 +101,8 @@
                 type={showConfirm ? "text" : "password"}
                 placeholder="••••••••"
                 autocomplete="new-password"
-                bind:value={confirmPassword}
-                aria-invalid={!!(fieldErrors.confirmPassword || serverFieldErrors.confirmPassword)}
+                bind:value={$form.confirmPassword}
+                aria-invalid={!!$errors.confirmPassword}
                 class="pr-10"
               />
               <button
@@ -156,21 +114,19 @@
                 {#if showConfirm}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
               </button>
             </div>
-            {#if fieldErrors.confirmPassword || serverFieldErrors.confirmPassword}
-              <p class="text-destructive text-xs">
-                {fieldErrors.confirmPassword ?? serverFieldErrors.confirmPassword}
-              </p>
+            {#if $errors.confirmPassword}
+              <p class="text-destructive text-xs">{$errors.confirmPassword}</p>
             {/if}
           </div>
 
-          {#if form?.message}
+          {#if $message && typeof $message === "string"}
             <Alert variant="destructive">
-              <AlertDescription>{form.message}</AlertDescription>
+              <AlertDescription>{$message}</AlertDescription>
             </Alert>
           {/if}
 
-          <Button type="submit" class="w-full" disabled={loading}>
-            {loading ? m.auth_reset_submit_loading() : m.auth_reset_submit()}
+          <Button type="submit" class="w-full" disabled={$submitting}>
+            {$submitting ? m.auth_reset_submit_loading() : m.auth_reset_submit()}
           </Button>
         </form>
 
