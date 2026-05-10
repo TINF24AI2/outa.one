@@ -1,47 +1,34 @@
 <script lang="ts">
   import { Eye, EyeOff } from "@lucide/svelte";
-  import { enhance } from "$app/forms";
+  import { superForm } from "sveltekit-superforms";
+  import { zod4Client as zodClient } from "sveltekit-superforms/adapters";
 
   import logo from "$lib/assets/logo.svg";
   import { Alert, AlertDescription } from "$lib/components/ui/alert";
   import { Button } from "$lib/components/ui/button";
   import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "$lib/components/ui/card";
+  import { FormControl, FormField, FormFieldErrors, FormLabel } from "$lib/components/ui/form";
   import { Input } from "$lib/components/ui/input";
-  import { Label } from "$lib/components/ui/label";
   import { Separator } from "$lib/components/ui/separator";
   import { DEMO_PASSWORD, DEMO_USERS } from "$lib/demo-users";
   import { m } from "$lib/paraglide/messages.js";
+  import { loginSchema } from "$lib/schemas/auth";
 
-  import type { ActionData, PageData } from "./$types";
+  import type { PageData } from "./$types";
 
-  let { data, form }: { data: PageData; form: ActionData } = $props();
+  let { data }: { data: PageData } = $props();
 
-  let loading = $state(false);
-  let email = $state("");
-  let password = $state("");
+  const sf = superForm(data.form, {
+    validators: zodClient(loginSchema),
+  });
+  const { form, enhance, submitting, message } = sf;
+
   let showPassword = $state(false);
-  let fieldErrors = $state<{ email?: string; password?: string }>({});
-  type FieldErrors = { email?: string; password?: string };
 
   const demoUsers = DEMO_USERS.map((u) => ({
     role: u.role === "admin" ? m.role_admin() : m.role_employee(),
     email: u.email,
   }));
-
-  const serverFieldErrors = $derived((form?.fieldErrors ?? {}) as FieldErrors);
-
-  function validate() {
-    const errors: typeof fieldErrors = {};
-    if (!email.trim()) {
-      errors.email = m.auth_login_error_email_required();
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      errors.email = m.auth_login_error_email_invalid();
-    }
-    if (!password) {
-      errors.password = m.auth_login_error_password_required();
-    }
-    return errors;
-  }
 </script>
 
 <div class="bg-muted/40 flex min-h-screen items-center justify-center px-4 py-12">
@@ -55,80 +42,58 @@
     </CardHeader>
 
     <CardContent>
-      <form
-        method="post"
-        novalidate
-        use:enhance={({ cancel }) => {
-          const errors = validate();
-          if (Object.keys(errors).length > 0) {
-            fieldErrors = errors;
-            cancel();
-            return;
-          }
-          fieldErrors = {};
-          loading = true;
-          return async ({ update }) => {
-            loading = false;
-            await update();
-          };
-        }}
-        class="flex flex-col gap-4"
-      >
-        <div class="flex flex-col gap-2">
-          <Label for="email">{m.auth_login_email_label()}</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            placeholder={m.auth_login_email_placeholder()}
-            autocomplete="email"
-            bind:value={email}
-            aria-invalid={!!(fieldErrors.email || serverFieldErrors.email)}
-          />
-          {#if fieldErrors.email}
-            <p class="text-destructive text-xs">
-              {fieldErrors.email ?? serverFieldErrors.email}
-            </p>
-          {/if}
-        </div>
+      <form method="post" use:enhance class="flex flex-col gap-4">
+        <FormField form={sf} name="email">
+          <FormControl>
+            {#snippet children({ props })}
+              <FormLabel>{m.auth_login_email_label()}</FormLabel>
+              <Input
+                {...props}
+                type="email"
+                placeholder={m.auth_login_email_placeholder()}
+                autocomplete="email"
+                bind:value={$form.email}
+              />
+            {/snippet}
+          </FormControl>
+          <FormFieldErrors />
+        </FormField>
 
-        <div class="flex flex-col gap-2">
-          <Label for="password">{m.auth_login_password_label()}</Label>
-          <div class="relative">
-            <Input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
-              autocomplete="current-password"
-              bind:value={password}
-              aria-invalid={!!(fieldErrors.password || serverFieldErrors.password)}
-              class="pr-10"
-            />
-            <button
-              type="button"
-              onclick={() => (showPassword = !showPassword)}
-              class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
-              aria-label={showPassword ? m.auth_login_hide_password() : m.auth_login_show_password()}
-            >
-              {#if showPassword}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
-            </button>
-          </div>
-          {#if fieldErrors.password || serverFieldErrors.password}
-            <p class="text-destructive text-xs">
-              {fieldErrors.password ?? serverFieldErrors.password}
-            </p>
-          {/if}
-        </div>
+        <FormField form={sf} name="password">
+          <FormControl>
+            {#snippet children({ props })}
+              <FormLabel>{m.auth_login_password_label()}</FormLabel>
+              <div class="relative">
+                <Input
+                  {...props}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  autocomplete="current-password"
+                  bind:value={$form.password}
+                  class="pr-10"
+                />
+                <button
+                  type="button"
+                  onclick={() => (showPassword = !showPassword)}
+                  class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
+                  aria-label={showPassword ? m.auth_login_hide_password() : m.auth_login_show_password()}
+                >
+                  {#if showPassword}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
+                </button>
+              </div>
+            {/snippet}
+          </FormControl>
+          <FormFieldErrors />
+        </FormField>
 
-        {#if form?.message}
+        {#if $message}
           <Alert variant="destructive">
-            <AlertDescription>{form.message}</AlertDescription>
+            <AlertDescription>{$message}</AlertDescription>
           </Alert>
         {/if}
 
-        <Button type="submit" class="w-full" disabled={loading}>
-          {loading ? m.auth_login_submit_loading() : m.auth_login_submit()}
+        <Button type="submit" class="w-full" disabled={$submitting}>
+          {$submitting ? m.auth_login_submit_loading() : m.auth_login_submit()}
         </Button>
       </form>
 
@@ -150,8 +115,8 @@
             <button
               type="button"
               onclick={() => {
-                email = demoEmail;
-                password = DEMO_PASSWORD;
+                $form.email = demoEmail;
+                $form.password = DEMO_PASSWORD;
               }}
               class="hover:bg-muted flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors"
             >

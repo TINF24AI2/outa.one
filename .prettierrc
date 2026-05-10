@@ -14,7 +14,6 @@
   ],
   "importOrder": ["<THIRD_PARTY_MODULES>", "", "^\\$lib/(.*)$", "", "^[./]"],
   "importOrderParserPlugins": ["typescript", "svelte"],
-  "svelteBracketNewLine": true,
   "htmlWhitespaceSensitivity": "ignore",
   "endOfLine": "lf"
 }

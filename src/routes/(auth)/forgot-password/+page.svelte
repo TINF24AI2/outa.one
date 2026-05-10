@@ -1,31 +1,28 @@
 <script lang="ts">
   import { CircleCheckBig, Mail, MoveLeft } from "@lucide/svelte";
-  import { enhance } from "$app/forms";
+  import { superForm } from "sveltekit-superforms";
+  import { zod4Client as zodClient } from "sveltekit-superforms/adapters";
 
   import logo from "$lib/assets/logo.svg";
   import { Button } from "$lib/components/ui/button";
   import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "$lib/components/ui/card";
+  import { FormControl, FormField, FormFieldErrors, FormLabel } from "$lib/components/ui/form";
   import { Input } from "$lib/components/ui/input";
-  import { Label } from "$lib/components/ui/label";
   import { m } from "$lib/paraglide/messages.js";
+  import { forgotPasswordSchema } from "$lib/schemas/auth";
 
-  import type { ActionData } from "./$types";
+  import type { PageData } from "./$types";
 
-  let { form }: { form: ActionData } = $props();
+  let { data }: { data: PageData } = $props();
 
-  let loading = $state(false);
-  let email = $state("");
-  let fieldError = $state("");
-
-  function validate() {
-    if (!email.trim()) return m.auth_forgot_error_email_required();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return m.auth_forgot_error_email_invalid();
-    return "";
-  }
+  const sf = superForm(data.form, {
+    validators: zodClient(forgotPasswordSchema),
+  });
+  const { form, enhance, submitting, message } = sf;
 </script>
 
 <div class="bg-muted/40 flex min-h-screen items-center justify-center px-4 py-12">
-  {#if form?.success}
+  {#if $message}
     <Card class="w-full max-w-sm">
       <CardHeader class="items-center justify-items-center text-center">
         <div class="mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
@@ -35,7 +32,7 @@
         <CardDescription>
           {m.auth_forgot_success_description()}
           <br />
-          <span class="text-foreground font-semibold">{form.email}</span>
+          <span class="text-foreground font-semibold">{$form.email}</span>
         </CardDescription>
       </CardHeader>
       <CardContent class="flex flex-col gap-4">
@@ -68,49 +65,29 @@
       </CardHeader>
 
       <CardContent>
-        <form
-          method="post"
-          novalidate
-          use:enhance={({ cancel }) => {
-            const error = validate();
-            if (error) {
-              fieldError = error;
-              cancel();
-              return;
-            }
-            fieldError = "";
-            loading = true;
-            return async ({ update }) => {
-              loading = false;
-              await update();
-            };
-          }}
-          class="flex flex-col gap-4"
-        >
-          <div class="flex flex-col gap-2">
-            <Label for="email">{m.auth_forgot_email_label()}</Label>
-            <div class="relative">
-              <Mail class="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder={m.auth_forgot_email_placeholder()}
-                autocomplete="email"
-                bind:value={email}
-                aria-invalid={!!(fieldError || form?.fieldError)}
-                class="pl-9"
-              />
-            </div>
-            {#if fieldError || form?.fieldError}
-              <p class="text-destructive text-xs">
-                {fieldError || form?.fieldError}
-              </p>
-            {/if}
-          </div>
+        <form method="post" use:enhance class="flex flex-col gap-4">
+          <FormField form={sf} name="email">
+            <FormControl>
+              {#snippet children({ props })}
+                <FormLabel>{m.auth_forgot_email_label()}</FormLabel>
+                <div class="relative">
+                  <Mail class="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                  <Input
+                    {...props}
+                    type="email"
+                    placeholder={m.auth_forgot_email_placeholder()}
+                    autocomplete="email"
+                    bind:value={$form.email}
+                    class="pl-9"
+                  />
+                </div>
+              {/snippet}
+            </FormControl>
+            <FormFieldErrors />
+          </FormField>
 
-          <Button type="submit" class="w-full" disabled={loading}>
-            {loading ? m.auth_forgot_submit_loading() : m.auth_forgot_submit()}
+          <Button type="submit" class="w-full" disabled={$submitting}>
+            {$submitting ? m.auth_forgot_submit_loading() : m.auth_forgot_submit()}
           </Button>
         </form>
 
