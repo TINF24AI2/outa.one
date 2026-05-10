@@ -48,6 +48,7 @@
   "auth_signup_submit_loading": "Creating account…",
   "auth_forgot_error_email_required": "Email address is required",
   "auth_forgot_error_email_invalid": "Enter a valid email address",
+  "auth_forgot_email_sent": "Password reset instructions sent",
   "auth_forgot_success_title": "Check your email",
   "auth_forgot_success_description": "We've sent password reset instructions to",
   "auth_forgot_success_notice": "If you don't receive an email within a few minutes, please check your spam folder or try again.",

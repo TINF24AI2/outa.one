@@ -75,6 +75,7 @@
     "storybook": "^10.3.5",
     "svelte": "^5.55.2",
     "svelte-check": "^4.4.6",
+    "sveltekit-superforms": "^2.30.1",
     "tailwind-merge": "^3.5.0",
     "tailwind-variants": "^3.2.2",
     "tailwindcss": "^4.2.2",
@@ -87,6 +88,7 @@
   },
   "packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977",
   "dependencies": {
+    "formsnap": "^2.0.1",
     "zod": "^4.4.3"
   }
 }
