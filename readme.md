@@ -36,10 +36,12 @@ Detailed documentation is located in the [`/docs`](docs) folder, this includes:
 | Topic                                    | File                                         |
 | ---------------------------------------- | -------------------------------------------- |
 | Collaboration Guide & Local Setup        | [docs/contributing.md](docs/contributing.md) |
+| Development Guide / Reference            | [docs/development.md](docs/development.md)   |
 | Software Architecture & Design Decisions | [docs/architecture.md](docs/architecture.md) |
 | Database Schema & ER Diagrams            | [docs/database.md](docs/database.md)         |
 | Design Mockups & UI/UX Decisions         | [docs/design.md](docs/design.md)             |
-| Development Guide / Reference            | [docs/development.md](docs/development.md)   |
+| Authentication System                    | [docs/auth.md](docs/auth.md)                 |
+| Scrum                                    | [docs/scrum.md](docs/scrum.md)               |
 
 ## Team
 
