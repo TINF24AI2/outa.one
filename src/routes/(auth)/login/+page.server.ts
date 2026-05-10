@@ -18,14 +18,16 @@ export const load: PageServerLoad = async (event) => {
     redirect(302, "/dashboard");
   }
 
-  const form = await superValidate(zod(loginSchema()));
   const existing = await db.select({ id: user.id }).from(user).where(inArray(user.email, DEMO_EMAILS));
-  return { form, hasDemoUsers: existing };
+  return {
+    form: await superValidate(zod(loginSchema)),
+    hasDemoUsers: existing,
+  };
 };
 
 export const actions: Actions = {
   default: async (event) => {
-    const form = await superValidate(event.request, zod(loginSchema()));
+    const form = await superValidate(event.request, zod(loginSchema));
     if (!form.valid) return fail(400, { form });
 
     try {

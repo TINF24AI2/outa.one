@@ -21,24 +21,23 @@ export const load: PageServerLoad = async (event) => {
   const token = event.url.searchParams.get("token");
 
   if (!token) {
-    const form = await superValidate(zod(signupSchema()));
-    return { error: "no_invite" as const, form };
+    return { error: "no_invite" as const, form: await superValidate(zod(signupSchema)) };
   }
 
   const invite = await getValidInvite(token);
   if (!invite) {
-    const form = await superValidate(zod(signupSchema()));
-    return { error: "invalid_invite" as const, form };
+    return { error: "invalid_invite" as const, form: await superValidate(zod(signupSchema)) };
   }
 
-  const form = await superValidate(zod(signupSchema()));
-  form.data.token = invite.token;
-  return { form, email: invite.email };
+  return {
+    form: await superValidate({ token: invite.token }, zod(signupSchema)),
+    email: invite.email,
+  };
 };
 
 export const actions: Actions = {
   default: async (event) => {
-    const form = await superValidate(event.request, zod(signupSchema()));
+    const form = await superValidate(event.request, zod(signupSchema));
     if (!form.valid) return fail(400, { form });
 
     const invite = await getValidInvite(form.data.token);

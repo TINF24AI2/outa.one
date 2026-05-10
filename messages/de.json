@@ -48,6 +48,7 @@
   "auth_signup_submit_loading": "Konto wird erstellt…",
   "auth_forgot_error_email_required": "E-Mail-Adresse ist erforderlich",
   "auth_forgot_error_email_invalid": "Geben Sie eine gültige E-Mail-Adresse ein",
+  "auth_forgot_email_sent": "Anweisungen zum Zurücksetzen des Passworts gesendet",
   "auth_forgot_success_title": "Prüfen Sie Ihre E-Mails",
   "auth_forgot_success_description": "Wir haben Anweisungen zum Zurücksetzen des Passworts gesendet an",
   "auth_forgot_success_notice": "Wenn Sie innerhalb weniger Minuten keine E-Mail erhalten, prüfen Sie bitte den Spam-Ordner oder versuchen Sie es erneut.",

@@ -7,8 +7,8 @@
   import { Alert, AlertDescription } from "$lib/components/ui/alert";
   import { Button } from "$lib/components/ui/button";
   import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "$lib/components/ui/card";
+  import { FormControl, FormField, FormFieldErrors, FormLabel } from "$lib/components/ui/form";
   import { Input } from "$lib/components/ui/input";
-  import { Label } from "$lib/components/ui/label";
   import { Separator } from "$lib/components/ui/separator";
   import { DEMO_PASSWORD, DEMO_USERS } from "$lib/demo-users";
   import { m } from "$lib/paraglide/messages.js";
@@ -18,9 +18,10 @@
 
   let { data }: { data: PageData } = $props();
 
-  const { form, errors, enhance, submitting, message } = superForm(data.form, {
-    validators: zodClient(loginSchema()),
+  const sf = superForm(data.form, {
+    validators: zodClient(loginSchema),
   });
+  const { form, enhance, submitting, message } = sf;
 
   let showPassword = $state(false);
 
@@ -42,48 +43,48 @@
 
     <CardContent>
       <form method="post" use:enhance class="flex flex-col gap-4">
-        <div class="flex flex-col gap-2">
-          <Label for="email">{m.auth_login_email_label()}</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            placeholder={m.auth_login_email_placeholder()}
-            autocomplete="email"
-            bind:value={$form.email}
-            aria-invalid={!!$errors.email}
-          />
-          {#if $errors.email}
-            <p class="text-destructive text-xs">{$errors.email?.[0]}</p>
-          {/if}
-        </div>
+        <FormField form={sf} name="email">
+          <FormControl>
+            {#snippet children({ props })}
+              <FormLabel>{m.auth_login_email_label()}</FormLabel>
+              <Input
+                {...props}
+                type="email"
+                placeholder={m.auth_login_email_placeholder()}
+                autocomplete="email"
+                bind:value={$form.email}
+              />
+            {/snippet}
+          </FormControl>
+          <FormFieldErrors />
+        </FormField>
 
-        <div class="flex flex-col gap-2">
-          <Label for="password">{m.auth_login_password_label()}</Label>
-          <div class="relative">
-            <Input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
-              autocomplete="current-password"
-              bind:value={$form.password}
-              aria-invalid={!!$errors.password}
-              class="pr-10"
-            />
-            <button
-              type="button"
-              onclick={() => (showPassword = !showPassword)}
-              class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
-              aria-label={showPassword ? m.auth_login_hide_password() : m.auth_login_show_password()}
-            >
-              {#if showPassword}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
-            </button>
-          </div>
-          {#if $errors.password}
-            <p class="text-destructive text-xs">{$errors.password?.[0]}</p>
-          {/if}
-        </div>
+        <FormField form={sf} name="password">
+          <FormControl>
+            {#snippet children({ props })}
+              <FormLabel>{m.auth_login_password_label()}</FormLabel>
+              <div class="relative">
+                <Input
+                  {...props}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  autocomplete="current-password"
+                  bind:value={$form.password}
+                  class="pr-10"
+                />
+                <button
+                  type="button"
+                  onclick={() => (showPassword = !showPassword)}
+                  class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
+                  aria-label={showPassword ? m.auth_login_hide_password() : m.auth_login_show_password()}
+                >
+                  {#if showPassword}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
+                </button>
+              </div>
+            {/snippet}
+          </FormControl>
+          <FormFieldErrors />
+        </FormField>
 
         {#if $message}
           <Alert variant="destructive">

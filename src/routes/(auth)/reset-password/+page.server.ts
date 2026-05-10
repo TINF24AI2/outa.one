@@ -19,14 +19,14 @@ export const load: PageServerLoad = async (event) => {
     redirect(302, "/forgot-password");
   }
 
-  const form = await superValidate(zod(resetPasswordSchema()));
-  form.data.token = token;
-  return { form };
+  return {
+    form: await superValidate({ token }, zod(resetPasswordSchema)),
+  };
 };
 
 export const actions: Actions = {
   default: async (event) => {
-    const form = await superValidate(event.request, zod(resetPasswordSchema()));
+    const form = await superValidate(event.request, zod(resetPasswordSchema));
     if (!form.valid) return fail(400, { form });
 
     try {

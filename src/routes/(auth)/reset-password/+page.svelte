@@ -9,8 +9,8 @@
   import { Alert, AlertDescription } from "$lib/components/ui/alert";
   import { Button } from "$lib/components/ui/button";
   import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "$lib/components/ui/card";
+  import { FormControl, FormDescription, FormField, FormFieldErrors, FormLabel } from "$lib/components/ui/form";
   import { Input } from "$lib/components/ui/input";
-  import { Label } from "$lib/components/ui/label";
   import { m } from "$lib/paraglide/messages.js";
   import { resetPasswordSchema } from "$lib/schemas/auth";
 
@@ -18,19 +18,18 @@
 
   let { data }: { data: PageData } = $props();
 
-  const { form, errors, enhance, submitting, message } = superForm(data.form, {
-    validators: zodClient(resetPasswordSchema()),
+  const sf = superForm(data.form, {
+    validators: zodClient(resetPasswordSchema),
+    onUpdated({ form }) {
+      if (form.message && typeof form.message === "object" && "success" in form.message) {
+        setTimeout(() => goto(resolve("/login")), 3000);
+      }
+    },
   });
+  const { form, enhance, submitting, message } = sf;
 
   let showPassword = $state(false);
   let showConfirm = $state(false);
-
-  $effect(() => {
-    if ($message && typeof $message === "object" && "success" in $message) {
-      const timer = setTimeout(() => goto(resolve("/login")), 3000);
-      return () => clearTimeout(timer);
-    }
-  });
 </script>
 
 <div class="bg-muted/40 flex min-h-screen items-center justify-center px-4 py-12">
@@ -63,61 +62,64 @@
         <form method="post" use:enhance class="flex flex-col gap-4">
           <input type="hidden" name="token" bind:value={$form.token} />
 
-          <div class="flex flex-col gap-2">
-            <Label for="password">{m.auth_reset_password_label()}</Label>
-            <div class="relative">
-              <Input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                autocomplete="new-password"
-                bind:value={$form.password}
-                aria-invalid={!!$errors.password}
-                class="pr-10"
-              />
-              <button
-                type="button"
-                onclick={() => (showPassword = !showPassword)}
-                class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
-                aria-label={showPassword ? m.auth_login_hide_password() : m.auth_login_show_password()}
-              >
-                {#if showPassword}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
-              </button>
-            </div>
-            {#if $errors.password}
-              <p class="text-destructive text-xs">{$errors.password?.[0]}</p>
-            {:else}
-              <p class="text-muted-foreground text-xs">{m.auth_password_min_length()}</p>
-            {/if}
-          </div>
+          <FormField form={sf} name="password">
+            {#snippet children({ errors })}
+              <FormControl>
+                {#snippet children({ props })}
+                  <FormLabel>{m.auth_reset_password_label()}</FormLabel>
+                  <div class="relative">
+                    <Input
+                      {...props}
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      autocomplete="new-password"
+                      bind:value={$form.password}
+                      class="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onclick={() => (showPassword = !showPassword)}
+                      class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
+                      aria-label={showPassword ? m.auth_login_hide_password() : m.auth_login_show_password()}
+                    >
+                      {#if showPassword}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
+                    </button>
+                  </div>
+                {/snippet}
+              </FormControl>
+              {#if !errors.length}
+                <FormDescription>{m.auth_password_min_length()}</FormDescription>
+              {/if}
+              <FormFieldErrors />
+            {/snippet}
+          </FormField>
 
-          <div class="flex flex-col gap-2">
-            <Label for="confirmPassword">{m.auth_reset_confirm_label()}</Label>
-            <div class="relative">
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                type={showConfirm ? "text" : "password"}
-                placeholder="••••••••"
-                autocomplete="new-password"
-                bind:value={$form.confirmPassword}
-                aria-invalid={!!$errors.confirmPassword}
-                class="pr-10"
-              />
-              <button
-                type="button"
-                onclick={() => (showConfirm = !showConfirm)}
-                class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
-                aria-label={showConfirm ? m.auth_login_hide_password() : m.auth_login_show_password()}
-              >
-                {#if showConfirm}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
-              </button>
-            </div>
-            {#if $errors.confirmPassword}
-              <p class="text-destructive text-xs">{$errors.confirmPassword?.[0]}</p>
-            {/if}
-          </div>
+          <FormField form={sf} name="confirmPassword">
+            <FormControl>
+              {#snippet children({ props })}
+                <FormLabel>{m.auth_reset_confirm_label()}</FormLabel>
+                <div class="relative">
+                  <Input
+                    {...props}
+                    type={showConfirm ? "text" : "password"}
+                    placeholder="••••••••"
+                    autocomplete="new-password"
+                    bind:value={$form.confirmPassword}
+                    class="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onclick={() => (showConfirm = !showConfirm)}
+                    class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
+                    aria-label={showConfirm ? m.auth_login_hide_password() : m.auth_login_show_password()}
+                  >
+                    {#if showConfirm}<EyeOff class="h-4 w-4" />{:else}<Eye class="h-4 w-4" />{/if}
+                  </button>
+                </div>
+              {/snippet}
+            </FormControl>
+            <FormFieldErrors />
+          </FormField>
 
           {#if $message && typeof $message === "string"}
             <Alert variant="destructive">

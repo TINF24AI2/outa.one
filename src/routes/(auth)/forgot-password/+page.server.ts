@@ -2,6 +2,7 @@ import { fail, redirect } from "@sveltejs/kit";
 import { message, superValidate } from "sveltekit-superforms";
 import { zod4 as zod } from "sveltekit-superforms/adapters";
 
+import { m } from "$lib/paraglide/messages.js";
 import { forgotPasswordSchema } from "$lib/schemas/auth";
 import { auth } from "$lib/server/auth";
 
@@ -12,13 +13,12 @@ export const load: PageServerLoad = async (event) => {
     redirect(302, "/dashboard");
   }
 
-  const form = await superValidate(zod(forgotPasswordSchema()));
-  return { form };
+  return { form: await superValidate(zod(forgotPasswordSchema)) };
 };
 
 export const actions: Actions = {
   default: async (event) => {
-    const form = await superValidate(event.request, zod(forgotPasswordSchema()));
+    const form = await superValidate(event.request, zod(forgotPasswordSchema));
     if (!form.valid) return fail(400, { form });
 
     try {
@@ -29,6 +29,6 @@ export const actions: Actions = {
       // Always show success to prevent email enumeration
     }
 
-    return message(form, { success: true as const, email: form.data.email });
+    return message(form, m.auth_forgot_email_sent());
   },
 };
