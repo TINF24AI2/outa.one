@@ -11,7 +11,7 @@ const LOGO_SVG = `<svg width="32" height="32" viewBox="0 0 36 36" fill="none" xm
 
 const LOGO_DATA_URI = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(LOGO_SVG)}`;
 
-function base(content: string) {
+function base(content: string, footerNote: string) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,8 +54,7 @@ function base(content: string) {
           <tr>
             <td style="padding:20px 40px 32px;border-top:1px solid #e4e4e7;text-align:center;">
               <p style="margin:0;font-size:12px;color:#a1a1aa;">
-                You received this email because a password reset was requested for your outa.one account.<br />
-                If you didn't request this, you can safely ignore this email.
+                ${footerNote}
               </p>
               <p style="margin:12px 0 0;font-size:12px;color:#d4d4d8;">
                 &copy; ${new Date().getFullYear()} outa.one
@@ -69,6 +68,46 @@ function base(content: string) {
   </table>
 </body>
 </html>`;
+}
+
+export function inviteEmail(url: string, expiresInDays = 7) {
+  const content = `
+    <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#09090b;letter-spacing:-0.3px;">You're invited to outa.one</h1>
+    <p style="margin:0 0 24px;font-size:15px;color:#52525b;line-height:1.6;">
+      You've been invited to join the outa.one portal. Click the button below to create your account.
+    </p>
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr>
+        <td align="center">
+          <a href="${url}"
+            style="display:inline-block;padding:13px 28px;background-color:${BRAND_COLOR};color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:8px;letter-spacing:-0.1px;">
+            Accept invitation
+          </a>
+        </td>
+      </tr>
+    </table>
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr>
+        <td style="background-color:${BRAND_LIGHT};border-radius:8px;padding:14px 16px;">
+          <p style="margin:0;font-size:12px;color:#52525b;line-height:1.5;">
+            <strong style="color:#09090b;">Button not working?</strong> Copy and paste the URL below into your browser:
+          </p>
+          <p style="margin:6px 0 0;font-size:11px;color:${BRAND_COLOR};word-break:break-all;">${url}</p>
+        </td>
+      </tr>
+    </table>
+
+    <p style="margin:0;font-size:13px;color:#a1a1aa;">
+      This invitation expires in <strong style="color:#71717a;">${expiresInDays} day${expiresInDays !== 1 ? "s" : ""}</strong> and can only be used once.
+    </p>
+  `;
+
+  return base(
+    content,
+    "You received this email because you were invited to join outa.one.<br />If you didn't expect this invitation, you can safely ignore this email.",
+  );
 }
 
 export function resetPasswordEmail(url: string) {
@@ -104,5 +143,8 @@ export function resetPasswordEmail(url: string) {
       This link expires in <strong style="color:#71717a;">1 hour</strong> and can only be used once.
     </p>
   `;
-  return base(content);
+  return base(
+    content,
+    "You received this email because a password reset was requested for your outa.one account.<br />If you didn't request this, you can safely ignore this email.",
+  );
 }
