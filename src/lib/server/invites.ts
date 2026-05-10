@@ -28,6 +28,10 @@ export async function consumeInvite(token: string) {
   await db.update(invite).set({ usedAt: new Date() }).where(eq(invite.token, token));
 }
 
+export async function deleteInviteByEmail(email: string) {
+  await db.delete(invite).where(eq(invite.email, email));
+}
+
 // Helper functions
 async function emailAlreadyRegistered(email: string) {
   const [existing] = await db.select({ id: user.id }).from(user).where(eq(user.email, email));
