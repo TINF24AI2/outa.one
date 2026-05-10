@@ -10,12 +10,14 @@
   let { title, subtitle, children }: Props = $props();
 </script>
 
-<div class="h-fit w-full border-b px-8 py-5">
-  <div class="mx-auto flex w-full max-w-5xl items-center justify-between">
+<div class="h-fit w-full border-b px-6 py-5">
+  <div class="mx-auto flex w-full max-w-7xl items-center justify-between">
     <div>
-      <h2 class="text-lg font-semibold">{title}</h2>
+      <h2 class="text-2xl font-semibold">{title}</h2>
       {#if subtitle}
-        <p>{subtitle}</p>
+        <p class="text-muted-foreground pt-2 text-sm">
+          {subtitle}
+        </p>
       {/if}
     </div>
     <div>

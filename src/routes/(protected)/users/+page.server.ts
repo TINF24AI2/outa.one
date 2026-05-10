@@ -6,7 +6,9 @@ import { m } from "$lib/paraglide/messages.js";
 import { auth } from "$lib/server/auth";
 import { db } from "$lib/server/db";
 import { session, user } from "$lib/server/db/schema";
+import { inviteEmail } from "$lib/server/email-templates";
 import { createInvite, deleteInviteByEmail } from "$lib/server/invites";
+import { sendEmail } from "$lib/server/mail";
 
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -99,10 +101,25 @@ export const actions: Actions = {
     const managedRole = role as "admin" | "user";
 
     try {
-      const invite = await createInvite(email, managedRole, 1);
+      const EXPIRES_IN_DAYS = 7;
+      const invite = await createInvite(email, managedRole, EXPIRES_IN_DAYS);
+      const inviteUrl = `${env.ORIGIN}/signup?token=${invite.token}`;
+
+      let emailSent = false;
+      try {
+        await sendEmail({
+          to: email,
+          subject: "You're invited to outa.one",
+          html: inviteEmail(inviteUrl, EXPIRES_IN_DAYS),
+        });
+        emailSent = true;
+      } catch {
+        // email failure is non-fatal — admin can share the link manually
+      }
 
       return {
-        inviteUrl: `${env.ORIGIN}/signup?token=${invite.token}`,
+        inviteUrl,
+        emailSent,
         message: m.users_invite_success({ email }),
       };
     } catch (error) {

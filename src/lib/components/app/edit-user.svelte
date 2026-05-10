@@ -6,6 +6,7 @@
   import * as Dialog from "$lib/components/ui/dialog";
   import { Label } from "$lib/components/ui/label";
   import * as Select from "$lib/components/ui/select";
+  import { Separator } from "$lib/components/ui/separator";
   import { m } from "$lib/paraglide/messages";
 
   type ManagedUser = {
@@ -48,7 +49,7 @@
   >
     <SquarePen class="h-4 w-4 text-gray-500" />
   </Dialog.Trigger>
-  <Dialog.Content class="sm:max-w-106.25">
+  <Dialog.Content class="shadow-xl ring-0 sm:max-w-106.25">
     <form
       method="post"
       action="?/updateUser"
@@ -83,6 +84,7 @@
         <Dialog.Title>{m.users_edit_dialog_title()}</Dialog.Title>
         <Dialog.Description>{m.users_edit_dialog_description({ email: user.email })}</Dialog.Description>
       </Dialog.Header>
+      <div class="-mx-6 -mt-2"><Separator /></div>
       <div class="grid gap-4">
         <div class="grid gap-3">
           <Label for={`role-${user.id}`}>{m.users_role_label()}</Label>
@@ -112,12 +114,12 @@
           <p class="text-destructive text-sm">{message}</p>
         {/if}
       </div>
-      <Dialog.Footer>
-        <Dialog.Close type="button" class={buttonVariants({ variant: "outline" })}>
+      <div class="flex gap-3">
+        <Dialog.Close type="button" class={`${buttonVariants({ variant: "secondary" })} flex-1`}>
           {m.users_dialog_cancel()}
         </Dialog.Close>
-        <Button type="submit" disabled={loading}>{m.users_edit_submit()}</Button>
-      </Dialog.Footer>
+        <Button type="submit" disabled={loading} class="flex-1">{m.users_edit_submit()}</Button>
+      </div>
     </form>
   </Dialog.Content>
 </Dialog.Root>

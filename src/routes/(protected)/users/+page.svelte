@@ -38,8 +38,8 @@
     <InviteUser />
   </PageHeader>
 
-  <div class="mx-auto w-full max-w-7xl flex-1 overflow-auto p-6">
-    <div class="rounded-lg border bg-white">
+  <div class="mx-auto w-full max-w-7xl flex-1 overflow-auto py-6">
+    <div class="overflow-hidden rounded-lg border bg-white">
       <!-- Mobile card list -->
       <ul class="divide-y sm:hidden">
         {#each data.users as user (user.email)}
@@ -90,14 +90,14 @@
       <!-- Desktop table -->
       <div class="hidden sm:block">
         <Table.Root>
-          <Table.Header class="bg-gray-100">
+          <Table.Header class="bg-slate-50">
             <Table.Row class="[&>th]:text-neutral-500">
               <Table.Head class="pl-6">{m.users_table_name()}</Table.Head>
               <Table.Head>{m.users_table_email()}</Table.Head>
               <Table.Head>{m.users_table_role()}</Table.Head>
               <Table.Head>{m.users_table_licenses_held()}</Table.Head>
               <Table.Head>{m.users_table_last_active()}</Table.Head>
-              <Table.Head class="pr-6 text-right">{m.users_table_actions()}</Table.Head>
+              <Table.Head>{m.users_table_actions()}</Table.Head>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -128,7 +128,7 @@
                 <Table.Cell class="text-gray-700">0</Table.Cell>
                 <Table.Cell class="text-gray-500">{formatDate(user.lastActive)}</Table.Cell>
                 <Table.Cell class="pr-6">
-                  <div class="flex items-center justify-end gap-0.5">
+                  <div class="flex items-center gap-0.5">
                     <Button variant="ghost" size="icon-sm" title={m.users_action_viewLicenses()}>
                       <KeyRound class="h-4 w-4 text-gray-500" />
                     </Button>
