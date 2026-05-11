@@ -8,20 +8,20 @@ import { DEMO_EMAILS } from "$lib/demo-users";
 import { m } from "$lib/paraglide/messages.js";
 import { loginSchema } from "$lib/schemas/auth";
 import { auth } from "$lib/server/auth";
+import { redirectAuthenticated } from "$lib/server/auth/guards";
 import { db } from "$lib/server/db";
 import { user } from "$lib/server/db/schema";
 
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async (event) => {
-  if (event.locals.user) {
-    redirect(302, "/dashboard");
-  }
+  redirectAuthenticated(event);
 
   const existing = await db.select({ id: user.id }).from(user).where(inArray(user.email, DEMO_EMAILS));
+
   return {
     form: await superValidate(zod(loginSchema)),
-    hasDemoUsers: existing,
+    hasDemoUsers: existing.length > 0,
   };
 };
 

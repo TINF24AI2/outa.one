@@ -7,6 +7,7 @@ import { zod4 as zod } from "sveltekit-superforms/adapters";
 import { m } from "$lib/paraglide/messages.js";
 import { signupSchema } from "$lib/schemas/auth";
 import { auth } from "$lib/server/auth";
+import { redirectAuthenticated } from "$lib/server/auth/guards";
 import { db } from "$lib/server/db";
 import { user } from "$lib/server/db/schema";
 import { consumeInvite, getValidInvite } from "$lib/server/invites";
@@ -14,9 +15,7 @@ import { consumeInvite, getValidInvite } from "$lib/server/invites";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async (event) => {
-  if (event.locals.user) {
-    redirect(302, "/dashboard");
-  }
+  redirectAuthenticated(event);
 
   const token = event.url.searchParams.get("token");
 

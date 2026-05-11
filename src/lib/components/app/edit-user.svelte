@@ -2,37 +2,31 @@
   import { SquarePen } from "@lucide/svelte";
   import { enhance } from "$app/forms";
 
+  import UserRoleSelect from "$lib/components/app/user-role-select.svelte";
   import { Button, buttonVariants } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
-  import { Label } from "$lib/components/ui/label";
-  import * as Select from "$lib/components/ui/select";
   import { Separator } from "$lib/components/ui/separator";
   import { m } from "$lib/paraglide/messages";
+  import type { ManagedRole } from "$lib/user-management";
 
   type ManagedUser = {
     id: string;
     email: string;
-    managedRole: "admin" | "user";
+    managedRole: ManagedRole;
   };
 
   let { user }: { user: ManagedUser } = $props();
 
-  const roles = [
-    { value: "admin", label: m.role_admin() },
-    { value: "user", label: m.role_employee() },
-  ];
-
   let open = $state(false);
   let loading = $state(false);
-  let value = $derived(user.managedRole);
+  let value = $state<ManagedRole>("user");
   let message = $state<string | null>(null);
   let fieldErrors = $state<{ role?: string }>({});
-
-  const triggerContent = $derived(roles.find((role) => role.value === value)?.label ?? m.users_role_placeholder());
 
   $effect(() => {
     if (!open) {
       loading = false;
+      value = user.managedRole;
       return;
     }
 
@@ -86,29 +80,13 @@
       </Dialog.Header>
       <div class="-mx-6 -mt-2"><Separator /></div>
       <div class="grid gap-4">
-        <div class="grid gap-3">
-          <Label for={`role-${user.id}`}>{m.users_role_label()}</Label>
-          <Select.Root type="single" name="role" bind:value>
-            <Select.Trigger id={`role-${user.id}`} class="w-full">
-              {triggerContent}
-            </Select.Trigger>
-            <Select.Content>
-              <Select.Group>
-                <Select.Label>{m.users_roles_group_label()}</Select.Label>
-                {#each roles as role (role.value)}
-                  <Select.Item value={role.value} label={role.label}>
-                    {role.label}
-                  </Select.Item>
-                {/each}
-              </Select.Group>
-            </Select.Content>
-          </Select.Root>
-          {#if fieldErrors.role}
-            <p class="text-destructive text-xs">{fieldErrors.role}</p>
-          {:else}
-            <Dialog.Description class="text-xs">{m.users_role_admin_hint()}</Dialog.Description>
-          {/if}
-        </div>
+        <UserRoleSelect
+          id={`role-${user.id}`}
+          bind:value
+          label={m.users_role_label()}
+          error={fieldErrors.role}
+          hint={m.users_role_admin_hint()}
+        />
 
         {#if message}
           <p class="text-destructive text-sm">{message}</p>

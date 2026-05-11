@@ -1,17 +1,16 @@
-import { fail, redirect } from "@sveltejs/kit";
+import { fail } from "@sveltejs/kit";
 import { message, superValidate } from "sveltekit-superforms";
 import { zod4 as zod } from "sveltekit-superforms/adapters";
 
 import { m } from "$lib/paraglide/messages.js";
 import { forgotPasswordSchema } from "$lib/schemas/auth";
 import { auth } from "$lib/server/auth";
+import { redirectAuthenticated } from "$lib/server/auth/guards";
 
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async (event) => {
-  if (event.locals.user) {
-    redirect(302, "/dashboard");
-  }
+  redirectAuthenticated(event);
 
   return { form: await superValidate(zod(forgotPasswordSchema)) };
 };

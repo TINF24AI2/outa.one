@@ -1,19 +1,11 @@
 import { fail, type Actions } from "@sveltejs/kit";
-import { z } from "zod";
 
+import { createLicenseSchema } from "$lib/schemas/licenses";
+import type { CreateLicenseInput } from "$lib/schemas/licenses";
 import { db } from "$lib/server/db";
 import { license, product } from "$lib/server/db/schema";
 
 import type { PageServerLoad } from "./$types";
-
-const createLicenseSchema = z.object({
-  productId: z.string().uuid("Please select a product"),
-  key: z.string().min(1, "Key is required"),
-  usageVolume: z.preprocess(
-    (v) => (v === "" || v == null ? undefined : v),
-    z.coerce.number({ error: "Must be a number" }).int().min(0, "Must be 0 or a positive number"),
-  ),
-});
 
 export const load: PageServerLoad = async () => {
   const products = await db.select({ id: product.id, name: product.name }).from(product);
@@ -38,7 +30,7 @@ export const actions: Actions = {
       return { success: true };
     } catch (error) {
       if (error instanceof Error && "code" in error && error.code === "23505") {
-        const errors: Record<keyof z.infer<typeof createLicenseSchema>, string[] | undefined> = {
+        const errors: Record<keyof CreateLicenseInput, string[] | undefined> = {
           productId: undefined,
           key: ["This key already exists for the selected product"],
           usageVolume: undefined,

@@ -1,9 +1,8 @@
 <script lang="ts">
-  import MinusIcon from "@lucide/svelte/icons/minus";
-  import PlusIcon from "@lucide/svelte/icons/plus";
   import UploadIcon from "@lucide/svelte/icons/upload";
   import { enhance } from "$app/forms";
 
+  import NumberStepperInput from "$lib/components/app/number-stepper-input.svelte";
   import Modal from "$lib/components/modal.svelte";
   import Combobox from "$lib/components/product-combobox.svelte";
   import { Button } from "$lib/components/ui/button/index.js";
@@ -11,7 +10,9 @@
   import Input from "$lib/components/ui/input/input.svelte";
   import { m } from "$lib/paraglide/messages.js";
 
-  let { data, form } = $props();
+  import type { ActionData, PageData } from "./$types";
+
+  let { data, form }: { data: PageData; form: ActionData } = $props();
 
   let open = $state(false);
   let productValue = $state("");
@@ -80,49 +81,15 @@
               <Field.Error>{form.errors.productId[0]}</Field.Error>
             {/if}
           </Field.Field>
-          <Field.Field class="gap-2">
-            <Field.Label for="usagevolume">
-              {m.licenses_popup_add_usage_volume_label()}
-              <span class="text-destructive">*</span>
-            </Field.Label>
-            <div
-              class="border-input focus-within:border-ring focus-within:ring-ring/50 flex h-10 overflow-hidden rounded-md border shadow-xs focus-within:ring-3"
-            >
-              <input
-                id="usagevolume"
-                name="usageVolume"
-                type="number"
-                min="0"
-                bind:value={usageVolume}
-                class="w-full min-w-0 [appearance:textfield] bg-transparent px-2.5 py-1 text-base outline-none md:text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                required
-              />
-              <div class="hight-10 flex flex-col p-1">
-                <button
-                  type="button"
-                  onclick={() => (usageVolume = (usageVolume ?? 0) + 1)}
-                  class="text-muted-foreground flex flex-1 cursor-pointer items-center justify-center px-2 text-sm leading-none"
-                  aria-label={m.common_increase()}
-                >
-                  <PlusIcon class="size-4" />
-                </button>
-                <button
-                  type="button"
-                  onclick={() => (usageVolume = Math.max(0, (usageVolume ?? 0) - 1))}
-                  class="text-muted-foreground flex flex-1 cursor-pointer items-center justify-center px-2 text-sm leading-none"
-                  aria-label={m.common_decrease()}
-                >
-                  <MinusIcon class="size-4" />
-                </button>
-              </div>
-            </div>
-            {#if form?.errors?.usageVolume}
-              <Field.Error>{form.errors.usageVolume[0]}</Field.Error>
-            {/if}
-            <Field.Description class="text-muted-foreground text-xs">
-              {m.licenses_popup_add_usage_volume_description()}
-            </Field.Description>
-          </Field.Field>
+          <NumberStepperInput
+            id="usagevolume"
+            name="usageVolume"
+            bind:value={usageVolume}
+            label={m.licenses_popup_add_usage_volume_label()}
+            required
+            error={form?.errors?.usageVolume?.[0]}
+            description={m.licenses_popup_add_usage_volume_description()}
+          />
           <Field.Field class="gap-2">
             <Field.Label for="key">
               {m.licenses_popup_add_key_label()}

@@ -2,46 +2,43 @@
   import { Check, Copy, Mail, UserPlus } from "@lucide/svelte";
   import { enhance } from "$app/forms";
 
+  import UserRoleSelect from "$lib/components/app/user-role-select.svelte";
   import { Button, buttonVariants } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
-  import * as Select from "$lib/components/ui/select";
   import { Separator } from "$lib/components/ui/separator";
   import { m } from "$lib/paraglide/messages";
+  import { inviteUserSchema } from "$lib/schemas/users";
+  import type { InviteUserInput } from "$lib/schemas/users";
+  import type { ManagedRole } from "$lib/user-management";
 
-  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  const roles = [
-    { value: "admin", label: m.role_admin() },
-    { value: "user", label: m.role_employee() },
-  ];
+  type InviteFieldErrors = Partial<Record<keyof InviteUserInput, string>>;
 
   let open = $state(false);
   let loading = $state(false);
   let email = $state("");
-  let value = $state<"admin" | "user">("user");
-  let fieldErrors = $state<{ email?: string; role?: string }>({});
+  let value = $state<ManagedRole>("user");
+  let fieldErrors = $state<InviteFieldErrors>({});
   let step = $state<"form" | "success">("form");
   let inviteUrl = $state<string | null>(null);
   let emailSent = $state(false);
   let submittedEmail = $state("");
   let copied = $state(false);
 
-  const triggerContent = $derived(roles.find((role) => role.value === value)?.label ?? m.users_role_placeholder());
-
   function validate() {
-    const errors: typeof fieldErrors = {};
+    const result = inviteUserSchema.safeParse({ email, role: value });
 
-    if (!EMAIL_REGEX.test(email.trim())) {
-      errors.email = m.dashboard_invite_error_email_invalid();
+    if (result.success) {
+      return {};
     }
 
-    if (!roles.some((role) => role.value === value)) {
-      errors.role = "Select a valid role.";
-    }
+    const { fieldErrors } = result.error.flatten();
 
-    return errors;
+    return {
+      email: fieldErrors.email?.[0],
+      role: fieldErrors.role?.[0],
+    } satisfies InviteFieldErrors;
   }
 
   async function copyToClipboard() {
@@ -134,29 +131,13 @@
               <p class="text-destructive text-xs">{fieldErrors.email}</p>
             {/if}
           </div>
-          <div class="grid gap-3">
-            <Label for="role">{m.users_role_label()}</Label>
-            <Select.Root type="single" name="role" bind:value>
-              <Select.Trigger class="w-full">
-                {triggerContent}
-              </Select.Trigger>
-              <Select.Content>
-                <Select.Group>
-                  <Select.Label>{m.users_roles_group_label()}</Select.Label>
-                  {#each roles as role (role.value)}
-                    <Select.Item value={role.value} label={role.label}>
-                      {role.label}
-                    </Select.Item>
-                  {/each}
-                </Select.Group>
-              </Select.Content>
-            </Select.Root>
-            {#if fieldErrors.role}
-              <p class="text-destructive text-xs">{fieldErrors.role}</p>
-            {:else}
-              <Dialog.Description class="text-xs">{m.users_role_admin_hint()}</Dialog.Description>
-            {/if}
-          </div>
+          <UserRoleSelect
+            id="role"
+            bind:value
+            label={m.users_role_label()}
+            error={fieldErrors.role}
+            hint={m.users_role_admin_hint()}
+          />
         </div>
         <div class="flex gap-3">
           <Dialog.Close type="button" class={`${buttonVariants({ variant: "secondary" })} flex-1`}>

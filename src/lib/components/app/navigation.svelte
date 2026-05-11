@@ -7,6 +7,7 @@
   import { authClient } from "$lib/authClient";
   import { Button } from "$lib/components/ui/button";
   import { m } from "$lib/paraglide/messages.js";
+  import { getInitials } from "$lib/user-management";
 
   type Props = {
     user: { name: string; email: string; role?: string | null };
@@ -14,17 +15,6 @@
   };
 
   let { user, children }: Props = $props();
-
-  const roleLabel = $derived(user.role === "admin" ? m.role_admin() : m.role_employee());
-
-  const initials = $derived(
-    user.name
-      .split(" ")
-      .map((n: string) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase(),
-  );
 
   const signOut = async () => {
     await authClient.signOut();
@@ -43,7 +33,7 @@
     </div>
     <div class="min-w-0">
       <p class="truncate text-sm font-semibold">{m.app_license_portal()}</p>
-      <p class="text-muted-foreground truncate text-xs">{roleLabel}</p>
+      <p class="text-muted-foreground truncate text-xs">{user.role === "admin" ? m.role_admin() : m.role_employee()}</p>
     </div>
   </div>
 
@@ -58,7 +48,7 @@
       <div
         class="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
       >
-        {initials}
+        {getInitials(user.name)}
       </div>
       <div class="min-w-0">
         <p class="truncate text-sm font-medium">{user.name}</p>

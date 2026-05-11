@@ -6,6 +6,7 @@
   import * as Dialog from "$lib/components/ui/dialog";
   import { Separator } from "$lib/components/ui/separator";
   import { m } from "$lib/paraglide/messages";
+  import { splitName } from "$lib/user-management";
 
   type ManagedUser = {
     id: string;
@@ -14,14 +15,7 @@
 
   let { user, isCurrentUser = false }: { user: ManagedUser; isCurrentUser?: boolean } = $props();
 
-  const nameParts = $derived.by(() => {
-    const parts = user.name.trim().split(/\s+/).filter(Boolean);
-
-    return {
-      firstName: parts[0] ?? user.name,
-      lastName: parts.slice(1).join(" ") || "",
-    };
-  });
+  const nameParts = $derived(splitName(user.name));
 
   let open = $state(false);
   let loading = $state(false);
