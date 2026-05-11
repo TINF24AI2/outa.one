@@ -7,7 +7,7 @@ import { auth } from "$lib/server/auth";
 import { db } from "$lib/server/db";
 import { session, user } from "$lib/server/db/schema";
 import { inviteEmail } from "$lib/server/email-templates";
-import { createInvite, deleteInviteByEmail } from "$lib/server/invites";
+import { createInvite } from "$lib/server/invites";
 import { sendEmail } from "$lib/server/mail";
 
 import type { Actions, PageServerLoad } from "./$types";
@@ -214,8 +214,6 @@ export const actions: Actions = {
       headers: event.request.headers,
       body: { userId },
     });
-
-    await deleteInviteByEmail(targetUser.email);
 
     return { message: m.users_delete_success({ name: targetUser.name }) };
   },
