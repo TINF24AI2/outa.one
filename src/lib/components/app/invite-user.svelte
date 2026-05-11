@@ -164,7 +164,7 @@
           </Dialog.Close>
           <Button type="submit" disabled={loading} class="flex-1">
             <Mail />
-            {m.users_invite_submit()}
+            {loading ? m.users_invite_submit_loading() : m.users_invite_submit()}
           </Button>
         </div>
       </form>

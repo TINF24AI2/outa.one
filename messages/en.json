@@ -124,6 +124,7 @@
   "users_invite_done": "Done",
   "users_invite_error_account_exists": "{email} already has an account",
   "users_invite_submit": "Send Invite",
+  "users_invite_submit_loading": "Sending invite…",
   "users_edit_dialog_title": "Edit User",
   "users_edit_dialog_description": "Editing {email}",
   "users_edit_success": "Updated {name}.",
