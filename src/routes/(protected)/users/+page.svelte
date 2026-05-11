@@ -38,7 +38,7 @@
     <InviteUser />
   </PageHeader>
 
-  <div class="mx-auto w-full max-w-7xl flex-1 overflow-auto py-6">
+  <div class="mx-auto w-full max-w-7xl flex-1 overflow-auto px-2 py-6">
     <div class="overflow-hidden rounded-lg border bg-white">
       <!-- Mobile card list -->
       <ul class="divide-y sm:hidden">
