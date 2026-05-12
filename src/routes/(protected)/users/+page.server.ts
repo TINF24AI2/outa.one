@@ -120,7 +120,5 @@ export const actions: Actions = {
       }
       return message(form, m.auth_error_unexpected(), { status: 500 });
     }
-
-    return { message: m.users_delete_success({ name: targetUser.name }) };
   },
 };
