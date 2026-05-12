@@ -1,220 +1,124 @@
-import { fail, redirect } from "@sveltejs/kit";
-import { env } from "$env/dynamic/private";
-import { eq, sql } from "drizzle-orm";
+import { fail } from "@sveltejs/kit";
+import { message, setError, superValidate } from "sveltekit-superforms";
+import { zod4 as zod } from "sveltekit-superforms/adapters";
 
 import { m } from "$lib/paraglide/messages.js";
-import { auth } from "$lib/server/auth";
-import { db } from "$lib/server/db";
-import { session, user } from "$lib/server/db/schema";
-import { inviteEmail } from "$lib/server/email-templates";
-import { createInvite } from "$lib/server/invites";
-import { sendEmail } from "$lib/server/mail";
+import { inviteUserSchema, removeUserSchema, updateUserRoleSchema } from "$lib/schemas/users";
+import { requireAdminUser } from "$lib/server/auth/guards";
+import {
+  inviteManagedUser,
+  listManagedUsers,
+  ManagedUserError,
+  removeManagedUser,
+  updateManagedUserRole,
+} from "$lib/server/users";
 
 import type { Actions, PageServerLoad } from "./$types";
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MANAGED_ROLES = new Set(["admin", "user"]);
-
-function isAdminRole(role: string | null | undefined) {
-  return role?.split(",").includes("admin") ?? false;
-}
-
 function requireAdmin(event: Parameters<NonNullable<Actions[keyof Actions]>>[0]) {
-  if (event.locals.user?.role !== "admin") {
-    return fail(403, { message: m.dashboard_invite_error_forbidden() });
-  }
-
-  return null;
-}
-
-async function findManagedUser(userId: string) {
-  const [found] = await db
-    .select({ id: user.id, name: user.name, role: user.role, email: user.email })
-    .from(user)
-    .where(eq(user.id, userId));
-  return found ?? null;
-}
-
-async function countAdmins() {
-  const [{ count }] = await db
-    .select({ count: sql<number>`count(*)`.as("count") })
-    .from(user)
-    .where(eq(user.role, "admin"));
-
-  return Number(count);
+  return event.locals.user?.role === "admin";
 }
 
 export const load: PageServerLoad = async (event) => {
-  if (event.locals.user?.role !== "admin") {
-    redirect(302, "/dashboard");
-  }
+  requireAdminUser(event);
 
-  const { users } = await auth.api.listUsers({
-    headers: event.request.headers,
-    query: { limit: 100, sortBy: "name", sortDirection: "asc" },
-  });
-
-  const lastActiveSessions = await db
-    .select({
-      userId: session.userId,
-      lastActive: sql<Date | null>`MAX(${session.updatedAt})`.as("last_active"),
-    })
-    .from(session)
-    .groupBy(session.userId);
-
-  const lastActiveMap = new Map(lastActiveSessions.map((s) => [s.userId, s.lastActive]));
+  const users = await listManagedUsers(event.request.headers);
+  const editForms = await Promise.all(
+    users.map(
+      async (u) =>
+        await superValidate({ userId: u.id, role: u.managedRole }, zod(updateUserRoleSchema), {
+          id: `update-user-${u.id}`,
+        }),
+    ),
+  );
+  const deleteForms = await Promise.all(
+    users.map(async (u) => await superValidate({ userId: u.id }, zod(removeUserSchema), { id: `remove-user-${u.id}` })),
+  );
 
   return {
-    users: users.map((u) => ({
-      ...u,
-      managedRole: isAdminRole(u.role) ? ("admin" as const) : ("user" as const),
-      lastActive: lastActiveMap.get(u.id) ?? null,
-    })),
+    inviteForm: await superValidate(zod(inviteUserSchema), { id: "invite-user" }),
+    editForms,
+    deleteForms,
+    users,
   };
 };
 
 export const actions: Actions = {
   inviteUser: async (event) => {
-    const forbidden = requireAdmin(event);
-    if (forbidden) {
-      return forbidden;
-    }
+    const form = await superValidate(event.request, zod(inviteUserSchema));
+    if (!requireAdmin(event)) return message(form, m.dashboard_invite_error_forbidden(), { status: 403 });
+    if (!form.valid) return fail(400, { form });
 
-    const formData = await event.request.formData();
-    const email = formData.get("email")?.toString().trim().toLowerCase() ?? "";
-    const role = formData.get("role")?.toString() ?? "user";
-
-    if (!EMAIL_REGEX.test(email)) {
-      return fail(400, {
-        fieldErrors: { email: m.dashboard_invite_error_email_invalid() },
-        message: m.dashboard_invite_error_email_invalid(),
-      });
-    }
-
-    if (!MANAGED_ROLES.has(role)) {
-      return fail(400, {
-        fieldErrors: { role: m.users_role_error_invalid() },
-        message: m.users_role_error_invalid(),
-      });
-    }
-
-    const managedRole = role as "admin" | "user";
+    const email = form.data.email.toLowerCase();
 
     try {
-      const EXPIRES_IN_DAYS = 7;
-      const invite = await createInvite(email, managedRole, EXPIRES_IN_DAYS);
-      const inviteUrl = `${env.ORIGIN}/signup?token=${invite.token}`;
-
-      let emailSent = false;
-      try {
-        await sendEmail({
-          to: email,
-          subject: "You're invited to outa.one",
-          html: inviteEmail(inviteUrl, EXPIRES_IN_DAYS),
-        });
-        emailSent = true;
-      } catch {
-        // email failure is non-fatal — admin can share the link manually
-      }
+      const { inviteUrl, emailSent } = await inviteManagedUser(email, form.data.role);
 
       return {
+        form,
         inviteUrl,
         emailSent,
-        message: m.users_invite_success({ email }),
       };
     } catch (error) {
-      const message =
-        error instanceof Error && error.message === `${email} already has an account`
+      const errorMessage =
+        error instanceof ManagedUserError && error.code === "account_exists"
           ? m.users_invite_error_account_exists({ email })
           : m.auth_error_unexpected();
 
-      return fail(400, {
-        fieldErrors: { email: message },
-        message,
-      });
+      if (error instanceof ManagedUserError && error.code === "account_exists") {
+        return setError(form, "email", errorMessage);
+      }
+
+      return message(form, errorMessage, { status: 500 });
     }
   },
 
   updateUser: async (event) => {
-    const forbidden = requireAdmin(event);
-    if (forbidden) {
-      return forbidden;
-    }
+    const form = await superValidate(event.request, zod(updateUserRoleSchema));
+    if (!requireAdmin(event)) return message(form, m.dashboard_invite_error_forbidden(), { status: 403 });
+    if (!form.valid) return fail(400, { form });
 
-    const formData = await event.request.formData();
-    const userId = formData.get("userId")?.toString() ?? "";
-    const role = formData.get("role")?.toString() ?? "";
+    try {
+      await updateManagedUserRole(event.request.headers, form.data.userId, form.data.role);
+      return { form };
+    } catch (error) {
+      if (error instanceof ManagedUserError) {
+        if (error.code === "last_admin") {
+          return message(form, m.users_error_last_admin(), { status: 400 });
+        }
 
-    if (!userId) {
-      return fail(400, { message: m.users_error_not_found() });
-    }
-
-    if (!MANAGED_ROLES.has(role)) {
-      return fail(400, {
-        fieldErrors: { role: m.users_role_error_invalid() },
-        message: m.users_role_error_invalid(),
-      });
-    }
-
-    const managedRole = role as "admin" | "user";
-
-    const targetUser = await findManagedUser(userId);
-    if (!targetUser) {
-      return fail(404, { message: m.users_error_not_found() });
-    }
-
-    if (isAdminRole(targetUser.role) && managedRole !== "admin") {
-      const adminCount = await countAdmins();
-      if (adminCount <= 1) {
-        return fail(400, { message: m.users_error_last_admin() });
+        if (error.code === "not_found") {
+          return message(form, m.users_error_not_found(), { status: 404 });
+        }
       }
+
+      return message(form, m.auth_error_unexpected(), { status: 500 });
     }
-
-    await auth.api.setRole({
-      headers: event.request.headers,
-      body: {
-        userId,
-        role: managedRole,
-      },
-    });
-
-    return { message: m.users_edit_success({ name: targetUser.name }) };
   },
 
   removeUser: async (event) => {
-    const forbidden = requireAdmin(event);
-    if (forbidden) {
-      return forbidden;
-    }
+    const form = await superValidate(event.request, zod(removeUserSchema));
+    if (!requireAdmin(event)) return message(form, m.dashboard_invite_error_forbidden(), { status: 403 });
+    if (!form.valid) return fail(400, { form });
 
-    const formData = await event.request.formData();
-    const userId = formData.get("userId")?.toString() ?? "";
+    try {
+      await removeManagedUser(event.request.headers, form.data.userId, event.locals.user?.id);
+      return { form };
+    } catch (error) {
+      if (error instanceof ManagedUserError) {
+        if (error.code === "self_delete") {
+          return message(form, m.users_delete_error_self(), { status: 400 });
+        }
 
-    if (!userId) {
-      return fail(400, { message: m.users_error_not_found() });
-    }
+        if (error.code === "last_admin") {
+          return message(form, m.users_error_last_admin(), { status: 400 });
+        }
 
-    if (userId === event.locals.user?.id) {
-      return fail(400, { message: m.users_delete_error_self() });
-    }
-
-    const targetUser = await findManagedUser(userId);
-    if (!targetUser) {
-      return fail(404, { message: m.users_error_not_found() });
-    }
-
-    if (isAdminRole(targetUser.role)) {
-      const adminCount = await countAdmins();
-      if (adminCount <= 1) {
-        return fail(400, { message: m.users_error_last_admin() });
+        if (error.code === "not_found") {
+          return message(form, m.users_error_not_found(), { status: 404 });
+        }
       }
+      return message(form, m.auth_error_unexpected(), { status: 500 });
     }
-
-    await auth.api.removeUser({
-      headers: event.request.headers,
-      body: { userId },
-    });
-
-    return { message: m.users_delete_success({ name: targetUser.name }) };
   },
 };

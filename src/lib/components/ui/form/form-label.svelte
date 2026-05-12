@@ -1,13 +1,21 @@
 <script lang="ts">
-  import { Label } from "formsnap";
-  import type { LabelProps } from "formsnap";
+  import * as FormPrimitive from "formsnap";
 
-  import { cn } from "$lib/utils.js";
+  import { Label } from "$lib/components/ui/label/index.js";
+  import { cn, type WithoutChild } from "$lib/utils.js";
 
-  let { class: className, ...restProps }: LabelProps = $props();
+  let {
+    ref = $bindable(null),
+    children,
+    class: className,
+    ...restProps
+  }: WithoutChild<FormPrimitive.LabelProps> = $props();
 </script>
 
-<Label
-  class={cn("text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70", className)}
-  {...restProps}
-/>
+<FormPrimitive.Label {...restProps} bind:ref>
+  {#snippet child({ props })}
+    <Label {...props} data-slot="form-label" class={cn("data-[fs-error]:text-destructive", className)}>
+      {@render children?.()}
+    </Label>
+  {/snippet}
+</FormPrimitive.Label>

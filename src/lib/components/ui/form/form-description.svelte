@@ -1,10 +1,18 @@
 <script lang="ts">
-  import { Description } from "formsnap";
-  import type { DescriptionProps } from "formsnap";
+  import * as FormPrimitive from "formsnap";
 
-  import { cn } from "$lib/utils.js";
+  import { cn, type WithoutChild } from "$lib/utils.js";
 
-  let { class: className, ...restProps }: DescriptionProps = $props();
+  let {
+    ref = $bindable(null),
+    class: className,
+    ...restProps
+  }: WithoutChild<FormPrimitive.DescriptionProps> = $props();
 </script>
 
-<Description class={cn("text-muted-foreground text-sm", className)} {...restProps} />
+<FormPrimitive.Description
+  bind:ref
+  data-slot="form-description"
+  class={cn("text-muted-foreground text-sm", className)}
+  {...restProps}
+/>
