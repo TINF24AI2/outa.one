@@ -1,11 +1,14 @@
 <script lang="ts">
   import { UserX } from "@lucide/svelte";
-  import { enhance } from "$app/forms";
+  import { superForm, type SuperValidated } from "sveltekit-superforms";
+  import { zod4Client as zodClient } from "sveltekit-superforms/adapters";
+  import type { Infer } from "zod";
 
   import { Button, buttonVariants } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
   import { Separator } from "$lib/components/ui/separator";
   import { m } from "$lib/paraglide/messages";
+  import { removeUserSchema } from "$lib/schemas/users";
   import { splitName } from "$lib/user-management";
 
   type ManagedUser = {
@@ -13,22 +16,33 @@
     name: string;
   };
 
-  let { user, isCurrentUser = false }: { user: ManagedUser; isCurrentUser?: boolean } = $props();
+  type Props = {
+    user: ManagedUser;
+    form: SuperValidated<Infer<typeof removeUserSchema>>;
+    isCurrentUser?: boolean;
+  };
+
+  let { user, form, isCurrentUser = false }: Props = $props();
+  let open = $state(false);
 
   const nameParts = $derived(splitName(user.name));
 
-  let open = $state(false);
-  let loading = $state(false);
-  let message = $state<string | null>(null);
-
-  $effect(() => {
-    if (open) {
-      message = null;
-      return;
-    }
-
-    loading = false;
+  // svelte-ignore state_referenced_locally
+  const sf = superForm(form, {
+    validators: zodClient(removeUserSchema),
+    onUpdated({ form }) {
+      if (form.valid) {
+        open = false;
+        sf.reset({
+          id: `remove-user-${user.id}`,
+          data: { userId: user.id },
+          newState: { userId: user.id },
+        });
+      }
+    },
   });
+
+  const { form: formData, enhance, submitting, message } = sf;
 </script>
 
 <Dialog.Root bind:open>
@@ -41,29 +55,8 @@
     <UserX class="h-4 w-4 text-red-500" />
   </Dialog.Trigger>
   <Dialog.Content class="shadow-xl ring-0 sm:max-w-106.25">
-    <form
-      method="post"
-      action="?/removeUser"
-      use:enhance={() => {
-        loading = true;
-        message = null;
-
-        return async ({ result, update }) => {
-          loading = false;
-          await update({ reset: false });
-
-          if (result.type === "success") {
-            open = false;
-            return;
-          }
-
-          const data = (result.type === "failure" ? result.data : null) as { message?: string } | null;
-          message = data?.message ?? null;
-        };
-      }}
-      class="grid gap-6"
-    >
-      <input type="hidden" name="userId" value={user.id} />
+    <form method="post" action="?/removeUser" use:enhance class="grid gap-6">
+      <input type="hidden" name="userId" bind:value={$formData.userId} />
 
       <Dialog.Header>
         <Dialog.Title>{m.users_delete_dialog_title()}</Dialog.Title>
@@ -86,15 +79,15 @@
           </ul>
         </div>
 
-        {#if message}
-          <p class="text-destructive text-sm">{message}</p>
+        {#if $message}
+          <p class="text-destructive text-sm">{$message}</p>
         {/if}
       </div>
       <div class="flex gap-3">
         <Dialog.Close type="button" class={`${buttonVariants({ variant: "secondary" })} flex-1`}>
           {m.users_dialog_cancel()}
         </Dialog.Close>
-        <Button type="submit" variant="destructive" disabled={loading} class="flex-1">
+        <Button type="submit" variant="destructive" disabled={$submitting} class="flex-1">
           {m.users_delete_submit()}
         </Button>
       </div>

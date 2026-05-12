@@ -1,5 +1,6 @@
 import { fail } from "@sveltejs/kit";
-import { z } from "zod";
+import { message, setError, superValidate } from "sveltekit-superforms";
+import { zod4 as zod } from "sveltekit-superforms/adapters";
 
 import { m } from "$lib/paraglide/messages.js";
 import { inviteUserSchema, removeUserSchema, updateUserRoleSchema } from "$lib/schemas/users";
@@ -15,135 +16,110 @@ import {
 import type { Actions, PageServerLoad } from "./$types";
 
 function requireAdmin(event: Parameters<NonNullable<Actions[keyof Actions]>>[0]) {
-  if (event.locals.user?.role !== "admin") {
-    return fail(403, { message: m.dashboard_invite_error_forbidden() });
-  }
-
-  return null;
+  return event.locals.user?.role === "admin";
 }
 
 export const load: PageServerLoad = async (event) => {
   requireAdminUser(event);
 
+  const users = await listManagedUsers(event.request.headers);
+  const editForms = await Promise.all(
+    users.map(
+      async (u) =>
+        await superValidate({ userId: u.id, role: u.managedRole }, zod(updateUserRoleSchema), {
+          id: `update-user-${u.id}`,
+        }),
+    ),
+  );
+  const deleteForms = await Promise.all(
+    users.map(async (u) => await superValidate({ userId: u.id }, zod(removeUserSchema), { id: `remove-user-${u.id}` })),
+  );
+
   return {
-    users: await listManagedUsers(event.request.headers),
+    inviteForm: await superValidate(zod(inviteUserSchema), { id: "invite-user" }),
+    editForms,
+    deleteForms,
+    users,
   };
 };
 
 export const actions: Actions = {
   inviteUser: async (event) => {
-    const forbidden = requireAdmin(event);
-    if (forbidden) {
-      return forbidden;
-    }
+    const form = await superValidate(event.request, zod(inviteUserSchema));
+    if (!requireAdmin(event)) return message(form, m.dashboard_invite_error_forbidden(), { status: 403 });
+    if (!form.valid) return fail(400, { form });
 
-    const payload = Object.fromEntries(await event.request.formData());
-    const result = inviteUserSchema.safeParse(payload);
-
-    if (!result.success) {
-      const fieldErrors = z.flattenError(result.error).fieldErrors;
-
-      return fail(400, {
-        fieldErrors: {
-          email: fieldErrors.email?.[0],
-          role: fieldErrors.role?.[0],
-        },
-        message: fieldErrors.email?.[0] ?? fieldErrors.role?.[0] ?? m.auth_error_unexpected(),
-      });
-    }
-
-    const email = result.data.email.toLowerCase();
+    const email = form.data.email.toLowerCase();
 
     try {
-      const { inviteUrl, emailSent } = await inviteManagedUser(email, result.data.role);
+      const { inviteUrl, emailSent } = await inviteManagedUser(email, form.data.role);
 
       return {
+        form,
         inviteUrl,
         emailSent,
-        message: m.users_invite_success({ email }),
       };
     } catch (error) {
-      const message =
+      const errorMessage =
         error instanceof ManagedUserError && error.code === "account_exists"
           ? m.users_invite_error_account_exists({ email })
           : m.auth_error_unexpected();
 
-      return fail(400, {
-        fieldErrors: { email: message },
-        message,
-      });
+      if (error instanceof ManagedUserError && error.code === "account_exists") {
+        return setError(form, "email", errorMessage);
+      }
+
+      return message(form, errorMessage, { status: 500 });
     }
   },
 
   updateUser: async (event) => {
-    const forbidden = requireAdmin(event);
-    if (forbidden) {
-      return forbidden;
-    }
-
-    const payload = Object.fromEntries(await event.request.formData());
-    const result = updateUserRoleSchema.safeParse(payload);
-
-    if (!result.success) {
-      const fieldErrors = z.flattenError(result.error).fieldErrors;
-      return fail(400, {
-        fieldErrors: { role: fieldErrors.role?.[0] },
-        message: fieldErrors.role?.[0] ?? m.users_error_not_found(),
-      });
-    }
+    const form = await superValidate(event.request, zod(updateUserRoleSchema));
+    if (!requireAdmin(event)) return message(form, m.dashboard_invite_error_forbidden(), { status: 403 });
+    if (!form.valid) return fail(400, { form });
 
     try {
-      const targetUser = await updateManagedUserRole(event.request.headers, result.data.userId, result.data.role);
-
-      return { message: m.users_edit_success({ name: targetUser.name }) };
+      await updateManagedUserRole(event.request.headers, form.data.userId, form.data.role);
+      return { form };
     } catch (error) {
       if (error instanceof ManagedUserError) {
         if (error.code === "last_admin") {
-          return fail(400, { message: m.users_error_last_admin() });
+          return message(form, m.users_error_last_admin(), { status: 400 });
         }
 
         if (error.code === "not_found") {
-          return fail(404, { message: m.users_error_not_found() });
+          return message(form, m.users_error_not_found(), { status: 404 });
         }
       }
 
-      return fail(500, { message: m.auth_error_unexpected() });
+      return message(form, m.auth_error_unexpected(), { status: 500 });
     }
   },
 
   removeUser: async (event) => {
-    const forbidden = requireAdmin(event);
-    if (forbidden) {
-      return forbidden;
-    }
-
-    const payload = Object.fromEntries(await event.request.formData());
-    const result = removeUserSchema.safeParse(payload);
-
-    if (!result.success) {
-      return fail(400, { message: m.users_error_not_found() });
-    }
+    const form = await superValidate(event.request, zod(removeUserSchema));
+    if (!requireAdmin(event)) return message(form, m.dashboard_invite_error_forbidden(), { status: 403 });
+    if (!form.valid) return fail(400, { form });
 
     try {
-      const targetUser = await removeManagedUser(event.request.headers, result.data.userId, event.locals.user?.id);
-
-      return { message: m.users_delete_success({ name: targetUser.name }) };
+      await removeManagedUser(event.request.headers, form.data.userId, event.locals.user?.id);
+      return { form };
     } catch (error) {
       if (error instanceof ManagedUserError) {
         if (error.code === "self_delete") {
-          return fail(400, { message: m.users_delete_error_self() });
+          return message(form, m.users_delete_error_self(), { status: 400 });
         }
 
         if (error.code === "last_admin") {
-          return fail(400, { message: m.users_error_last_admin() });
+          return message(form, m.users_error_last_admin(), { status: 400 });
         }
 
         if (error.code === "not_found") {
-          return fail(404, { message: m.users_error_not_found() });
+          return message(form, m.users_error_not_found(), { status: 404 });
         }
       }
 
-      return fail(500, { message: m.auth_error_unexpected() });
+      return message(form, m.auth_error_unexpected(), { status: 500 });
     }
   },
 };

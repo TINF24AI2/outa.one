@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Check, Copy, Mail, UserPlus } from "@lucide/svelte";
-  import { enhance } from "$app/forms";
+  import { superForm, type SuperValidated } from "sveltekit-superforms";
+  import { zod4Client as zodClient } from "sveltekit-superforms/adapters";
 
   import UserRoleSelect from "$lib/components/app/user-role-select.svelte";
   import { Button, buttonVariants } from "$lib/components/ui/button";
@@ -11,35 +12,41 @@
   import { m } from "$lib/paraglide/messages";
   import { inviteUserSchema } from "$lib/schemas/users";
   import type { InviteUserInput } from "$lib/schemas/users";
-  import type { ManagedRole } from "$lib/user-management";
 
-  type InviteFieldErrors = Partial<Record<keyof InviteUserInput, string>>;
+  type InviteActionResult = {
+    inviteUrl?: string;
+    emailSent?: boolean;
+  };
+
+  let { initialForm }: { initialForm: SuperValidated<InviteUserInput> } = $props();
 
   let open = $state(false);
-  let loading = $state(false);
-  let email = $state("");
-  let value = $state<ManagedRole>("user");
-  let fieldErrors = $state<InviteFieldErrors>({});
   let step = $state<"form" | "success">("form");
   let inviteUrl = $state<string | null>(null);
   let emailSent = $state(false);
   let submittedEmail = $state("");
   let copied = $state(false);
 
-  function validate() {
-    const result = inviteUserSchema.safeParse({ email, role: value });
+  // svelte-ignore state_referenced_locally
+  const sf = superForm(initialForm, {
+    validators: zodClient(inviteUserSchema),
+    onUpdated({ form }) {
+      if (!form.valid) {
+        return;
+      }
 
-    if (result.success) {
-      return {};
-    }
+      const data = form.data as InviteActionResult | null;
+      if (!data?.inviteUrl) {
+        return;
+      }
 
-    const { fieldErrors } = result.error.flatten();
-
-    return {
-      email: fieldErrors.email?.[0],
-      role: fieldErrors.role?.[0],
-    } satisfies InviteFieldErrors;
-  }
+      inviteUrl = data.inviteUrl;
+      emailSent = data.emailSent ?? false;
+      submittedEmail = form.data.email.trim().toLowerCase();
+      step = "success";
+    },
+  });
+  const { form, errors, enhance, submitting, message } = sf;
 
   async function copyToClipboard() {
     if (!inviteUrl) return;
@@ -50,15 +57,12 @@
 
   $effect(() => {
     if (!open) {
-      email = "";
-      value = "user";
-      fieldErrors = {};
-      loading = false;
       step = "form";
       inviteUrl = null;
       emailSent = false;
       submittedEmail = "";
       copied = false;
+      sf.reset();
     }
   });
 </script>
@@ -71,45 +75,7 @@
 
   <Dialog.Content class="shadow-xl ring-0 sm:max-w-106.25">
     {#if step === "form"}
-      <form
-        method="post"
-        action="?/inviteUser"
-        novalidate
-        use:enhance={({ cancel }) => {
-          const errors = validate();
-
-          if (Object.keys(errors).length > 0) {
-            fieldErrors = errors;
-            cancel();
-            return;
-          }
-
-          loading = true;
-          fieldErrors = {};
-
-          return async ({ result, update }) => {
-            loading = false;
-            await update({ reset: false });
-
-            const data = (result.type === "success" || result.type === "failure" ? result.data : null) as {
-              inviteUrl?: string;
-              emailSent?: boolean;
-              message?: string;
-              fieldErrors?: { email?: string; role?: string };
-            } | null;
-
-            if (result.type === "success" && data?.inviteUrl) {
-              inviteUrl = data.inviteUrl;
-              emailSent = data?.emailSent ?? false;
-              submittedEmail = email.trim().toLowerCase();
-              step = "success";
-            } else {
-              fieldErrors = data?.fieldErrors ?? {};
-            }
-          };
-        }}
-        class="grid gap-6"
-      >
+      <form method="post" action="?/inviteUser" use:enhance novalidate class="grid gap-6">
         <Dialog.Header>
           <Dialog.Title>{m.users_invite_dialog_title()}</Dialog.Title>
           <Dialog.Description>{m.users_invite_dialog_description()}</Dialog.Description>
@@ -124,28 +90,32 @@
               type="email"
               placeholder={m.users_invite_email_placeholder()}
               autocomplete="email"
-              bind:value={email}
-              aria-invalid={!!fieldErrors.email}
+              bind:value={$form.email}
+              aria-invalid={$errors.email ? "true" : undefined}
             />
-            {#if fieldErrors.email}
-              <p class="text-destructive text-xs">{fieldErrors.email}</p>
+            {#if $errors.email}
+              <p class="text-destructive text-xs">{$errors.email[0]}</p>
             {/if}
           </div>
           <UserRoleSelect
             id="role"
-            bind:value
+            bind:value={$form.role}
             label={m.users_role_label()}
-            error={fieldErrors.role}
+            error={$errors.role?.[0]}
             hint={m.users_role_admin_hint()}
           />
+
+          {#if $message}
+            <p class="text-destructive text-sm">{$message}</p>
+          {/if}
         </div>
         <div class="flex gap-3">
           <Dialog.Close type="button" class={`${buttonVariants({ variant: "secondary" })} flex-1`}>
             {m.users_dialog_cancel()}
           </Dialog.Close>
-          <Button type="submit" disabled={loading} class="flex-1">
+          <Button type="submit" disabled={$submitting} class="flex-1">
             <Mail />
-            {loading ? m.users_invite_submit_loading() : m.users_invite_submit()}
+            {$submitting ? m.users_invite_submit_loading() : m.users_invite_submit()}
           </Button>
         </div>
       </form>

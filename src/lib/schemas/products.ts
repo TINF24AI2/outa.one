@@ -7,7 +7,7 @@ export const createProductSchema = z.object({
     (value) => (value === "" || value == null ? undefined : value),
     z.coerce.number({ error: "Must be a number" }).int().min(0, "Must be 0 or a positive number"),
   ),
-  requiresApproval: z.preprocess((value) => value === "on", z.boolean()),
+  requiresApproval: z.preprocess((value) => value === "on" || value === true, z.boolean()),
 });
 
 export type CreateProductInput = z.infer<typeof createProductSchema>;

@@ -17,6 +17,9 @@
 
   let { data }: { data: PageData } = $props();
 
+  let editForms = $derived(Object.fromEntries(data.editForms.map((form) => [form.data.userId, form])));
+  let deleteForms = $derived(Object.fromEntries(data.deleteForms.map((form) => [form.data.userId, form])));
+
   type ManagedUser = PageData["users"][number];
 
   const locale = getLocale();
@@ -24,7 +27,7 @@
 
 <div class="flex h-full w-full flex-col overflow-hidden">
   <PageHeader title={m.users_title()} subtitle={m.users_subtitle()}>
-    <InviteUser />
+    <InviteUser initialForm={data.inviteForm} />
   </PageHeader>
 
   <div class="mx-auto w-full max-w-7xl flex-1 overflow-auto px-2 py-6">
@@ -34,8 +37,8 @@
           <Button variant="ghost" size="icon-sm" title={m.users_action_viewLicenses()}>
             <KeyRound class="h-4 w-4 text-gray-500" />
           </Button>
-          <EditUser {user} />
-          <DeleteUser {user} isCurrentUser={user.id === data.user.id} />
+          <EditUser {user} form={editForms[user.id]} />
+          <DeleteUser {user} form={deleteForms[user.id]} isCurrentUser={user.id === data.user.id} />
         </div>
       {/snippet}
 

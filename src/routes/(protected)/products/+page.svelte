@@ -1,6 +1,7 @@
 <script lang="ts">
   import PlusIcon from "@lucide/svelte/icons/plus";
-  import { enhance } from "$app/forms";
+  import { stringProxy, superForm } from "sveltekit-superforms";
+  import { zod4Client as zodClient } from "sveltekit-superforms/adapters";
 
   import NumberStepperInput from "$lib/components/app/number-stepper-input.svelte";
   import Modal from "$lib/components/modal.svelte";
@@ -12,21 +13,28 @@
   import Switch from "$lib/components/ui/switch/switch.svelte";
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
   import { m } from "$lib/paraglide/messages.js";
+  import { createProductSchema } from "$lib/schemas/products";
 
-  import type { ActionData } from "./$types";
+  import type { PageData } from "./$types";
 
-  let { form }: { form: ActionData } = $props();
+  let { data }: { data: PageData } = $props();
   let open = $state(false);
-  let maxLicenses = $state<number | undefined>(undefined);
 
-  $effect(() => {
-    if (form?.errors && !form.success) {
-      open = true;
-      if (form.data?.maxLicensesPerUser) {
-        maxLicenses = Number(form.data.maxLicensesPerUser);
+  // svelte-ignore state_referenced_locally
+  const sf = superForm(data.form, {
+    validators: zodClient(createProductSchema),
+    onUpdate({ result }) {
+      if (result.type === "success") {
+        open = false;
+        sf.reset();
+        return;
       }
-    }
+
+      open = true;
+    },
   });
+  const { form, errors, enhance, submitting } = sf;
+  const description = stringProxy(sf, "description", { empty: "null" });
 </script>
 
 <svelte:head>
@@ -41,18 +49,7 @@
 
 <Modal bind:open class="h-auto bg-white text-black">
   <div class="w-full max-w-md">
-    <form
-      method="POST"
-      action="?/createProduct"
-      use:enhance={() => {
-        return async ({ result }) => {
-          if (result.type === "success") {
-            open = false;
-            maxLicenses = undefined;
-          }
-        };
-      }}
-    >
+    <form method="POST" action="?/createProduct" use:enhance>
       <Field.Set class="gap-6">
         <Field.Legend>{m.products_popup_add_create_legend()}</Field.Legend>
         <Field.Separator class="-mx-6" />
@@ -67,11 +64,12 @@
               name="name"
               type="text"
               placeholder={m.products_popup_add_name_placeholder()}
-              value={form?.data?.name ?? ""}
+              bind:value={$form.name}
               required
+              aria-invalid={$errors.name ? "true" : undefined}
             />
-            {#if form?.errors?.name}
-              <Field.Error>{form.errors.name[0]}</Field.Error>
+            {#if $errors.name}
+              <Field.Error>{$errors.name[0]}</Field.Error>
             {/if}
           </Field.Field>
 
@@ -82,19 +80,20 @@
               name="description"
               class="resize-none"
               placeholder={m.products_popup_add_description_placeholder()}
-              value={String(form?.data?.description ?? "")}
+              bind:value={$description}
+              aria-invalid={$errors.description ? "true" : undefined}
             />
-            {#if form?.errors?.description}
-              <Field.Error>{form.errors.description[0]}</Field.Error>
+            {#if $errors.description}
+              <Field.Error>{$errors.description[0]}</Field.Error>
             {/if}
           </Field.Field>
 
           <NumberStepperInput
             id="maxlicenses"
             name="maxLicensesPerUser"
-            bind:value={maxLicenses}
+            bind:value={$form.maxLicensesPerUser}
             label={m.products_popup_add_max_licenses_label()}
-            error={form?.errors?.maxLicensesPerUser?.[0]}
+            error={$errors.maxLicensesPerUser?.[0]}
             description={m.products_popup_add_max_licenses_description()}
           />
 
@@ -109,7 +108,7 @@
               id="reqapproval"
               name="requiresApproval"
               class="self-center"
-              checked={form?.data?.requiresApproval === "on"}
+              bind:checked={$form.requiresApproval}
             />
           </Field.Field>
 
@@ -117,9 +116,7 @@
             <Button variant="secondary" class="flex-1" onclick={() => (open = false)} type="button">
               {m.products_popup_add_cancel()}
             </Button>
-            <Button class="flex-1" type="submit">
-              {m.products_popup_add_submit()}
-            </Button>
+            <Button class="flex-1" type="submit" disabled={$submitting}>{m.products_popup_add_submit()}</Button>
           </div>
         </Field.Group>
       </Field.Set>

@@ -1,16 +1,27 @@
 <script lang="ts">
-  import { FieldErrors } from "formsnap";
-  import type { FieldErrorsProps } from "formsnap";
+  import * as FormPrimitive from "formsnap";
 
-  import { cn } from "$lib/utils.js";
+  import { cn, type WithoutChild } from "$lib/utils.js";
 
-  let { class: className, ...restProps }: Omit<FieldErrorsProps, "children"> = $props();
+  let {
+    ref = $bindable(null),
+    class: className,
+    errorClasses,
+    children: childrenProp,
+    ...restProps
+  }: WithoutChild<FormPrimitive.FieldErrorsProps> & {
+    errorClasses?: string | undefined | null;
+  } = $props();
 </script>
 
-<FieldErrors {...restProps}>
+<FormPrimitive.FieldErrors bind:ref class={cn("text-destructive text-sm font-medium", className)} {...restProps}>
   {#snippet children({ errors, errorProps })}
-    {#each errors as error, i (i)}
-      <p {...errorProps} class={cn("text-destructive text-sm font-medium", className)}>{error}</p>
-    {/each}
+    {#if childrenProp}
+      {@render childrenProp({ errors, errorProps })}
+    {:else}
+      {#each errors as error (error)}
+        <div {...errorProps} class={cn(errorClasses)}>{error}</div>
+      {/each}
+    {/if}
   {/snippet}
-</FieldErrors>
+</FormPrimitive.FieldErrors>
