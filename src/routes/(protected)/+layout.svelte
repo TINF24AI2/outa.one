@@ -4,19 +4,20 @@
   import { page } from "$app/state";
 
   import Navigation from "$lib/components/app/navigation.svelte";
+  import { m } from "$lib/paraglide/messages.js";
 
   let { data, children } = $props();
 
   let pages = $derived(() => {
     if (data.user.role === "admin") {
       return [
-        { name: "Dashboard", href: resolve("/dashboard"), icon: LayoutDashboard },
-        { name: "Products", href: resolve("/products"), icon: Package },
-        { name: "Licenses", href: resolve("/licenses"), icon: FileKey },
-        { name: "Users", href: resolve("/users"), icon: Users },
+        { name: m.dashboard_title(), href: resolve("/dashboard"), icon: LayoutDashboard },
+        { name: m.products_title(), href: resolve("/products"), icon: Package },
+        { name: m.licenses_title(), href: resolve("/licenses"), icon: FileKey },
+        { name: m.users_title(), href: resolve("/users"), icon: Users },
       ];
     } else {
-      return [{ name: "Dashboard", href: resolve("/dashboard"), icon: LayoutDashboard }];
+      return [{ name: m.dashboard_title(), href: resolve("/dashboard"), icon: LayoutDashboard }];
     }
   });
 </script>

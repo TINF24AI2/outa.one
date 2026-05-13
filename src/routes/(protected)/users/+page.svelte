@@ -25,6 +25,11 @@
   const locale = getLocale();
 </script>
 
+<svelte:head>
+  <title>{m.users_meta_title()}</title>
+  <meta name="users" content={m.meta_description()} />
+</svelte:head>
+
 <div class="flex h-full w-full flex-col overflow-hidden">
   <PageHeader title={m.users_title()} subtitle={m.users_subtitle()}>
     <InviteUser initialForm={data.inviteForm} />
