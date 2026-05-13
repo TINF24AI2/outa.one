@@ -19,7 +19,7 @@ export const load: PageServerLoad = async (event) => {
   }
 
   return {
-    form: await superValidate({ token }, zod(resetPasswordSchema)),
+    form: await superValidate({ token }, zod(resetPasswordSchema), { errors: false }),
   };
 };
 

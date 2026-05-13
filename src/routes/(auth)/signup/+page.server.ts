@@ -29,7 +29,7 @@ export const load: PageServerLoad = async (event) => {
   }
 
   return {
-    form: await superValidate({ token: invite.token }, zod(signupSchema)),
+    form: await superValidate({ token: invite.token }, zod(signupSchema), { errors: false }),
     email: invite.email,
   };
 };

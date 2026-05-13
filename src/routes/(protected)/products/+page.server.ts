@@ -10,7 +10,10 @@ import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async () => {
   return {
-    form: await superValidate(zod(createProductSchema), { id: "create-product" }),
+    form: await superValidate({ maxLicensesPerUser: 1 }, zod(createProductSchema), {
+      id: "create-product",
+      errors: false,
+    }),
   };
 };
 

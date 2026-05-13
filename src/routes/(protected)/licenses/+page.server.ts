@@ -12,7 +12,7 @@ export const load: PageServerLoad = async () => {
   const products = await db.select({ id: product.id, name: product.name }).from(product);
   return {
     products,
-    form: await superValidate(zod(createLicenseSchema), { id: "create-license" }),
+    form: await superValidate({ usageVolume: 1 }, zod(createLicenseSchema), { id: "create-license", errors: false }),
   };
 };
 
