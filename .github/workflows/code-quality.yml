@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  code-quality:
+  check-formatting:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,8 +27,56 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Check formatting and linting
-        run: pnpm run ci:check
+      - name: Check formatting
+        run: pnpm run ci:format
+
+  check-linting:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check linting
+        run: pnpm run ci:lint
+
+  check-translation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check translation sorting
+        run: pnpm run ci:translation
 
       # Here we can add a step to run tests in the future
       # For now, it's commented out since we would need a test database setup and all requires environment variables to be set up correctly.
