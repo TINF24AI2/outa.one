@@ -44,7 +44,7 @@
 <aside class="bg-background hidden w-64 shrink-0 flex-col border-r md:flex">
   <!-- App header -->
   <div class="flex items-center gap-3 border-b px-4 py-3">
-    <div class="bg-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-xl">
+    <div class="bg-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
       <img src={logo} alt={m.navigation_logo_alt()} class="h-5 w-5 object-contain brightness-0 invert" />
     </div>
     <div class="min-w-0">
