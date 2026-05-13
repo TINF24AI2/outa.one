@@ -1,9 +1,9 @@
-import { requireAuthenticatedUser } from "$lib/server/auth/guards";
+import { requireAdminUser } from "$lib/server/auth/guards";
 
 import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = (event) => {
-  const user = requireAuthenticatedUser(event);
+  const user = requireAdminUser(event);
 
   return { user };
 };

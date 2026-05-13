@@ -1,7 +1,9 @@
 <script lang="ts">
-  import { CircleUserRound, LogOut } from "@lucide/svelte";
+  import { ArrowRightLeft, CircleUserRound, LogOut } from "@lucide/svelte";
+  import { browser } from "$app/environment";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
+  import { page } from "$app/state";
 
   import logo from "$lib/assets/logo.svg";
   import { authClient } from "$lib/authClient";
@@ -21,6 +23,20 @@
     await goto(resolve("/login"));
   };
 
+  const isAdminView = $derived(() => page.url.pathname.startsWith("/admin"));
+
+  const switchViewLink = () => {
+    if (!browser) {
+      return "#";
+    }
+
+    if (isAdminView()) {
+      return resolve("/dashboard");
+    } else {
+      return resolve("/admin/dashboard");
+    }
+  };
+
   let accountOpen = $state(false);
 </script>
 
@@ -33,7 +49,9 @@
     </div>
     <div class="min-w-0">
       <p class="truncate text-sm font-semibold">{m.app_license_portal()}</p>
-      <p class="text-muted-foreground truncate text-xs">{user.role === "admin" ? m.role_admin() : m.role_employee()}</p>
+      <p class="text-muted-foreground truncate text-xs">
+        {isAdminView() ? m.navigation_adminView() : m.navigation_employeeView()}
+      </p>
     </div>
   </div>
 
@@ -56,10 +74,21 @@
       </div>
     </div>
 
-    <Button variant="ghost" class="w-full justify-start gap-2 px-2 text-gray-700" onclick={signOut}>
-      <LogOut class="h-4 w-4" />
-      {m.navigation_logout()}
-    </Button>
+    <div class="mt-4 flex flex-col">
+      {#if user.role === "admin"}
+        <div class="flex flex-col items-start gap-2">
+          <Button variant="ghost" class="w-full justify-start gap-2 px-2 text-gray-700" href={switchViewLink()}>
+            <ArrowRightLeft class="h-4 w-4" />
+            {isAdminView() ? m.navigation_switchToEmployee() : m.navigation_switchToAdmin()}
+          </Button>
+        </div>
+      {/if}
+
+      <Button variant="ghost" class="w-full justify-start gap-2 px-2 text-gray-700" onclick={signOut}>
+        <LogOut class="h-4 w-4" />
+        {m.navigation_logout()}
+      </Button>
+    </div>
   </div>
 </aside>
 
@@ -82,6 +111,10 @@
           <p class="text-muted-foreground text-xs">{user.email}</p>
         </div>
         <div class="border-t px-2 py-2">
+          <Button variant="ghost" class="w-full justify-start gap-2 px-2 text-gray-700" href={switchViewLink()}>
+            <ArrowRightLeft class="h-4 w-4" />
+            {isAdminView() ? m.navigation_switchToEmployee() : m.navigation_switchToAdmin()}
+          </Button>
           <Button variant="ghost" class="h-9 w-full justify-start gap-2 px-2 text-gray-700" onclick={signOut}>
             <LogOut class="h-4 w-4" />
             {m.navigation_logout()}
