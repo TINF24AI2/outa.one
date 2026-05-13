@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FileKey, LayoutDashboard, Package, Users } from "@lucide/svelte";
+  import { LayoutDashboard } from "@lucide/svelte";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
 
@@ -8,23 +8,12 @@
 
   let { data, children } = $props();
 
-  let pages = $derived(() => {
-    if (data.user.role === "admin") {
-      return [
-        { name: m.dashboard_title(), href: resolve("/dashboard"), icon: LayoutDashboard },
-        { name: m.products_title(), href: resolve("/products"), icon: Package },
-        { name: m.licenses_title(), href: resolve("/licenses"), icon: FileKey },
-        { name: m.users_title(), href: resolve("/users"), icon: Users },
-      ];
-    } else {
-      return [{ name: m.dashboard_title(), href: resolve("/dashboard"), icon: LayoutDashboard }];
-    }
-  });
+  const pages = [{ name: m.dashboard_title(), href: resolve("/dashboard"), icon: LayoutDashboard }];
 </script>
 
 <div class="flex h-screen overflow-hidden">
   <Navigation user={data.user}>
-    {#each pages() as navPage (navPage.name)}
+    {#each pages as navPage (navPage.name)}
       {@const isActive = page.url.pathname === navPage.href || page.url.pathname.startsWith(`${navPage.href}/`)}
       <a
         href={navPage.href}
