@@ -30,16 +30,22 @@ export const actions: Actions = {
     const form = await superValidate(event.request, zod(loginSchema));
     if (!form.valid) return fail(400, { form });
 
+    let user;
     try {
-      await auth.api.signInEmail({ body: { email: form.data.email, password: form.data.password } });
+      const res = await auth.api.signInEmail({ body: { email: form.data.email, password: form.data.password } });
+      user = res.user;
     } catch (error) {
       if (error instanceof APIError) {
         setError(form, "email", m.auth_login_error_invalid_credentials());
         return setError(form, "password", m.auth_login_error_invalid_credentials());
       }
+
       return message(form, m.auth_error_unexpected(), { status: 500 });
     }
 
+    if (user.role === "admin") {
+      redirect(302, "/admin/dashboard");
+    }
     redirect(302, "/dashboard");
   },
 };
