@@ -8,6 +8,7 @@
   import "./layout.css";
 
   import logo from "$lib/assets/logo.svg?raw";
+  import { Toaster } from "$lib/components/ui/sonner";
 
   let { children } = $props();
 
@@ -19,6 +20,9 @@
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
+
+<Toaster />
+
 {@render children()}
 
 <div style="display:none">

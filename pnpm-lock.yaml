@@ -120,6 +120,9 @@ importers:
       lefthook:
         specifier: ^2.1.6
         version: 2.1.6
+      mode-watcher:
+        specifier: ^1.1.0
+        version: 1.1.0(svelte@5.55.4(@typescript-eslint/types@8.59.2))
       nodemailer:
         specifier: ^8.0.7
         version: 8.0.7
@@ -150,6 +153,9 @@ importers:
       svelte-check:
         specifier: ^4.4.6
         version: 4.4.6(picomatch@4.0.4)(svelte@5.55.4(@typescript-eslint/types@8.59.2))(typescript@6.0.2)
+      svelte-sonner:
+        specifier: ^1.1.1
+        version: 1.1.1(svelte@5.55.4(@typescript-eslint/types@8.59.2))
       sveltekit-superforms:
         specifier: ^2.30.1
         version: 2.30.1(@sveltejs/kit@2.57.1(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.4(@typescript-eslint/types@8.59.2))(vite@8.0.8(@types/node@24.12.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)))(svelte@5.55.4(@typescript-eslint/types@8.59.2))(typescript@6.0.2)(vite@8.0.8(@types/node@24.12.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)))(@types/json-schema@7.0.15)(svelte@5.55.4(@typescript-eslint/types@8.59.2))(typescript@6.0.2)
@@ -3223,6 +3229,11 @@ packages:
   mkdirp-classic@0.5.3:
     resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
 
+  mode-watcher@1.1.0:
+    resolution: {integrity: sha512-mUT9RRGPDYenk59qJauN1rhsIMKBmWA3xMF+uRwE8MW/tjhaDSCCARqkSuDTq8vr4/2KcAxIGVjACxTjdk5C3g==}
+    peerDependencies:
+      svelte: ^5.27.0
+
   mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
     engines: {node: '>=4'}
@@ -3643,6 +3654,21 @@ packages:
   run-parallel@1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
 
+  runed@0.23.4:
+    resolution: {integrity: sha512-9q8oUiBYeXIDLWNK5DfCWlkL0EW3oGbk845VdKlPeia28l751VpfesaB/+7pI6rnbx1I6rqoZ2fZxptOJLxILA==}
+    peerDependencies:
+      svelte: ^5.7.0
+
+  runed@0.25.0:
+    resolution: {integrity: sha512-7+ma4AG9FT2sWQEA0Egf6mb7PBT2vHyuHail1ie8ropfSjvZGtEAx8YTmUjv/APCsdRRxEVvArNjALk9zFSOrg==}
+    peerDependencies:
+      svelte: ^5.7.0
+
+  runed@0.28.0:
+    resolution: {integrity: sha512-k2xx7RuO9hWcdd9f+8JoBeqWtYrm5CALfgpkg2YDB80ds/QE4w0qqu34A7fqiAwiBBSBQOid7TLxwxVC27ymWQ==}
+    peerDependencies:
+      svelte: ^5.7.0
+
   runed@0.35.1:
     resolution: {integrity: sha512-2F4Q/FZzbeJTFdIS/PuOoPRSm92sA2LhzTnv6FXhCoENb3huf5+fDuNOg1LNvGOouy3u/225qxmuJvcV3IZK5Q==}
     peerDependencies:
@@ -3828,6 +3854,11 @@ packages:
       svelte:
         optional: true
 
+  svelte-sonner@1.1.1:
+    resolution: {integrity: sha512-5cd3p7wa4cq0NsqslMwdlPb7x1JglEZ/GKrLePWNr5bCxR1nagAVrY01FRFrXfUGs41miLt3C327+8XJo5BzZw==}
+    peerDependencies:
+      svelte: ^5.0.0
+
   svelte-toolbelt@0.10.6:
     resolution: {integrity: sha512-YWuX+RE+CnWYx09yseAe4ZVMM7e7GRFZM6OYWpBKOb++s+SQ8RBIMMe+Bs/CznBMc0QPLjr+vDBxTAkozXsFXQ==}
     engines: {node: '>=18', pnpm: '>=8.7.0'}
@@ -3839,6 +3870,12 @@ packages:
     engines: {node: '>=18', pnpm: '>=8.7.0'}
     peerDependencies:
       svelte: ^5.0.0-next.126
+
+  svelte-toolbelt@0.7.1:
+    resolution: {integrity: sha512-HcBOcR17Vx9bjaOceUvxkY3nGmbBmCBBbuWLLEWO6jtmWH8f/QoWmbyUfQZrpDINH39en1b8mptfPQT9VKQ1xQ==}
+    engines: {node: '>=18', pnpm: '>=8.7.0'}
+    peerDependencies:
+      svelte: ^5.0.0
 
   svelte2tsx@0.7.53:
     resolution: {integrity: sha512-ljVSwmnYRDHRm8+7ICP6QoAN7U7vgOFfPBLN6T745YWNYqRRSzHxlrzUVqMjYls2Un8MzJissfziy/38e6Deeg==}
@@ -6925,6 +6962,12 @@ snapshots:
 
   mkdirp-classic@0.5.3: {}
 
+  mode-watcher@1.1.0(svelte@5.55.4(@typescript-eslint/types@8.59.2)):
+    dependencies:
+      runed: 0.25.0(svelte@5.55.4(@typescript-eslint/types@8.59.2))
+      svelte: 5.55.4(@typescript-eslint/types@8.59.2)
+      svelte-toolbelt: 0.7.1(svelte@5.55.4(@typescript-eslint/types@8.59.2))
+
   mri@1.2.0: {}
 
   mrmime@2.0.1: {}
@@ -7302,6 +7345,21 @@ snapshots:
     dependencies:
       queue-microtask: 1.2.3
 
+  runed@0.23.4(svelte@5.55.4(@typescript-eslint/types@8.59.2)):
+    dependencies:
+      esm-env: 1.2.2
+      svelte: 5.55.4(@typescript-eslint/types@8.59.2)
+
+  runed@0.25.0(svelte@5.55.4(@typescript-eslint/types@8.59.2)):
+    dependencies:
+      esm-env: 1.2.2
+      svelte: 5.55.4(@typescript-eslint/types@8.59.2)
+
+  runed@0.28.0(svelte@5.55.4(@typescript-eslint/types@8.59.2)):
+    dependencies:
+      esm-env: 1.2.2
+      svelte: 5.55.4(@typescript-eslint/types@8.59.2)
+
   runed@0.35.1(@sveltejs/kit@2.57.1(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.4(@typescript-eslint/types@8.59.2))(vite@8.0.8(@types/node@24.12.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)))(svelte@5.55.4(@typescript-eslint/types@8.59.2))(typescript@6.0.2)(vite@8.0.8(@types/node@24.12.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)))(svelte@5.55.4(@typescript-eslint/types@8.59.2)):
     dependencies:
       dequal: 2.0.3
@@ -7498,6 +7556,11 @@ snapshots:
     optionalDependencies:
       svelte: 5.55.4(@typescript-eslint/types@8.59.2)
 
+  svelte-sonner@1.1.1(svelte@5.55.4(@typescript-eslint/types@8.59.2)):
+    dependencies:
+      runed: 0.28.0(svelte@5.55.4(@typescript-eslint/types@8.59.2))
+      svelte: 5.55.4(@typescript-eslint/types@8.59.2)
+
   svelte-toolbelt@0.10.6(@sveltejs/kit@2.57.1(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.4(@typescript-eslint/types@8.59.2))(vite@8.0.8(@types/node@24.12.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)))(svelte@5.55.4(@typescript-eslint/types@8.59.2))(typescript@6.0.2)(vite@8.0.8(@types/node@24.12.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)))(svelte@5.55.4(@typescript-eslint/types@8.59.2)):
     dependencies:
       clsx: 2.1.1
@@ -7510,6 +7573,13 @@ snapshots:
   svelte-toolbelt@0.5.0(svelte@5.55.4(@typescript-eslint/types@8.59.2)):
     dependencies:
       clsx: 2.1.1
+      style-to-object: 1.0.14
+      svelte: 5.55.4(@typescript-eslint/types@8.59.2)
+
+  svelte-toolbelt@0.7.1(svelte@5.55.4(@typescript-eslint/types@8.59.2)):
+    dependencies:
+      clsx: 2.1.1
+      runed: 0.23.4(svelte@5.55.4(@typescript-eslint/types@8.59.2))
       style-to-object: 1.0.14
       svelte: 5.55.4(@typescript-eslint/types@8.59.2)
 

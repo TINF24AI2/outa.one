@@ -1,5 +1,6 @@
 <script lang="ts">
   import PlusIcon from "@lucide/svelte/icons/plus";
+  import { toast } from "svelte-sonner";
   import { stringProxy, superForm, type SuperValidated } from "sveltekit-superforms";
   import { zod4Client as zodClient } from "sveltekit-superforms/adapters";
   import type { Infer } from "zod";
@@ -23,10 +24,14 @@
   // svelte-ignore state_referenced_locally
   const sf = superForm(form, {
     validators: zodClient(createProductSchema),
-    onUpdate({ result }) {
-      if (result.type === "success") {
+    onUpdated({ form }) {
+      if (form.message) {
+        toast.error(form.message as string);
+      } else if (form.valid) {
+        const name = form.data.name;
         open = false;
         sf.reset();
+        toast.success(m.products_create_success({ name }));
       }
     },
   });
