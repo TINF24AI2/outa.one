@@ -6,7 +6,7 @@ import { zod4 as zod } from "sveltekit-superforms/adapters";
 import { assignLicenseUserSchema, createLicenseSchema, deleteLicenseSchema, unassignLicenseUserSchema } from "$lib/schemas/licenses";
 import { requireAdminUser } from "$lib/server/auth/guards";
 import { db } from "$lib/server/db";
-import { license, product } from "$lib/server/db/schema";
+import { license, product, user } from "$lib/server/db/schema";
 import { assignUserToLicense, unassignUserFromLicense } from "$lib/server/licenses";
 
 import type { PageServerLoad } from "./$types";
@@ -14,7 +14,7 @@ import type { PageServerLoad } from "./$types";
 export const load: PageServerLoad = async (event) => {
   requireAdminUser(event);
 
-  const [licenses, products] = await Promise.all([
+  const [licenses, products, users] = await Promise.all([
     db
       .select({
         id: license.id,
@@ -28,6 +28,7 @@ export const load: PageServerLoad = async (event) => {
       .leftJoin(product, eq(license.productId, product.id))
       .orderBy(license.createdAt),
     db.select({ id: product.id, name: product.name }).from(product),
+    db.select({ id: user.id, name: user.name, email: user.email }).from(user).orderBy(user.name),
   ]);
 
   const deleteForms = await Promise.all(
@@ -39,6 +40,7 @@ export const load: PageServerLoad = async (event) => {
   return {
     licenses,
     products,
+    users,
     form: await superValidate({ usageVolume: 1 }, zod(createLicenseSchema), { id: "create-license", errors: false }),
     deleteForms,
   };

@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { UserPlus, X } from "@lucide/svelte";
+  import { X } from "@lucide/svelte";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
 
   import AddLicenseDialog from "$lib/components/app/add-license-dialog.svelte";
+  import AssignUserDialog from "$lib/components/app/assign-user-dialog.svelte";
   import DeleteLicense from "$lib/components/app/delete-license.svelte";
   import LicenseKeyCell from "$lib/components/app/license-key-cell.svelte";
   import PageHeader from "$lib/components/app/page-header.svelte";
   import StatusBadge from "$lib/components/app/status-badge.svelte";
   import Combobox from "$lib/components/product-combobox.svelte";
-  import { Button } from "$lib/components/ui/button";
   import * as Table from "$lib/components/ui/table";
   import { m } from "$lib/paraglide/messages.js";
 
@@ -24,7 +24,7 @@
   let userFilter = $state(page.url.searchParams.get("user") ?? "");
 
   const productOptions = $derived(data.products.map((p) => ({ value: p.id, label: p.name })));
-  const userOptions: { value: string; label: string }[] = [];
+  const userOptions = $derived(data.users.map((u) => ({ value: u.id, label: u.name })));
 
   async function syncUrl() {
     // eslint-disable-next-line svelte/prefer-svelte-reactivity
@@ -58,7 +58,13 @@
             clear: clearProduct,
           }
         : null,
-      userFilter ? { key: "user", label: `${m.licenses_filters_user_label()}: ${userFilter}`, clear: clearUser } : null,
+      userFilter
+        ? {
+            key: "user",
+            label: `${m.licenses_filters_user_label()}: ${userOptions.find((u) => u.value === userFilter)?.label ?? userFilter}`,
+            clear: clearUser,
+          }
+        : null,
     ].filter((f) => f !== null),
   );
 
@@ -156,9 +162,12 @@
       <div class="overflow-hidden rounded-lg border bg-white">
         {#snippet licenseActions(lic: (typeof filteredLicenses)[number])}
           <div class="flex items-center gap-0.5">
-            <Button variant="ghost" size="icon-sm" title={m.licenses_action_assign_user()}>
-              <UserPlus class="h-4 w-4 text-gray-500" />
-            </Button>
+            <AssignUserDialog
+              licenseId={lic.id}
+              productName={lic.productName ?? "—"}
+              usageVolume={lic.usageVolume}
+              {userOptions}
+            />
             <DeleteLicense licenseId={lic.id} productName={lic.productName ?? "—"} form={deleteForms[lic.id]} />
           </div>
         {/snippet}
