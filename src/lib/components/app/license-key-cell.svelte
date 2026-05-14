@@ -21,12 +21,13 @@
 
 <button
   type="button"
-  class="relative w-min cursor-pointer overflow-hidden rounded bg-gray-50 px-2 font-mono text-sm tabular-nums"
+  class="relative w-fit cursor-pointer overflow-hidden rounded bg-gray-50 px-2 font-mono text-sm tabular-nums"
   onclick={copyKey}
   onmouseenter={() => (hovering = true)}
   onmouseleave={() => (hovering = false)}
   onfocus={() => (hovering = true)}
   onblur={() => (hovering = false)}
+  ontouchstart={() => (hovering = true)}
 >
   {hovering ? key : masked}
 

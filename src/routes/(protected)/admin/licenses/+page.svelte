@@ -95,7 +95,7 @@
     <AddLicenseDialog form={data.form} products={data.products} />
   </PageHeader>
 
-  <div class="mx-auto w-full max-w-7xl flex-1 overflow-auto px-2 py-6">
+  <div class="mx-auto w-full max-w-7xl flex-1 overflow-auto px-4 py-6 sm:px-6">
     <div class="flex flex-col gap-4">
       <!-- Filters card -->
       <div class="rounded-lg border bg-white p-5">
@@ -143,23 +143,23 @@
       </div>
 
       <!-- Stats cards -->
-      <div class="grid grid-cols-3 gap-4">
-        <div class="rounded-lg border bg-white p-5">
-          <p class="text-sm text-gray-500">{m.licenses_stats_total()}</p>
-          <p class="mt-1 text-3xl font-bold text-gray-900">{totalCount}</p>
+      <div class="grid grid-cols-3 gap-3 sm:gap-4">
+        <div class="rounded-lg border bg-white p-3 sm:p-5">
+          <p class="text-xs text-gray-500 sm:text-sm">{m.licenses_stats_total()}</p>
+          <p class="mt-1 text-2xl font-bold text-gray-900 sm:text-3xl">{totalCount}</p>
         </div>
-        <div class="rounded-lg border bg-white p-5">
-          <p class="text-sm text-gray-500">{m.licenses_stats_assigned()}</p>
-          <p class="mt-1 text-3xl font-bold text-blue-600">{assignedCount}</p>
+        <div class="rounded-lg border bg-white p-3 sm:p-5">
+          <p class="text-xs text-gray-500 sm:text-sm">{m.licenses_stats_assigned()}</p>
+          <p class="mt-1 text-2xl font-bold text-blue-600 sm:text-3xl">{assignedCount}</p>
         </div>
-        <div class="rounded-lg border bg-white p-5">
-          <p class="text-sm text-gray-500">{m.licenses_stats_available()}</p>
-          <p class="mt-1 text-3xl font-bold text-green-600">{availableCount}</p>
+        <div class="rounded-lg border bg-white p-3 sm:p-5">
+          <p class="text-xs text-gray-500 sm:text-sm">{m.licenses_stats_available()}</p>
+          <p class="mt-1 text-2xl font-bold text-green-600 sm:text-3xl">{availableCount}</p>
         </div>
       </div>
 
       <!-- Licenses table -->
-      <div class="overflow-hidden rounded-lg border bg-white">
+      <div class="mb-12 overflow-hidden rounded-lg border bg-white">
         {#snippet licenseActions(lic: (typeof filteredLicenses)[number])}
           <div class="flex items-center gap-0.5">
             <AssignUserDialog
@@ -175,24 +175,29 @@
         <!-- Mobile card list -->
         <ul class="divide-y sm:hidden">
           {#each filteredLicenses as lic (lic.id)}
-            <li class="flex flex-col gap-3 p-4">
-              <div class="flex items-center justify-between gap-3">
-                <div class="min-w-0">
-                  <p class="truncate font-semibold text-gray-900">{lic.productName ?? "—"}</p>
-                  <LicenseKeyCell key={lic.key} />
-                </div>
-                <StatusBadge variant="secondary">
+            <li class="flex flex-col gap-4 p-4">
+              <div class="flex items-start justify-between gap-3">
+                <p class="text-lg leading-tight font-bold text-gray-900">{lic.productName ?? "—"}</p>
+                <StatusBadge variant="success">
                   {m.licenses_table_status_available()}
                 </StatusBadge>
               </div>
-              <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                <div>
+              <div class="flex flex-col gap-1">
+                <p class="text-xs text-gray-400">{m.licenses_table_key()}</p>
+                <LicenseKeyCell key={lic.key} />
+              </div>
+              <div class="grid grid-cols-2 gap-x-4">
+                <div class="flex flex-col gap-0.5">
                   <p class="text-xs text-gray-400">{m.licenses_table_assigned_to()}</p>
-                  <p class="text-gray-500">—</p>
+                  <p class="text-sm text-gray-900">—</p>
                 </div>
-                <div>
+                <div class="flex flex-col gap-0.5">
                   <p class="text-xs text-gray-400">{m.licenses_table_type()}</p>
-                  <p class="text-gray-500">{licenseTypeLabel(lic.usageVolume)}</p>
+                  <div>
+                    <StatusBadge variant="secondary">
+                      {licenseTypeLabel(lic.usageVolume)}
+                    </StatusBadge>
+                  </div>
                 </div>
               </div>
               <div class="flex justify-end">{@render licenseActions(lic)}</div>
