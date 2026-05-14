@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Check, Copy, Mail, UserPlus } from "@lucide/svelte";
+  import { toast } from "svelte-sonner";
   import { superForm, type SuperValidated } from "sveltekit-superforms";
   import { zod4Client as zodClient } from "sveltekit-superforms/adapters";
 
@@ -29,12 +30,12 @@
   // svelte-ignore state_referenced_locally
   const sf = superForm(initialForm, {
     validators: zodClient(inviteUserSchema),
-    onUpdated({ form }) {
-      if (!form.valid) {
+    onUpdate({ result, form }) {
+      if (result.type !== "success") {
         return;
       }
 
-      const data = form.data as InviteActionResult | null;
+      const data = result.data as InviteActionResult | null;
       if (!data?.inviteUrl) {
         return;
       }
@@ -43,9 +44,15 @@
       emailSent = data.emailSent ?? false;
       submittedEmail = form.data.email.trim().toLowerCase();
       step = "success";
+      toast.success(m.users_invite_success({ email: submittedEmail }));
+    },
+    onUpdated({ form }) {
+      if (form.message) {
+        toast.error(form.message as string);
+      }
     },
   });
-  const { form, errors, enhance, submitting, message } = sf;
+  const { form, errors, enhance, submitting } = sf;
 
   async function copyToClipboard() {
     if (!inviteUrl) return;
@@ -111,10 +118,6 @@
           error={$errors.role?.[0]}
           hint={m.users_role_admin_hint()}
         />
-
-        {#if $message}
-          <p class="text-destructive text-sm">{$message}</p>
-        {/if}
       </div>
       <div class="flex gap-3">
         <Button type="button" variant="secondary" class="flex-1" onclick={() => (open = false)}>

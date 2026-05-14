@@ -1,5 +1,6 @@
 <script lang="ts">
   import { UserX } from "@lucide/svelte";
+  import { toast } from "svelte-sonner";
   import { superForm, type SuperValidated } from "sveltekit-superforms";
   import { zod4Client as zodClient } from "sveltekit-superforms/adapters";
   import type { Infer } from "zod";
@@ -30,18 +31,21 @@
   const sf = superForm(form, {
     validators: zodClient(removeUserSchema),
     onUpdated({ form }) {
-      if (form.valid) {
+      if (form.message) {
+        toast.error(form.message as string);
+      } else if (form.valid) {
         open = false;
         sf.reset({
           id: `remove-user-${user.id}`,
           data: { userId: user.id },
           newState: { userId: user.id },
         });
+        toast.success(m.users_delete_success({ name: user.name }));
       }
     },
   });
 
-  const { form: formData, enhance, submitting, message } = sf;
+  const { form: formData, enhance, submitting } = sf;
 </script>
 
 <AppDialog
@@ -74,10 +78,6 @@
           <li>{m.users_delete_effect_remains_in_history({ firstName: nameParts.firstName })}</li>
         </ul>
       </div>
-
-      {#if $message}
-        <p class="text-destructive text-sm">{$message}</p>
-      {/if}
     </div>
     <div class="flex gap-3">
       <Button type="button" variant="secondary" class="flex-1" onclick={() => (open = false)}>

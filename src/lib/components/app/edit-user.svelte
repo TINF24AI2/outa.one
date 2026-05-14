@@ -1,5 +1,6 @@
 <script lang="ts">
   import { SquarePen } from "@lucide/svelte";
+  import { toast } from "svelte-sonner";
   import { superForm, type Infer, type SuperValidated } from "sveltekit-superforms";
   import { zod4Client as zodClient } from "sveltekit-superforms/adapters";
 
@@ -23,19 +24,22 @@
   // svelte-ignore state_referenced_locally
   const sf = superForm(form, {
     validators: zodClient(updateUserRoleSchema),
-    onUpdate({ form }) {
-      if (form.valid) {
+    onUpdated({ form }) {
+      if (form.message) {
+        toast.error(form.message as string);
+      } else if (form.valid) {
         open = false;
         sf.reset({
           id: `update-user-${user.id}`,
           data: { userId: user.id, role: user.managedRole },
           newState: { userId: user.id, role: user.managedRole },
         });
+        toast.success(m.users_edit_success({ name: user.email }));
       }
     },
   });
 
-  const { form: formData, errors, enhance, submitting, message } = sf;
+  const { form: formData, errors, enhance, submitting } = sf;
 </script>
 
 <AppDialog
@@ -65,9 +69,6 @@
             hint={m.users_role_admin_hint()}
           />
 
-          {#if $message}
-            <p class="text-destructive text-sm">{$message}</p>
-          {/if}
           <Form.FieldErrors />
         </Form.Control>
       </Form.Field>
