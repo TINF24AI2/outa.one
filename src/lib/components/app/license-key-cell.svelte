@@ -33,7 +33,7 @@
   {#if copied}
     <span
       transition:fade={{ duration: 250 }}
-      class="bg-opacity-75 pointer-events-none absolute inset-0 flex items-center justify-center rounded bg-blue-600 font-mono text-sm text-white tabular-nums"
+      class="bg-opacity-75 pointer-events-none absolute inset-0 flex items-center justify-center rounded bg-blue-600 font-mono text-xs text-white tabular-nums"
     >
       <Copy class="mr-1 h-3 w-3" />
       Copied
