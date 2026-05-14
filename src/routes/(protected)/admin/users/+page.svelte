@@ -57,7 +57,12 @@
           </div>
         {:else}
           <div class="flex items-center gap-0.5">
-            <Button variant="ghost" size="icon-sm" title={m.users_action_viewLicenses()}>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              href="/admin/licenses?user={user.name}"
+              title={m.users_action_viewLicenses()}
+            >
               <KeyRound class="h-4 w-4 text-gray-500" />
             </Button>
             <EditUser
