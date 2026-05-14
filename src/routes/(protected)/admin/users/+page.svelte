@@ -8,8 +8,8 @@
   import InviteUser from "$lib/components/app/invite-user.svelte";
   import PageHeader from "$lib/components/app/page-header.svelte";
   import ResendInvite from "$lib/components/app/resend-invite.svelte";
+  import StatusBadge from "$lib/components/app/status-badge.svelte";
   import UserInitialsAvatar from "$lib/components/app/user-initials-avatar.svelte";
-  import UserRoleBadge from "$lib/components/app/user-role-badge.svelte";
   import UserStatusBadge from "$lib/components/app/user-status-badge.svelte";
   import { Button } from "$lib/components/ui/button";
   import * as Table from "$lib/components/ui/table";
@@ -87,7 +87,9 @@
               </div>
               <div class="flex shrink-0 flex-col items-end gap-2">
                 <UserStatusBadge status={user.status} />
-                <UserRoleBadge role={user.managedRole} />
+                <StatusBadge variant={user.managedRole === "admin" ? "primary" : "secondary"}>
+                  {user.managedRole === "admin" ? m.role_admin() : m.role_employee()}
+                </StatusBadge>
               </div>
             </div>
             <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
@@ -138,7 +140,9 @@
                 </Table.Cell>
                 <Table.Cell class="text-gray-500">{user.email}</Table.Cell>
                 <Table.Cell>
-                  <UserRoleBadge role={user.managedRole} />
+                  <StatusBadge variant={user.managedRole === "admin" ? "primary" : "secondary"}>
+                    {user.managedRole === "admin" ? m.role_admin() : m.role_employee()}
+                  </StatusBadge>
                 </Table.Cell>
                 <Table.Cell>
                   <UserStatusBadge status={user.status} />
