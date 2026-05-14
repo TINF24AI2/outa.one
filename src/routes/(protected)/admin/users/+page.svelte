@@ -60,7 +60,7 @@
             <Button
               variant="ghost"
               size="icon-sm"
-              href="/admin/licenses?user={user.name}"
+              href="/admin/licenses?user={user.id}"
               title={m.users_action_viewLicenses()}
             >
               <KeyRound class="h-4 w-4 text-gray-500" />
