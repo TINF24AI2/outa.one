@@ -1,6 +1,18 @@
 import { relations } from "drizzle-orm";
-import { boolean, index, integer, pgTable, serial, text, unique, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  index,
+  integer,
+  pgTable,
+  primaryKey,
+  serial,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from "drizzle-orm/pg-core";
 
+import { user } from "./auth.schema";
 import { defineTableWithUpdate } from "./utils/table-factory";
 
 export const task = pgTable("task", {
@@ -32,11 +44,38 @@ export const license = defineTableWithUpdate(
   (table) => [unique().on(table.productId, table.key), index("license_productId_idx").on(table.productId)],
 );
 
-export const licenseRelations = relations(license, ({ one }) => ({
+export const licenseRelations = relations(license, ({ one, many }) => ({
   product: one(product, {
     fields: [license.productId],
     references: [product.id],
   }),
+  assignedUsers: many(licenseUser),
+}));
+
+export const licenseUser = pgTable(
+  "license_user",
+  {
+    licenseId: uuid("license_id")
+      .notNull()
+      .references(() => license.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.licenseId, table.userId] }),
+    index("license_user_user_id_idx").on(table.userId),
+  ],
+);
+
+export const licenseUserRelations = relations(licenseUser, ({ one }) => ({
+  license: one(license, { fields: [licenseUser.licenseId], references: [license.id] }),
+  user: one(user, { fields: [licenseUser.userId], references: [user.id] }),
+}));
+
+export const userLicenseRelations = relations(user, ({ many }) => ({
+  licenseAssignments: many(licenseUser),
 }));
 
 export * from "./auth.schema";
