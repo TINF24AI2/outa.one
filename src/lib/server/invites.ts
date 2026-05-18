@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 import { db } from "$lib/server/db";
 import { invite, user } from "$lib/server/db/schema";
@@ -9,16 +9,15 @@ export async function createInvite(email: string, role: "user" | "admin" = "user
     throw new Error(`${email} already has an account`);
   }
 
-  const existing = await emailAlreadyInvited(email);
+  const existing = await pendingInviteForEmail(email);
 
-  // If the user was already invited, we only want to extend the expiration date if the invite was not yet used
-  // If it was used, we simply generate a new one. For security- and logging reasons, we do not want to reactivate the old one.
-  if (existing && !existing.usedAt) {
+  // If the user was already invited, we only want to extend the expiration date of the current pending invite.
+  if (existing) {
     const expiresAt = new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000);
     const [updated] = await db
       .update(invite)
       .set({ expiresAt, usedAt: null })
-      .where(eq(invite.email, email))
+      .where(eq(invite.id, existing.id))
       .returning();
 
     return updated;
@@ -47,11 +46,11 @@ async function emailAlreadyRegistered(email: string) {
   return !!existing;
 }
 
-async function emailAlreadyInvited(email: string) {
+async function pendingInviteForEmail(email: string) {
   const [existing] = await db
-    .select({ id: invite.id, usedAt: invite.usedAt })
+    .select({ id: invite.id })
     .from(invite)
-    .where(eq(invite.email, email));
+    .where(and(eq(invite.email, email), isNull(invite.usedAt)));
 
   return existing;
 }

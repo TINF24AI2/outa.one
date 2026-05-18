@@ -3,13 +3,21 @@ import { message, setError, superValidate } from "sveltekit-superforms";
 import { zod4 as zod } from "sveltekit-superforms/adapters";
 
 import { m } from "$lib/paraglide/messages.js";
-import { inviteUserSchema, removeUserSchema, updateUserRoleSchema } from "$lib/schemas/users";
+import {
+  cancelInviteSchema,
+  inviteUserSchema,
+  removeUserSchema,
+  resendInviteSchema,
+  updateUserRoleSchema,
+} from "$lib/schemas/users";
 import { requireAdminUser } from "$lib/server/auth/guards";
 import {
+  cancelManagedInvite,
   inviteManagedUser,
   listManagedUsers,
   ManagedUserError,
   removeManagedUser,
+  resendManagedInvite,
   updateManagedUserRole,
 } from "$lib/server/users";
 
@@ -23,6 +31,7 @@ export const load: PageServerLoad = async (event) => {
   requireAdminUser(event);
 
   const users = await listManagedUsers(event.request.headers);
+  const pendingUsers = users.filter((user) => user.status === "pending");
   const editForms = await Promise.all(
     users.map(
       async (u) =>
@@ -34,11 +43,23 @@ export const load: PageServerLoad = async (event) => {
   const deleteForms = await Promise.all(
     users.map(async (u) => await superValidate({ userId: u.id }, zod(removeUserSchema), { id: `remove-user-${u.id}` })),
   );
+  const resendForms = await Promise.all(
+    pendingUsers.map(
+      async (u) => await superValidate({ inviteId: u.id }, zod(resendInviteSchema), { id: `resend-invite-${u.id}` }),
+    ),
+  );
+  const cancelInviteForms = await Promise.all(
+    pendingUsers.map(
+      async (u) => await superValidate({ inviteId: u.id }, zod(cancelInviteSchema), { id: `cancel-invite-${u.id}` }),
+    ),
+  );
 
   return {
     inviteForm: await superValidate(zod(inviteUserSchema), { id: "invite-user" }),
+    cancelInviteForms,
     editForms,
     deleteForms,
+    resendForms,
     users,
   };
 };
@@ -70,6 +91,40 @@ export const actions: Actions = {
       }
 
       return message(form, errorMessage, { status: 500 });
+    }
+  },
+
+  resendInvite: async (event) => {
+    const form = await superValidate(event.request, zod(resendInviteSchema));
+    if (!requireAdmin(event)) return message(form, m.dashboard_invite_error_forbidden(), { status: 403 });
+    if (!form.valid) return fail(400, { form });
+
+    try {
+      const { emailSent } = await resendManagedInvite(form.data.inviteId);
+      return { form, emailSent };
+    } catch (error) {
+      if (error instanceof ManagedUserError && error.code === "invite_not_found") {
+        return message(form, m.users_error_invite_not_found(), { status: 404 });
+      }
+
+      return message(form, m.auth_error_unexpected(), { status: 500 });
+    }
+  },
+
+  cancelInvite: async (event) => {
+    const form = await superValidate(event.request, zod(cancelInviteSchema));
+    if (!requireAdmin(event)) return message(form, m.dashboard_invite_error_forbidden(), { status: 403 });
+    if (!form.valid) return fail(400, { form });
+
+    try {
+      await cancelManagedInvite(form.data.inviteId);
+      return { form };
+    } catch (error) {
+      if (error instanceof ManagedUserError && error.code === "invite_not_found") {
+        return message(form, m.users_error_invite_not_found(), { status: 404 });
+      }
+
+      return message(form, m.auth_error_unexpected(), { status: 500 });
     }
   },
 

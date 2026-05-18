@@ -14,6 +14,7 @@
     props?: Record<string, unknown>;
     showLabel: string;
     hideLabel: string;
+    toggleTabIndex?: number;
     class?: string;
   };
 
@@ -25,6 +26,7 @@
     props = {},
     showLabel,
     hideLabel,
+    toggleTabIndex = -1,
     class: className,
   }: Props = $props();
 
@@ -44,6 +46,7 @@
   <button
     type="button"
     onclick={() => (visible = !visible)}
+    tabindex={toggleTabIndex}
     class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center px-3 transition-colors"
     aria-label={visible ? hideLabel : showLabel}
   >
