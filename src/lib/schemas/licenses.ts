@@ -10,3 +10,12 @@ export const createLicenseSchema = z.object({
 });
 
 export type CreateLicenseInput = z.infer<typeof createLicenseSchema>;
+
+export const assignLicenseUserSchema = z.object({
+  licenseId: z.string().uuid("Invalid license"),
+  userId: z.string().min(1, "Invalid user"),
+});
+
+export const unassignLicenseUserSchema = assignLicenseUserSchema;
+
+export type AssignLicenseUserInput = z.infer<typeof assignLicenseUserSchema>;
