@@ -46,7 +46,7 @@
   }
 
   // Dialog open state from URL (?add=1&addProduct=<id or name>)
-  const initialDialogOpen = page.url.searchParams.get("add") === "1";
+  let addDialogOpen = $state(page.url.searchParams.get("add") === "1");
   // svelte-ignore state_referenced_locally
   const initialDialogProduct =
     resolveToIds(
@@ -138,7 +138,7 @@
     <AddLicenseDialog
       form={data.form}
       products={data.products}
-      initialOpen={initialDialogOpen}
+      bind:open={addDialogOpen}
       defaultProductId={initialDialogProduct}
     />
   </PageHeader>
@@ -213,7 +213,7 @@
               {userOptions}
               assignedUsers={lic.assignedUsers.map((u) => ({ value: u.id, label: u.name }))}
             />
-            <DeleteLicense licenseId={lic.id} productName={lic.productName ?? "—"} form={deleteForms[lic.id]} />
+            <DeleteLicense productName={lic.productName ?? "—"} form={deleteForms[lic.id]} />
           </div>
         {/snippet}
 

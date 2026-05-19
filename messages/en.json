@@ -93,6 +93,7 @@
   "common_no_option": "No option found.",
   "common_saving": "Saving…",
   "common_search_placeholder": "Search…",
+  "common_select_placeholder": "Select...",
   "common_selected_count": "{count} selected",
   "dashboard_invite_admin_rights": "Admin rights",
   "dashboard_invite_error_email_invalid": "Valid email is required",

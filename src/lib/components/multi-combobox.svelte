@@ -20,7 +20,13 @@
     contentClass?: string;
   }
 
-  let { options, placeholder = "Select...", values = $bindable([]), class: className, contentClass }: Props = $props();
+  let {
+    options,
+    placeholder = m.common_select_placeholder(),
+    values = $bindable([]),
+    class: className,
+    contentClass,
+  }: Props = $props();
 
   let open = $state(false);
   let triggerRef = $state<HTMLButtonElement | null>(null);

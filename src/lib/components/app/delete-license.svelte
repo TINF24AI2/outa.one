@@ -11,13 +11,11 @@
   import { deleteLicenseSchema } from "$lib/schemas/licenses";
 
   type Props = {
-    licenseId: string;
     productName: string;
     form: SuperValidated<Infer<typeof deleteLicenseSchema>>;
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let { licenseId, productName, form }: Props = $props();
+  let { productName, form }: Props = $props();
   let open = $state(false);
 
   // svelte-ignore state_referenced_locally
