@@ -8,7 +8,7 @@
 
   let { data }: { data: PageData } = $props();
 
-  const initialDialogOpen = page.url.searchParams.get("add") === "1";
+  let initialDialogOpen = $state(page.url.searchParams.get("add") === "1");
 </script>
 
 <svelte:head>
@@ -16,4 +16,4 @@
   <meta name="products" content={m.meta_description()} />
 </svelte:head>
 
-<AddProductDialog form={data.form} initialOpen={initialDialogOpen} />
+<AddProductDialog form={data.form} bind:open={initialDialogOpen} />

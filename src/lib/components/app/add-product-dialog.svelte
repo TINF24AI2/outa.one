@@ -19,14 +19,11 @@
 
   let {
     form,
-    initialOpen = false,
+    open = $bindable(false),
   }: {
     form: SuperValidated<Infer<typeof createProductSchema>>;
-    initialOpen?: boolean;
+    open?: boolean;
   } = $props();
-
-  // svelte-ignore state_referenced_locally
-  let open = $state(initialOpen);
 
   // svelte-ignore state_referenced_locally
   const sf = superForm(form, {
