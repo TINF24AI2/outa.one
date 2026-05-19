@@ -4,6 +4,7 @@
 
   import * as Command from "$lib/components/ui/command/index.js";
   import * as Popover from "$lib/components/ui/popover/index.js";
+  import { m } from "$lib/paraglide/messages.js";
   import { cn } from "$lib/utils.js";
 
   interface Option {
@@ -29,7 +30,7 @@
       ? null
       : values.length === 1
         ? (options.find((o) => o.value === values[0])?.label ?? null)
-        : `${values.length} selected`,
+        : m.common_selected_count({ count: values.length }),
   );
 
   function toggle(value: string) {
@@ -61,9 +62,9 @@
   </Popover.Trigger>
   <Popover.Content style="width: var(--bits-floating-anchor-width)" class={cn("p-0", contentClass)}>
     <Command.Root>
-      <Command.Input placeholder="Search..." />
+      <Command.Input placeholder={m.common_search_placeholder()} />
       <Command.List>
-        <Command.Empty>No option found.</Command.Empty>
+        <Command.Empty>{m.common_no_option()}</Command.Empty>
         <Command.Group>
           {#each options as option (option.value)}
             <Command.Item value={option.value} keywords={[option.label]} onSelect={() => toggle(option.value)}>

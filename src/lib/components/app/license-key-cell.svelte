@@ -2,6 +2,8 @@
   import { Copy } from "@lucide/svelte";
   import { fade } from "svelte/transition";
 
+  import { m } from "$lib/paraglide/messages";
+
   let { key }: { key: string } = $props();
 
   let copied = $state(false);
@@ -37,7 +39,7 @@
       class="bg-opacity-75 pointer-events-none absolute inset-0 flex items-center justify-center rounded bg-blue-600 font-mono text-xs text-white tabular-nums"
     >
       <Copy class="mr-1 h-3 w-3" />
-      Copied
+      {m.licenses_key_copied()}
     </span>
   {/if}
 </button>

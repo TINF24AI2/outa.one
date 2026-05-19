@@ -26,7 +26,7 @@
     onResult({ result }) {
       if (result.type === "success") {
         open = false;
-        toast.success(`License deleted`);
+        toast.success(m.licenses_delete_success());
       }
     },
     onUpdated({ form }) {

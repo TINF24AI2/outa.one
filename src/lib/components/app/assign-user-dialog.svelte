@@ -77,17 +77,17 @@
             result.type === "failure"
               ? ((result.data as Record<string, unknown>)?.form as Record<string, unknown>)?.message
               : result.error;
-          errorMessage = typeof msg === "string" ? msg : "Failed to assign user";
+          errorMessage = typeof msg === "string" ? msg : m.licenses_assign_error_failed();
           return;
         }
       }
 
       open = false;
-      if (toAdd.length > 0 || toRemove.length > 0) toast.success("Users updated successfully");
+      if (toAdd.length > 0 || toRemove.length > 0) toast.success(m.licenses_assign_success());
       await invalidateAll();
     } catch (e) {
       console.error("Failed to save user assignments:", e);
-      errorMessage = "An unexpected error occurred. Please try again.";
+      errorMessage = m.licenses_assign_error_unexpected();
     } finally {
       saving = false;
     }
@@ -141,7 +141,7 @@
               type="button"
               onclick={() => removeUser(user.value)}
               class="text-gray-400 transition-colors hover:text-gray-700"
-              aria-label="Remove {user.label}"
+              aria-label={m.licenses_assign_remove_user({ name: user.label })}
             >
               <X class="h-3.5 w-3.5" />
             </button>
@@ -184,7 +184,7 @@
       </Button>
       <Button type="button" class="flex-1" disabled={saving} onclick={save}>
         {#if saving}
-          Saving…
+          {m.common_saving()}
         {:else}
           {m.licenses_assign_dialog_save()}
         {/if}
