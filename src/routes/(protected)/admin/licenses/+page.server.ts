@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { message, setError, superValidate } from "sveltekit-superforms";
 import { zod4 as zod } from "sveltekit-superforms/adapters";
 
+import { m } from "$lib/paraglide/messages.js";
 import {
   assignLicenseUserSchema,
   createLicenseSchema,
@@ -104,15 +105,15 @@ export const actions: Actions = {
 
     const res = await assignUserToLicense(form.data.licenseId, form.data.userId);
     if (!res.ok) {
-      let userAtCapMsg = "User already has the maximum number of licenses for this product";
+      let userAtCapMsg = m.licenses_assign_error_user_at_product_cap();
       if (res.reason === "user_at_product_cap") {
         const [u] = await db.select({ name: user.name }).from(user).where(eq(user.id, form.data.userId));
-        if (u?.name) userAtCapMsg = `${u.name} already has the maximum number of licenses for this product`;
+        if (u?.name) userAtCapMsg = m.licenses_assign_error_user_at_product_cap_named({ name: u.name });
       }
       const reasonToMessage: Record<typeof res.reason, string> = {
-        license_not_found: "License not found",
-        user_not_found: "User not found",
-        license_at_capacity: "License is at capacity",
+        license_not_found: m.licenses_assign_error_license_not_found(),
+        user_not_found: m.licenses_assign_error_user_not_found(),
+        license_at_capacity: m.licenses_assign_error_license_at_capacity(),
         user_at_product_cap: userAtCapMsg,
       };
       return message(form, reasonToMessage[res.reason], { status: 409 });

@@ -65,7 +65,7 @@
         {m.licenses_popup_add_cancel()}
       </Button>
       <Button type="submit" variant="destructive" disabled={$submitting} class="flex-1">
-        {m.licenses_delete_dialog_title()}
+        {m.licenses_delete_submit()}
       </Button>
     </div>
   </form>
