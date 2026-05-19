@@ -3,10 +3,15 @@ import { eq } from "drizzle-orm";
 import { message, setError, superValidate } from "sveltekit-superforms";
 import { zod4 as zod } from "sveltekit-superforms/adapters";
 
-import { assignLicenseUserSchema, createLicenseSchema, deleteLicenseSchema, unassignLicenseUserSchema } from "$lib/schemas/licenses";
+import {
+  assignLicenseUserSchema,
+  createLicenseSchema,
+  deleteLicenseSchema,
+  unassignLicenseUserSchema,
+} from "$lib/schemas/licenses";
 import { requireAdminUser } from "$lib/server/auth/guards";
 import { db } from "$lib/server/db";
-import { license, product, user } from "$lib/server/db/schema";
+import { license, licenseUser, product, user } from "$lib/server/db/schema";
 import { assignUserToLicense, unassignUserFromLicense } from "$lib/server/licenses";
 
 import type { PageServerLoad } from "./$types";
@@ -14,7 +19,7 @@ import type { PageServerLoad } from "./$types";
 export const load: PageServerLoad = async (event) => {
   requireAdminUser(event);
 
-  const [licenses, products, users] = await Promise.all([
+  const [licenses, products, users, assignments] = await Promise.all([
     db
       .select({
         id: license.id,
@@ -29,7 +34,21 @@ export const load: PageServerLoad = async (event) => {
       .orderBy(license.createdAt),
     db.select({ id: product.id, name: product.name }).from(product),
     db.select({ id: user.id, name: user.name, email: user.email }).from(user).orderBy(user.name),
+    db
+      .select({ licenseId: licenseUser.licenseId, userId: user.id, userName: user.name })
+      .from(licenseUser)
+      .innerJoin(user, eq(licenseUser.userId, user.id)),
   ]);
+
+  const assignmentsByLicense = assignments.reduce<Record<string, { id: string; name: string }[]>>((acc, a) => {
+    (acc[a.licenseId] ??= []).push({ id: a.userId, name: a.userName });
+    return acc;
+  }, {});
+
+  const enrichedLicenses = licenses.map((lic) => ({
+    ...lic,
+    assignedUsers: assignmentsByLicense[lic.id] ?? [],
+  }));
 
   const deleteForms = await Promise.all(
     licenses.map((lic) =>
@@ -38,7 +57,7 @@ export const load: PageServerLoad = async (event) => {
   );
 
   return {
-    licenses,
+    licenses: enrichedLicenses,
     products,
     users,
     form: await superValidate({ usageVolume: 1 }, zod(createLicenseSchema), { id: "create-license", errors: false }),
@@ -85,11 +104,16 @@ export const actions: Actions = {
 
     const res = await assignUserToLicense(form.data.licenseId, form.data.userId);
     if (!res.ok) {
+      let userAtCapMsg = "User already has the maximum number of licenses for this product";
+      if (res.reason === "user_at_product_cap") {
+        const [u] = await db.select({ name: user.name }).from(user).where(eq(user.id, form.data.userId));
+        if (u?.name) userAtCapMsg = `${u.name} already has the maximum number of licenses for this product`;
+      }
       const reasonToMessage: Record<typeof res.reason, string> = {
         license_not_found: "License not found",
         user_not_found: "User not found",
         license_at_capacity: "License is at capacity",
-        user_at_product_cap: "User already has the maximum number of licenses for this product",
+        user_at_product_cap: userAtCapMsg,
       };
       return message(form, reasonToMessage[res.reason], { status: 409 });
     }

@@ -1,5 +1,8 @@
 <script lang="ts">
   import { UserPen, X } from "@lucide/svelte";
+  import { deserialize } from "$app/forms";
+  import { invalidateAll } from "$app/navigation";
+  import { toast } from "svelte-sonner";
 
   import AppDialog from "$lib/components/app/app-dialog.svelte";
   import Combobox from "$lib/components/product-combobox.svelte";
@@ -9,16 +12,20 @@
   type User = { value: string; label: string };
 
   type Props = {
+    licenseId: string;
     productName: string;
     usageVolume: number;
     userOptions: User[];
+    assignedUsers: User[];
   };
 
-  let { productName, usageVolume, userOptions }: Props = $props();
+  let { licenseId, productName, usageVolume, userOptions, assignedUsers: initialAssignedUsers }: Props = $props();
 
   let open = $state(false);
   let selectedUser = $state("");
-  let assignedUsers = $state<User[]>([]);
+  let assignedUsers = $state<User[]>([...initialAssignedUsers]);
+  let saving = $state(false);
+  let errorMessage = $state("");
 
   const isUnlimited = $derived(usageVolume === 0);
   const atCapacity = $derived(!isUnlimited && assignedUsers.length >= usageVolume);
@@ -38,10 +45,53 @@
 
   $effect(() => {
     if (!open) {
-      assignedUsers = [];
+      assignedUsers = [...initialAssignedUsers];
       selectedUser = "";
+      errorMessage = "";
     }
   });
+
+  async function save() {
+    saving = true;
+    errorMessage = "";
+
+    const toAdd = assignedUsers.filter((u) => !initialAssignedUsers.some((a) => a.value === u.value));
+    const toRemove = initialAssignedUsers.filter((u) => !assignedUsers.some((a) => a.value === u.value));
+
+    try {
+      for (const u of toRemove) {
+        const fd = new FormData();
+        fd.set("licenseId", licenseId);
+        fd.set("userId", u.value);
+        await fetch("?/unassignUser", { method: "POST", body: fd });
+      }
+
+      for (const u of toAdd) {
+        const fd = new FormData();
+        fd.set("licenseId", licenseId);
+        fd.set("userId", u.value);
+        const res = await fetch("?/assignUser", { method: "POST", body: fd });
+        const result = deserialize(await res.text());
+        if (result.type === "failure" || result.type === "error") {
+          const msg =
+            result.type === "failure"
+              ? ((result.data as Record<string, unknown>)?.form as Record<string, unknown>)?.message
+              : result.error;
+          errorMessage = typeof msg === "string" ? msg : "Failed to assign user";
+          return;
+        }
+      }
+
+      open = false;
+      if (toAdd.length > 0 || toRemove.length > 0) toast.success("Users updated successfully");
+      await invalidateAll();
+    } catch (e) {
+      console.error("Failed to save user assignments:", e);
+      errorMessage = "An unexpected error occurred. Please try again.";
+    } finally {
+      saving = false;
+    }
+  }
 </script>
 
 <AppDialog
@@ -123,13 +173,21 @@
       {/if}
     </div>
 
+    {#if errorMessage}
+      <p class="text-destructive text-sm">{errorMessage}</p>
+    {/if}
+
     <!-- Actions -->
     <div class="flex gap-3">
       <Button type="button" variant="secondary" class="flex-1" onclick={() => (open = false)}>
         {m.licenses_assign_dialog_cancel()}
       </Button>
-      <Button type="button" class="flex-1" disabled={assignedUsers.length === 0}>
-        {m.licenses_assign_dialog_save()}
+      <Button type="button" class="flex-1" disabled={saving} onclick={save}>
+        {#if saving}
+          Saving…
+        {:else}
+          {m.licenses_assign_dialog_save()}
+        {/if}
       </Button>
     </div>
   </div>

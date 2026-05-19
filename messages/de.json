@@ -153,6 +153,7 @@
   "licenses_table_status": "Status",
   "licenses_table_status_assigned": "Zugewiesen",
   "licenses_table_status_available": "Verfügbar",
+  "licenses_table_status_partially_assigned": "Teilweise zugewiesen",
   "licenses_table_type": "Lizenztyp",
   "licenses_table_type_single": "Einzelnutzung",
   "licenses_table_type_volume": "Volumen",

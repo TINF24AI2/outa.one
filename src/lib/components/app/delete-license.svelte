@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Trash2 } from "@lucide/svelte";
+  import { toast } from "svelte-sonner";
   import { superForm, type SuperValidated } from "sveltekit-superforms";
   import { zod4Client as zodClient } from "sveltekit-superforms/adapters";
   import type { Infer } from "zod";
@@ -22,9 +23,15 @@
   // svelte-ignore state_referenced_locally
   const sf = superForm(form, {
     validators: zodClient(deleteLicenseSchema),
-    onUpdated({ form }) {
-      if (form.valid) {
+    onResult({ result }) {
+      if (result.type === "success") {
         open = false;
+        toast.success(`License deleted`);
+      }
+    },
+    onUpdated({ form }) {
+      if (form.message) {
+        toast.error(form.message as string);
       }
     },
   });

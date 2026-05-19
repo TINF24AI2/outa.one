@@ -45,13 +45,16 @@
       }, []);
   }
 
-  // Filter state — initialised from URL so the page is bookmarkable / shareable
+  // Filter state — initialised from URL so the page is bookmarkable / shareable.
+  // The one-time snapshot of data is intentional: filters are user-controlled, not server-derived.
+  // svelte-ignore state_referenced_locally
   let productFilters = $state<string[]>(
     resolveToIds(
       page.url.searchParams.get("product"),
       data.products.map((p) => ({ value: p.id, label: p.name })),
     ),
   );
+  // svelte-ignore state_referenced_locally
   let userFilters = $state<string[]>(
     resolveToIds(
       page.url.searchParams.get("user"),
@@ -99,19 +102,26 @@
   const filteredLicenses = $derived(
     data.licenses.filter((lic) => {
       if (productFilters.length > 0 && !productFilters.includes(lic.productId)) return false;
-      // When user filters are active, only show licenses assigned to those users.
-      // No assignments exist yet, so this always returns empty.
-      if (userFilters.length > 0) return false;
+      if (userFilters.length > 0 && !userFilters.some((id) => lic.assignedUsers.some((u) => u.id === id))) return false;
       return true;
     }),
   );
 
   const totalCount = $derived(filteredLicenses.length);
-  const assignedCount = $derived(0); // placeholder until user assignment is implemented
+  const assignedCount = $derived(filteredLicenses.filter((lic) => lic.assignedUsers.length > 0).length);
   const availableCount = $derived(totalCount - assignedCount);
 
   function licenseTypeLabel(usageVolume: number): string {
     return usageVolume === 1 ? m.licenses_table_type_single() : m.licenses_table_type_volume();
+  }
+
+  function assignedUsersLabel(users: { name: string }[]): string {
+    if (users.length === 0) return "—";
+    const shown = users
+      .slice(0, 2)
+      .map((u) => u.name)
+      .join(", ");
+    return users.length > 2 ? `${shown} +${users.length - 2}` : shown;
   }
 </script>
 
@@ -193,6 +203,7 @@
               productName={lic.productName ?? "—"}
               usageVolume={lic.usageVolume}
               {userOptions}
+              assignedUsers={lic.assignedUsers.map((u) => ({ value: u.id, label: u.name }))}
             />
             <DeleteLicense licenseId={lic.id} productName={lic.productName ?? "—"} form={deleteForms[lic.id]} />
           </div>
@@ -213,9 +224,19 @@
               <li class="flex flex-col gap-4 p-4">
                 <div class="flex items-start justify-between gap-3">
                   <p class="text-lg leading-tight font-bold text-gray-900">{lic.productName ?? "—"}</p>
-                  <StatusBadge variant="success">
-                    {m.licenses_table_status_available()}
-                  </StatusBadge>
+                  {#if lic.assignedUsers.length === lic.usageVolume}
+                    <StatusBadge variant="secondary">
+                      {m.licenses_table_status_assigned()}
+                    </StatusBadge>
+                  {:else if lic.assignedUsers.length > 0 && lic.assignedUsers.length < lic.usageVolume}
+                    <StatusBadge variant="secondary">
+                      {m.licenses_table_status_partially_assigned()}
+                    </StatusBadge>
+                  {:else}
+                    <StatusBadge variant="success">
+                      {m.licenses_table_status_available()}
+                    </StatusBadge>
+                  {/if}
                 </div>
                 <div class="flex flex-col gap-1">
                   <p class="text-xs text-gray-400">{m.licenses_table_key()}</p>
@@ -224,7 +245,7 @@
                 <div class="grid grid-cols-2 gap-x-4">
                   <div class="flex flex-col gap-0.5">
                     <p class="text-xs text-gray-400">{m.licenses_table_assigned_to()}</p>
-                    <p class="text-sm text-gray-900">—</p>
+                    <p class="text-sm text-gray-900">{assignedUsersLabel(lic.assignedUsers)}</p>
                   </div>
                   <div class="flex flex-col gap-0.5">
                     <p class="text-xs text-gray-400">{m.licenses_table_type()}</p>
@@ -263,11 +284,23 @@
                       <LicenseKeyCell key={lic.key} />
                     </Table.Cell>
                     <Table.Cell>
-                      <StatusBadge variant="success">
-                        {m.licenses_table_status_available()}
-                      </StatusBadge>
+                      {#if lic.assignedUsers.length === lic.usageVolume}
+                        <StatusBadge variant="secondary">
+                          {m.licenses_table_status_assigned()}
+                        </StatusBadge>
+                      {:else if lic.assignedUsers.length > 0 && lic.assignedUsers.length < lic.usageVolume}
+                        <StatusBadge variant="secondary">
+                          {m.licenses_table_status_partially_assigned()}
+                        </StatusBadge>
+                      {:else}
+                        <StatusBadge variant="success">
+                          {m.licenses_table_status_available()}
+                        </StatusBadge>
+                      {/if}
                     </Table.Cell>
-                    <Table.Cell class="text-gray-500">—</Table.Cell>
+                    <Table.Cell class="text-gray-500">
+                      {assignedUsersLabel(lic.assignedUsers)}
+                    </Table.Cell>
                     <Table.Cell class="text-gray-500">
                       <StatusBadge variant="secondary">
                         {licenseTypeLabel(lic.usageVolume)}
