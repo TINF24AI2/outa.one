@@ -38,23 +38,6 @@
         <img src={logo} alt={m.auth_login_logo_alt()} class="h-8 w-8 object-contain brightness-0 invert" />
       </div>
     {/snippet}
-
-    {#snippet description()}
-      {m.auth_login_description()}
-    {/snippet}
-
-    {#snippet footer()}
-      {#if data.hasDemoUsers}
-        <Separator />
-        <p class="text-muted-foreground text-xs font-medium tracking-wide">
-          {m.auth_login_demo_title()}
-        </p>
-        <div class="w-full space-y-1">
-          {#each demoUsers as { role, email: demoEmail } (demoEmail)}
-            <button
-              type="button"
-              onclick={() => {
-                $form.email = demoEmail;
                 $form.password = DEMO_PASSWORD;
               }}
               class="hover:bg-muted flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors"
