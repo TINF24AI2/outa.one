@@ -1,13 +1,15 @@
 <script lang="ts">
   import { UserPen, X } from "@lucide/svelte";
-  import { deserialize } from "$app/forms";
   import { invalidateAll } from "$app/navigation";
   import { toast } from "svelte-sonner";
+  import { defaults, superForm } from "sveltekit-superforms";
+  import { zod4Client as zodClient } from "sveltekit-superforms/adapters";
 
   import AppDialog from "$lib/components/app/app-dialog.svelte";
   import Combobox from "$lib/components/product-combobox.svelte";
   import { Button, buttonVariants } from "$lib/components/ui/button";
   import { m } from "$lib/paraglide/messages";
+  import { assignLicenseUserSchema, unassignLicenseUserSchema } from "$lib/schemas/licenses";
 
   type User = { value: string; label: string };
 
@@ -25,13 +27,58 @@
   let selectedUser = $state("");
   // svelte-ignore state_referenced_locally
   let assignedUsers = $state<User[]>([...initialAssignedUsers]);
-  let saving = $state(false);
   let errorMessage = $state("");
+
+  let assignFormEl: HTMLFormElement;
+  let unassignFormEl: HTMLFormElement;
+
+  // Shared resolver for the sequential per-user submissions
+  let resolveCurrentOp: ((success: boolean, msg?: string) => void) | null = null;
 
   const isUnlimited = $derived(usageVolume === 0);
   const atCapacity = $derived(!isUnlimited && assignedUsers.length >= usageVolume);
-
   const availableOptions = $derived(userOptions.filter((u) => !assignedUsers.some((a) => a.value === u.value)));
+
+  // svelte-ignore state_referenced_locally
+  const assignSF = superForm(defaults({ licenseId, userId: "" }, zodClient(assignLicenseUserSchema)), {
+    applyAction: false,
+    invalidateAll: false,
+    resetForm: false,
+    onUpdated({ form }) {
+      resolveCurrentOp?.(
+        !form.message,
+        typeof form.message === "string" ? form.message : m.licenses_assign_error_failed(),
+      );
+      resolveCurrentOp = null;
+    },
+    onError() {
+      resolveCurrentOp?.(false, m.licenses_assign_error_unexpected());
+      resolveCurrentOp = null;
+    },
+  });
+
+  // svelte-ignore state_referenced_locally
+  const unassignSF = superForm(defaults({ licenseId, userId: "" }, zodClient(unassignLicenseUserSchema)), {
+    applyAction: false,
+    invalidateAll: false,
+    resetForm: false,
+    onUpdated({ form }) {
+      resolveCurrentOp?.(
+        !form.message,
+        typeof form.message === "string" ? form.message : m.licenses_assign_error_failed(),
+      );
+      resolveCurrentOp = null;
+    },
+    onError() {
+      resolveCurrentOp?.(false, m.licenses_assign_error_unexpected());
+      resolveCurrentOp = null;
+    },
+  });
+
+  const { enhance: assignEnhance, submitting: assignSubmitting } = assignSF;
+  const { enhance: unassignEnhance, submitting: unassignSubmitting } = unassignSF;
+
+  const saving = $derived($assignSubmitting || $unassignSubmitting);
 
   function addUser() {
     const user = availableOptions.find((u) => u.value === selectedUser);
@@ -52,64 +99,45 @@
     }
   });
 
-  async function save() {
-    saving = true;
-    errorMessage = "";
+  function submitOne(formEl: HTMLFormElement, userId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      resolveCurrentOp = (success, msg) => (success ? resolve() : reject(new Error(msg)));
+      const userIdInput = formEl.querySelector<HTMLInputElement>('input[name="userId"]');
+      if (userIdInput) userIdInput.value = userId;
+      formEl.requestSubmit();
+    });
+  }
 
+  async function save() {
+    errorMessage = "";
     const toAdd = assignedUsers.filter((u) => !initialAssignedUsers.some((a) => a.value === u.value));
     const toRemove = initialAssignedUsers.filter((u) => !assignedUsers.some((a) => a.value === u.value));
 
     try {
-      const removeResults = await Promise.all(
-        toRemove.map(async (u) => {
-          const fd = new FormData();
-          fd.set("licenseId", licenseId);
-          fd.set("userId", u.value);
-          const res = await fetch("?/unassignUser", { method: "POST", body: fd });
-          return deserialize(await res.text());
-        }),
-      );
-
-      const failedRemove = removeResults.find((r) => r.type === "failure" || r.type === "error");
-      if (failedRemove) {
-        const msg =
-          failedRemove.type === "failure"
-            ? ((failedRemove.data as Record<string, unknown>)?.form as Record<string, unknown>)?.message
-            : failedRemove.error;
-        errorMessage = typeof msg === "string" ? msg : m.licenses_assign_error_failed();
-        await invalidateAll();
-        return;
+      for (const u of toRemove) {
+        await submitOne(unassignFormEl, u.value);
       }
-
       for (const u of toAdd) {
-        const fd = new FormData();
-        fd.set("licenseId", licenseId);
-        fd.set("userId", u.value);
-        const res = await fetch("?/assignUser", { method: "POST", body: fd });
-        const result = deserialize(await res.text());
-        if (result.type === "failure" || result.type === "error") {
-          const msg =
-            result.type === "failure"
-              ? ((result.data as Record<string, unknown>)?.form as Record<string, unknown>)?.message
-              : result.error;
-          errorMessage = typeof msg === "string" ? msg : m.licenses_assign_error_failed();
-          await invalidateAll();
-          return;
-        }
+        await submitOne(assignFormEl, u.value);
       }
-
       open = false;
       if (toAdd.length > 0 || toRemove.length > 0) toast.success(m.licenses_assign_success());
       await invalidateAll();
     } catch (e) {
-      console.error("Failed to save user assignments:", e);
-      errorMessage = m.licenses_assign_error_unexpected();
+      errorMessage = e instanceof Error ? e.message : m.licenses_assign_error_unexpected();
       await invalidateAll();
-    } finally {
-      saving = false;
     }
   }
 </script>
+
+<form bind:this={unassignFormEl} method="post" action="?/unassignUser" use:unassignEnhance hidden>
+  <input type="hidden" name="licenseId" value={licenseId} />
+  <input type="hidden" name="userId" />
+</form>
+<form bind:this={assignFormEl} method="post" action="?/assignUser" use:assignEnhance hidden>
+  <input type="hidden" name="licenseId" value={licenseId} />
+  <input type="hidden" name="userId" />
+</form>
 
 <AppDialog
   bind:open
