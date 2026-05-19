@@ -16,11 +16,27 @@
 
   type Product = { id: string; name: string };
 
-  let { form, products }: { form: SuperValidated<Infer<typeof createLicenseSchema>>; products: Product[] } = $props();
+  let {
+    form,
+    products,
+    initialOpen = false,
+    defaultProductId = "",
+  }: {
+    form: SuperValidated<Infer<typeof createLicenseSchema>>;
+    products: Product[];
+    initialOpen?: boolean;
+    defaultProductId?: string;
+  } = $props();
 
-  let open = $state(false);
+  let open = $state(initialOpen);
 
   const productOptions = $derived(products.map((p) => ({ value: p.id, label: p.name })));
+
+  $effect(() => {
+    if (open && defaultProductId) {
+      $formData.productId = defaultProductId;
+    }
+  });
 
   // svelte-ignore state_referenced_locally
   const sf = superForm(form, {

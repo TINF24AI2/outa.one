@@ -45,6 +45,15 @@
       }, []);
   }
 
+  // Dialog open state from URL (?add=1&addProduct=<id or name>)
+  const initialDialogOpen = page.url.searchParams.get("add") === "1";
+  // svelte-ignore state_referenced_locally
+  const initialDialogProduct =
+    resolveToIds(
+      page.url.searchParams.get("addProduct"),
+      data.products.map((p) => ({ value: p.id, label: p.name })),
+    )[0] ?? "";
+
   // Filter state — initialised from URL so the page is bookmarkable / shareable.
   // The one-time snapshot of data is intentional: filters are user-controlled, not server-derived.
   // svelte-ignore state_referenced_locally
@@ -132,7 +141,12 @@
 
 <div class="flex h-full w-full flex-col overflow-hidden">
   <PageHeader title={m.licenses_title()} subtitle={m.licenses_subtitle()}>
-    <AddLicenseDialog form={data.form} products={data.products} />
+    <AddLicenseDialog
+      form={data.form}
+      products={data.products}
+      initialOpen={initialDialogOpen}
+      defaultProductId={initialDialogProduct}
+    />
   </PageHeader>
 
   <div class="mx-auto w-full max-w-7xl flex-1 overflow-auto px-4 py-6 sm:px-6">
