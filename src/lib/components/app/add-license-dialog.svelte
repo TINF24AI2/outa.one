@@ -28,6 +28,7 @@
     defaultProductId?: string;
   } = $props();
 
+  // svelte-ignore state_referenced_locally
   let open = $state(initialOpen);
 
   const productOptions = $derived(products.map((p) => ({ value: p.id, label: p.name })));

@@ -23,6 +23,7 @@
 
   let open = $state(false);
   let selectedUser = $state("");
+  // svelte-ignore state_referenced_locally
   let assignedUsers = $state<User[]>([...initialAssignedUsers]);
   let saving = $state(false);
   let errorMessage = $state("");
