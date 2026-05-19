@@ -59,11 +59,25 @@
     const toRemove = initialAssignedUsers.filter((u) => !assignedUsers.some((a) => a.value === u.value));
 
     try {
-      for (const u of toRemove) {
-        const fd = new FormData();
-        fd.set("licenseId", licenseId);
-        fd.set("userId", u.value);
-        await fetch("?/unassignUser", { method: "POST", body: fd });
+      const removeResults = await Promise.all(
+        toRemove.map(async (u) => {
+          const fd = new FormData();
+          fd.set("licenseId", licenseId);
+          fd.set("userId", u.value);
+          const res = await fetch("?/unassignUser", { method: "POST", body: fd });
+          return deserialize(await res.text());
+        }),
+      );
+
+      const failedRemove = removeResults.find((r) => r.type === "failure" || r.type === "error");
+      if (failedRemove) {
+        const msg =
+          failedRemove.type === "failure"
+            ? ((failedRemove.data as Record<string, unknown>)?.form as Record<string, unknown>)?.message
+            : failedRemove.error;
+        errorMessage = typeof msg === "string" ? msg : m.licenses_assign_error_failed();
+        await invalidateAll();
+        return;
       }
 
       for (const u of toAdd) {
@@ -78,6 +92,7 @@
               ? ((result.data as Record<string, unknown>)?.form as Record<string, unknown>)?.message
               : result.error;
           errorMessage = typeof msg === "string" ? msg : m.licenses_assign_error_failed();
+          await invalidateAll();
           return;
         }
       }
@@ -88,6 +103,7 @@
     } catch (e) {
       console.error("Failed to save user assignments:", e);
       errorMessage = m.licenses_assign_error_unexpected();
+      await invalidateAll();
     } finally {
       saving = false;
     }

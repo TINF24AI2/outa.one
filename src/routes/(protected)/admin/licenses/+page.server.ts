@@ -125,7 +125,12 @@ export const actions: Actions = {
     const form = await superValidate(event.request, zod(unassignLicenseUserSchema));
     if (!form.valid) return fail(400, { form });
 
-    await unassignUserFromLicense(form.data.licenseId, form.data.userId);
-    return { form };
+    try {
+      await unassignUserFromLicense(form.data.licenseId, form.data.userId);
+      return { form };
+    } catch (error) {
+      console.error("Error unassigning user:", error);
+      return message(form, "Failed to unassign user", { status: 500 });
+    }
   },
 };

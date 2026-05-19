@@ -71,19 +71,13 @@
     ),
   );
 
-  async function syncUrl() {
+  $effect(() => {
     // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const params = new URLSearchParams();
     if (productFilters.length) params.set("product", productFilters.join(","));
     if (userFilters.length) params.set("user", userFilters.join(","));
     // eslint-disable-next-line svelte/no-navigation-without-resolve
-    await goto(`?${params.toString()}`, { replaceState: true, noScroll: true, keepFocus: true });
-  }
-
-  $effect(() => {
-    void productFilters;
-    void userFilters;
-    syncUrl();
+    void goto(`?${params.toString()}`, { replaceState: true, noScroll: true, keepFocus: true });
   });
 
   function clearAllFilters() {
