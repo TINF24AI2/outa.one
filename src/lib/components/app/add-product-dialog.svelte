@@ -17,9 +17,13 @@
   import { m } from "$lib/paraglide/messages.js";
   import { createProductSchema } from "$lib/schemas/products";
 
-  let { form }: { form: SuperValidated<Infer<typeof createProductSchema>> } = $props();
-
-  let open = $state(false);
+  let {
+    form,
+    open = $bindable(false),
+  }: {
+    form: SuperValidated<Infer<typeof createProductSchema>>;
+    open?: boolean;
+  } = $props();
 
   // svelte-ignore state_referenced_locally
   const sf = superForm(form, {
