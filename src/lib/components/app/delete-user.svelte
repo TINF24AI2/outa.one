@@ -52,7 +52,7 @@
   bind:open
   title={m.users_delete_dialog_title()}
   triggerClass={buttonVariants({ variant: "ghost", size: "icon-sm" })}
-  triggerTitle={isCurrentUser ? "You cannot remove your own account." : m.users_action_remove()}
+  triggerTitle={isCurrentUser ? m.users_delete_error_self() : m.users_action_remove()}
   triggerDisabled={isCurrentUser}
 >
   {#snippet description()}

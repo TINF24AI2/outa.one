@@ -1,20 +1,68 @@
 import { fail, type Actions } from "@sveltejs/kit";
+import { eq } from "drizzle-orm";
 import { message, setError, superValidate } from "sveltekit-superforms";
 import { zod4 as zod } from "sveltekit-superforms/adapters";
 
-import { assignLicenseUserSchema, createLicenseSchema, unassignLicenseUserSchema } from "$lib/schemas/licenses";
+import { m } from "$lib/paraglide/messages.js";
+import {
+  assignLicenseUserSchema,
+  createLicenseSchema,
+  deleteLicenseSchema,
+  unassignLicenseUserSchema,
+} from "$lib/schemas/licenses";
 import { requireAdminUser } from "$lib/server/auth/guards";
 import { db } from "$lib/server/db";
-import { license, product } from "$lib/server/db/schema";
+import { license, licenseUser, product, user } from "$lib/server/db/schema";
 import { assignUserToLicense, unassignUserFromLicense } from "$lib/server/licenses";
 
 import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async () => {
-  const products = await db.select({ id: product.id, name: product.name }).from(product);
+export const load: PageServerLoad = async (event) => {
+  requireAdminUser(event);
+
+  const [licenses, products, users, assignments] = await Promise.all([
+    db
+      .select({
+        id: license.id,
+        key: license.key,
+        usageVolume: license.usageVolume,
+        createdAt: license.createdAt,
+        productId: license.productId,
+        productName: product.name,
+      })
+      .from(license)
+      .leftJoin(product, eq(license.productId, product.id))
+      .orderBy(license.createdAt),
+    db.select({ id: product.id, name: product.name }).from(product),
+    db.select({ id: user.id, name: user.name, email: user.email }).from(user).orderBy(user.name),
+    db
+      .select({ licenseId: licenseUser.licenseId, userId: user.id, userName: user.name })
+      .from(licenseUser)
+      .innerJoin(user, eq(licenseUser.userId, user.id)),
+  ]);
+
+  const assignmentsByLicense = assignments.reduce<Record<string, { id: string; name: string }[]>>((acc, a) => {
+    (acc[a.licenseId] ??= []).push({ id: a.userId, name: a.userName });
+    return acc;
+  }, {});
+
+  const enrichedLicenses = licenses.map((lic) => ({
+    ...lic,
+    assignedUsers: assignmentsByLicense[lic.id] ?? [],
+  }));
+
+  const deleteForms = await Promise.all(
+    licenses.map((lic) =>
+      superValidate({ licenseId: lic.id }, zod(deleteLicenseSchema), { id: `delete-license-${lic.id}` }),
+    ),
+  );
+
   return {
+    licenses: enrichedLicenses,
     products,
+    users,
     form: await superValidate({ usageVolume: 1 }, zod(createLicenseSchema), { id: "create-license", errors: false }),
+    deleteForms,
   };
 };
 
@@ -36,6 +84,20 @@ export const actions: Actions = {
     }
   },
 
+  deleteLicense: async (event) => {
+    requireAdminUser(event);
+    const form = await superValidate(event.request, zod(deleteLicenseSchema));
+    if (!form.valid) return fail(400, { form });
+
+    try {
+      await db.delete(license).where(eq(license.id, form.data.licenseId));
+      return { form };
+    } catch (error) {
+      console.error("Error deleting license:", error);
+      return message(form, "Failed to delete license", { status: 500 });
+    }
+  },
+
   assignUser: async (event) => {
     requireAdminUser(event);
     const form = await superValidate(event.request, zod(assignLicenseUserSchema));
@@ -43,11 +105,16 @@ export const actions: Actions = {
 
     const res = await assignUserToLicense(form.data.licenseId, form.data.userId);
     if (!res.ok) {
+      let userAtCapMsg = m.licenses_assign_error_user_at_product_cap();
+      if (res.reason === "user_at_product_cap") {
+        const [u] = await db.select({ name: user.name }).from(user).where(eq(user.id, form.data.userId));
+        if (u?.name) userAtCapMsg = m.licenses_assign_error_user_at_product_cap_named({ name: u.name });
+      }
       const reasonToMessage: Record<typeof res.reason, string> = {
-        license_not_found: "License not found",
-        user_not_found: "User not found",
-        license_at_capacity: "License is at capacity",
-        user_at_product_cap: "User already has the maximum number of licenses for this product",
+        license_not_found: m.licenses_assign_error_license_not_found(),
+        user_not_found: m.licenses_assign_error_user_not_found(),
+        license_at_capacity: m.licenses_assign_error_license_at_capacity(),
+        user_at_product_cap: userAtCapMsg,
       };
       return message(form, reasonToMessage[res.reason], { status: 409 });
     }
@@ -59,7 +126,12 @@ export const actions: Actions = {
     const form = await superValidate(event.request, zod(unassignLicenseUserSchema));
     if (!form.valid) return fail(400, { form });
 
-    await unassignUserFromLicense(form.data.licenseId, form.data.userId);
-    return { form };
+    try {
+      await unassignUserFromLicense(form.data.licenseId, form.data.userId);
+      return { form };
+    } catch (error) {
+      console.error("Error unassigning user:", error);
+      return message(form, "Failed to unassign user", { status: 500 });
+    }
   },
 };
