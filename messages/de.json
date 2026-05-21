@@ -225,6 +225,7 @@
   "products_subtitle": "Verwalten von Produkten und deren Eigenschaften",
   "products_table_available_count": "{count} verfügbar",
   "products_table_available_keys": "Verfügbare Schlüssel",
+  "products_table_max_per_user": "Max. pro Nutzer",
   "products_table_product": "Produkt",
   "products_table_total_keys": "Gesamtschlüssel",
   "products_table_used_keys": "Verwendete Schlüssel",

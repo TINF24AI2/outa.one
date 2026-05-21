@@ -225,6 +225,7 @@
   "products_subtitle": "Manage products and their properties",
   "products_table_available_count": "{count} available",
   "products_table_available_keys": "Available Keys",
+  "products_table_max_per_user": "Max Per User",
   "products_table_product": "Product",
   "products_table_total_keys": "Total Keys",
   "products_table_used_keys": "Used Keys",

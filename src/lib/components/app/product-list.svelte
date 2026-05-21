@@ -35,8 +35,8 @@
   const editFormsById = $derived(Object.fromEntries(editForms.map((form) => [form.data.productId, form])));
   const deleteFormsById = $derived(Object.fromEntries(deleteForms.map((form) => [form.data.productId, form])));
 
-  function licenseTypeLabel(product: ProductListItem): string {
-    return product.maxUsageVolume > 1 ? m.licenses_table_type_volume() : m.licenses_table_type_single();
+  function maxPerUserLabel(maxLicensesPerUser: number): string {
+    return maxLicensesPerUser === 0 ? m.licenses_usage_unlimited() : `${maxLicensesPerUser}`;
   }
 
   function availabilityClasses(availableKeys: number): string {
@@ -105,10 +105,8 @@
 
           <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
             <div>
-              <p class="text-xs text-gray-400">{m.licenses_table_type()}</p>
-              <div class="pt-1">
-                <StatusBadge variant="secondary">{licenseTypeLabel(product)}</StatusBadge>
-              </div>
+              <p class="text-xs text-gray-400">{m.products_table_max_per_user()}</p>
+              <p class="text-gray-700">{maxPerUserLabel(product.maxLicensesPerUser)}</p>
             </div>
             <div>
               <p class="text-xs text-gray-400">{m.products_table_total_keys()}</p>
@@ -138,7 +136,7 @@
         <Table.Header class="bg-slate-50">
           <Table.Row class="[&>th]:text-neutral-500">
             <Table.Head class="pl-6">{m.products_table_product()}</Table.Head>
-            <Table.Head>{m.licenses_table_type()}</Table.Head>
+            <Table.Head>{m.products_table_max_per_user()}</Table.Head>
             <Table.Head>{m.products_table_total_keys()}</Table.Head>
             <Table.Head>{m.products_table_used_keys()}</Table.Head>
             <Table.Head>{m.products_table_available_keys()}</Table.Head>
@@ -166,9 +164,7 @@
                   </div>
                 </div>
               </Table.Cell>
-              <Table.Cell>
-                <StatusBadge variant="secondary">{licenseTypeLabel(product)}</StatusBadge>
-              </Table.Cell>
+              <Table.Cell class="text-gray-500">{maxPerUserLabel(product.maxLicensesPerUser)}</Table.Cell>
               <Table.Cell class="text-gray-700">{product.totalSeats}</Table.Cell>
               <Table.Cell class="text-gray-700">{product.assignedSeats}</Table.Cell>
               <Table.Cell>
