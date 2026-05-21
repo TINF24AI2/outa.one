@@ -18,12 +18,12 @@
   <meta name="products" content={m.meta_description()} />
 </svelte:head>
 
-<div class="flex w-full flex-col">
+<div class="flex h-full w-full flex-col overflow-hidden">
   <PageHeader title={m.products_title()} subtitle={m.products_subtitle()}>
     <AddProductDialog form={data.form} bind:open={initialDialogOpen} />
   </PageHeader>
 
-  <div class="mx-auto w-full max-w-7xl">
-    <ProductList />
+  <div class="mx-auto w-full max-w-7xl flex-1 overflow-auto px-2 py-6">
+    <ProductList products={data.products} editForms={data.editForms} deleteForms={data.deleteForms} />
   </div>
 </div>

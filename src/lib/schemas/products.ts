@@ -11,3 +11,14 @@ export const createProductSchema = z.object({
 });
 
 export type CreateProductInput = z.infer<typeof createProductSchema>;
+
+export const updateProductSchema = createProductSchema.extend({
+  productId: z.uuid("Invalid product ID"),
+});
+
+export const deleteProductSchema = z.object({
+  productId: z.uuid("Invalid product ID"),
+});
+
+export type UpdateProductInput = z.infer<typeof updateProductSchema>;
+export type DeleteProductInput = z.infer<typeof deleteProductSchema>;
