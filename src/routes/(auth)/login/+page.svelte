@@ -55,6 +55,7 @@
               type="button"
               onclick={() => {
                 $form.email = demoEmail;
+
                 $form.password = DEMO_PASSWORD;
               }}
               class="hover:bg-muted flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors"
