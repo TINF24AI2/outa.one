@@ -199,6 +199,7 @@
   "products_popup_add_requires_approval_description": "License requests need admin approval before assignment",
   "products_popup_add_requires_approval_label": "Requires Approval",
   "products_popup_add_submit": "Add Product",
+  "products_subtitle": "Manage products and their properties",
   "products_title": "Products",
   "role_admin": "Admin",
   "role_employee": "Employee",
