@@ -10,7 +10,7 @@
   let hovering = $state(false);
   let timeout: ReturnType<typeof setTimeout>;
 
-  const masked = $derived(key.replace(/[a-zA-Z0-9]/g, "*"));
+  const masked = "***************************";
 
   function copyKey() {
     navigator.clipboard.writeText(key).then(() => {
@@ -21,25 +21,39 @@
   }
 </script>
 
-<button
-  type="button"
-  class="relative w-fit cursor-pointer overflow-hidden rounded bg-gray-50 px-2 font-mono text-sm tabular-nums"
-  onclick={copyKey}
+<div
+  class="relative w-fit"
   onmouseenter={() => (hovering = true)}
   onmouseleave={() => (hovering = false)}
   onfocus={() => (hovering = true)}
   onblur={() => (hovering = false)}
   ontouchstart={() => (hovering = true)}
+  role="none"
 >
-  {hovering ? key : masked}
+  <button
+    type="button"
+    class="relative cursor-pointer overflow-hidden rounded bg-gray-50 px-2 font-mono text-sm tabular-nums"
+    onclick={copyKey}
+  >
+    <span class={hovering ? "invisible" : ""}>{masked}</span>
 
-  {#if copied}
+    {#if copied}
+      <span
+        transition:fade={{ duration: 250 }}
+        class="bg-opacity-75 pointer-events-none absolute inset-0 flex items-center justify-center rounded bg-blue-600 font-mono text-xs text-white tabular-nums"
+      >
+        <Copy class="mr-1 h-3 w-3" />
+        {m.licenses_key_copied()}
+      </span>
+    {/if}
+  </button>
+
+  {#if hovering && !copied}
     <span
-      transition:fade={{ duration: 250 }}
-      class="bg-opacity-75 pointer-events-none absolute inset-0 flex items-center justify-center rounded bg-blue-600 font-mono text-xs text-white tabular-nums"
+      transition:fade={{ duration: 100 }}
+      class="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center rounded bg-gray-50 px-2 font-mono text-sm whitespace-nowrap tabular-nums"
     >
-      <Copy class="mr-1 h-3 w-3" />
-      {m.licenses_key_copied()}
+      {key}
     </span>
   {/if}
-</button>
+</div>
