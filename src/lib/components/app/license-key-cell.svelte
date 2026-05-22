@@ -10,7 +10,7 @@
   let hovering = $state(false);
   let timeout: ReturnType<typeof setTimeout>;
 
-  const masked = "*****************";
+  const masked = "***************************";
 
   function copyKey() {
     navigator.clipboard.writeText(key).then(() => {
