@@ -31,7 +31,7 @@
     }
 
     if (isAdminView()) {
-      return resolve("/dashboard");
+      return resolve("/request");
     } else {
       return resolve("/admin/dashboard");
     }

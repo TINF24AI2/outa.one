@@ -8,7 +8,7 @@
 
   let { data, children } = $props();
 
-  const pages = [{ name: m.dashboard_title(), href: resolve("/dashboard"), icon: LayoutDashboard }];
+  const pages = [{ name: m.navigation_request_license(), href: resolve("/request"), icon: LayoutDashboard }];
 </script>
 
 <div class="flex h-screen overflow-hidden">

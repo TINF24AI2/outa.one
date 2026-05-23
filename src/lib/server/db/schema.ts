@@ -3,6 +3,7 @@ import {
   boolean,
   index,
   integer,
+  pgEnum,
   pgTable,
   primaryKey,
   serial,
@@ -30,6 +31,7 @@ export const product = defineTableWithUpdate("product", {
 
 export const productRelations = relations(product, ({ many }) => ({
   licenses: many(license),
+  licenseRequests: many(licenseRequest),
 }));
 
 export const license = defineTableWithUpdate(
@@ -76,6 +78,31 @@ export const licenseUserRelations = relations(licenseUser, ({ one }) => ({
 
 export const userLicenseRelations = relations(user, ({ many }) => ({
   licenseAssignments: many(licenseUser),
+  licenseRequests: many(licenseRequest),
+}));
+
+export const licenseRequestStatusEnum = pgEnum("license_request_status", ["pending", "approved", "rejected"]);
+
+export const licenseRequest = defineTableWithUpdate(
+  "license_request",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => product.id, { onDelete: "cascade" }),
+    status: licenseRequestStatusEnum("status").notNull().default("pending"),
+  },
+  (table) => [
+    index("license_request_user_id_idx").on(table.userId),
+    index("license_request_product_id_idx").on(table.productId),
+  ],
+);
+
+export const licenseRequestRelations = relations(licenseRequest, ({ one }) => ({
+  user: one(user, { fields: [licenseRequest.userId], references: [user.id] }),
+  product: one(product, { fields: [licenseRequest.productId], references: [product.id] }),
 }));
 
 export * from "./auth.schema";
