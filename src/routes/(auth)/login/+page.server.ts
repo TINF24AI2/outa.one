@@ -46,6 +46,6 @@ export const actions: Actions = {
     if (user.role === "admin") {
       redirect(302, "/admin/dashboard");
     }
-    redirect(302, "/dashboard");
+    redirect(302, "/request");
   },
 };
