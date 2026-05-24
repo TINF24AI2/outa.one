@@ -43,6 +43,13 @@
       "when": 1779554356971,
       "tag": "0005_watery_tiger_shark",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1779628486454,
+      "tag": "0006_pale_invaders",
+      "breakpoints": true
     }
   ]
 }

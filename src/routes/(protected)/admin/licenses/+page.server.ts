@@ -10,6 +10,7 @@ import {
   deleteLicenseSchema,
   unassignLicenseUserSchema,
 } from "$lib/schemas/licenses";
+import { createAuditLog } from "$lib/server/audit";
 import { requireAdminUser } from "$lib/server/auth/guards";
 import { db } from "$lib/server/db";
 import { license, licenseUser, product, user } from "$lib/server/db/schema";
@@ -73,7 +74,13 @@ export const actions: Actions = {
     if (!form.valid) return fail(400, { form });
 
     try {
-      await db.insert(license).values(form.data);
+      const [inserted] = await db.insert(license).values(form.data).returning({ id: license.id });
+      await createAuditLog(event, {
+        action: "license.created",
+        entityType: "license",
+        entityId: inserted?.id,
+        metadata: { productId: form.data.productId },
+      });
       return { form };
     } catch (error) {
       if (error instanceof Error && "code" in error && error.code === "23505") {
@@ -91,6 +98,7 @@ export const actions: Actions = {
 
     try {
       await db.delete(license).where(eq(license.id, form.data.licenseId));
+      await createAuditLog(event, { action: "license.deleted", entityType: "license", entityId: form.data.licenseId });
       return { form };
     } catch (error) {
       console.error("Error deleting license:", error);
@@ -118,6 +126,12 @@ export const actions: Actions = {
       };
       return message(form, reasonToMessage[res.reason], { status: 409 });
     }
+    await createAuditLog(event, {
+      action: "license.user_assigned",
+      entityType: "license",
+      entityId: form.data.licenseId,
+      metadata: { assignedUserId: form.data.userId },
+    });
     return { form };
   },
 
@@ -128,6 +142,12 @@ export const actions: Actions = {
 
     try {
       await unassignUserFromLicense(form.data.licenseId, form.data.userId);
+      await createAuditLog(event, {
+        action: "license.user_unassigned",
+        entityType: "license",
+        entityId: form.data.licenseId,
+        metadata: { removedUserId: form.data.userId },
+      });
       return { form };
     } catch (error) {
       console.error("Error unassigning user:", error);

@@ -3,6 +3,7 @@ import {
   boolean,
   index,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   primaryKey,
@@ -14,7 +15,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { user } from "./auth.schema";
-import { defineTableWithUpdate } from "./utils/table-factory";
+import { defineTable, defineTableWithUpdate } from "./utils/table-factory";
 
 export const task = pgTable("task", {
   id: serial("id").primaryKey(),
@@ -104,5 +105,25 @@ export const licenseRequestRelations = relations(licenseRequest, ({ one }) => ({
   user: one(user, { fields: [licenseRequest.userId], references: [user.id] }),
   product: one(product, { fields: [licenseRequest.productId], references: [product.id] }),
 }));
+
+export const auditLog = defineTable(
+  "audit_log",
+  {
+    userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
+    userName: text("user_name").notNull(),
+    action: text("action").notNull(),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id"),
+    metadata: jsonb("metadata"),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+  },
+  (table) => [
+    index("audit_log_user_id_idx").on(table.userId),
+    index("audit_log_action_idx").on(table.action),
+    index("audit_log_entity_type_idx").on(table.entityType),
+    index("audit_log_created_at_idx").on(table.createdAt),
+  ],
+);
 
 export * from "./auth.schema";

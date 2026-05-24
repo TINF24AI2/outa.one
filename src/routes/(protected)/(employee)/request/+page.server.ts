@@ -5,6 +5,7 @@ import { zod4 as zod } from "sveltekit-superforms/adapters";
 
 import { m } from "$lib/paraglide/messages.js";
 import { requestLicenseSchema, type ProductItem } from "$lib/schemas/request-license";
+import { createAuditLog } from "$lib/server/audit";
 import { requireAuthenticatedUser } from "$lib/server/auth/guards";
 import { db } from "$lib/server/db";
 import { license, licenseRequest, licenseUser, product } from "$lib/server/db/schema";
@@ -91,12 +92,21 @@ export const actions: Actions = {
         return message(form, m.request_error_already_pending(), { status: 409 });
       }
 
-      await db.insert(licenseRequest).values({
-        userId: user.id,
-        productId: form.data.productId,
-        status: "pending",
-      });
+      const [insertedRequest] = await db
+        .insert(licenseRequest)
+        .values({
+          userId: user.id,
+          productId: form.data.productId,
+          status: "pending",
+        })
+        .returning({ id: licenseRequest.id });
 
+      await createAuditLog(event, {
+        action: "license_request.submitted",
+        entityType: "license_request",
+        entityId: insertedRequest?.id,
+        metadata: { productId: form.data.productId, productName: prod.name },
+      });
       return { form, pending: true, productName: prod.name };
     }
 
@@ -108,6 +118,12 @@ export const actions: Actions = {
     for (const lic of productLicenses) {
       const result = await assignUserToLicense(lic.id, user.id);
       if (result.ok) {
+        await createAuditLog(event, {
+          action: "license.user_assigned",
+          entityType: "license",
+          entityId: lic.id,
+          metadata: { productId: form.data.productId, productName: prod.name },
+        });
         return { form, licenseKey: lic.key, productName: prod.name };
       }
       if (result.reason === "user_at_product_cap") {
