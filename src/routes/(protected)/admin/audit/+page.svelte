@@ -24,6 +24,7 @@
   let entityTypeFilter = $state<AuditEntityType | "">((data.filters.entityType as AuditEntityType | null) ?? "");
 
   $effect(() => {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const params = new URLSearchParams();
     if (actionFilter) {
       params.set("action", actionFilter);
