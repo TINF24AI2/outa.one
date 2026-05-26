@@ -23,7 +23,7 @@
       <a
         href={navPage.href}
         aria-current={isActive ? "page" : undefined}
-        class={`flex flex-col items-center gap-0.5 px-4 py-2 text-xs transition-colors md:flex-row md:gap-2 md:rounded-md md:px-3 md:py-3 md:text-sm md:font-medium ${
+        class={`flex min-w-0 flex-1 flex-col items-center gap-0.5 py-2 text-xs transition-colors md:flex-none md:flex-row md:gap-2 md:rounded-md md:px-3 md:py-3 md:text-sm md:font-medium ${
           isActive
             ? "text-primary md:bg-primary md:hover:bg-primary/90 md:text-white md:hover:text-white"
             : "text-muted-foreground hover:text-foreground md:text-gray-700 md:hover:bg-gray-100 md:hover:text-gray-900"
