@@ -30,5 +30,7 @@
     {/each}
   </Navigation>
 
-  {@render children?.()}
+  <div class="min-h-0 flex-1 overflow-hidden pb-16 md:pb-0">
+    {@render children?.()}
+  </div>
 </div>

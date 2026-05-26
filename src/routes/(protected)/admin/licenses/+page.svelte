@@ -162,7 +162,7 @@
       </div>
 
       <!-- Licenses table -->
-      <div class="mb-12 overflow-hidden rounded-lg border bg-white">
+      <div class="overflow-hidden rounded-lg border bg-white">
         <!-- Filter toolbar -->
         <div class="flex flex-wrap items-center gap-2 px-4 py-3 sm:px-6">
           <MultiCombobox
