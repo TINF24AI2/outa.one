@@ -11,7 +11,7 @@
   const pages = [{ name: m.navigation_request_license(), href: resolve("/request"), icon: LayoutDashboard }];
 </script>
 
-<div class="flex h-screen overflow-hidden">
+<div class="flex h-dvh overflow-hidden">
   <Navigation user={data.user}>
     {#each pages as navPage (navPage.name)}
       {@const isActive = page.url.pathname === navPage.href || page.url.pathname.startsWith(`${navPage.href}/`)}
