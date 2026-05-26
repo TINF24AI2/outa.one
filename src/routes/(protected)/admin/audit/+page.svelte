@@ -92,12 +92,11 @@
   <PageHeader title={m.audit_title()} subtitle={m.audit_subtitle()} />
 
   <div class="mx-auto w-full max-w-7xl flex-1 overflow-auto px-2 py-6">
-    <!-- Filters -->
-    <div class="mb-4 flex flex-wrap items-center gap-3">
-      <div class="flex items-center gap-2">
-        <span class="text-sm text-gray-500">{m.audit_filter_action_label()}</span>
+    <div class="overflow-hidden rounded-lg border bg-white">
+      <!-- Filter toolbar -->
+      <div class="flex flex-wrap items-center gap-2 border-b px-4 py-3 sm:px-6">
         <Select.Root type="single" bind:value={actionFilter}>
-          <Select.Trigger size="sm">
+          <Select.Trigger size="sm" class="w-40">
             {actionFilter ? getActionLabel(actionFilter) : m.audit_filter_action_placeholder()}
           </Select.Trigger>
           <Select.Content>
@@ -112,11 +111,8 @@
             {/each}
           </Select.Content>
         </Select.Root>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="text-sm text-gray-500">{m.audit_filter_entity_type_label()}</span>
         <Select.Root type="single" bind:value={entityTypeFilter}>
-          <Select.Trigger size="sm">
+          <Select.Trigger size="sm" class="w-36">
             {entityTypeFilter || m.audit_filter_entity_type_placeholder()}
           </Select.Trigger>
           <Select.Content>
@@ -131,21 +127,18 @@
             {/each}
           </Select.Content>
         </Select.Root>
+        {#if actionFilter || entityTypeFilter}
+          <button
+            class="text-xs text-gray-400 hover:text-gray-600 hover:underline"
+            onclick={() => {
+              actionFilter = "";
+              entityTypeFilter = "";
+            }}
+          >
+            {m.audit_filter_clear()}
+          </button>
+        {/if}
       </div>
-      {#if actionFilter || entityTypeFilter}
-        <button
-          class="text-sm text-gray-500 underline underline-offset-2 hover:text-gray-800"
-          onclick={() => {
-            actionFilter = "";
-            entityTypeFilter = "";
-          }}
-        >
-          {m.audit_filter_clear()}
-        </button>
-      {/if}
-    </div>
-
-    <div class="overflow-hidden rounded-lg border bg-white">
       {#if data.logs.length === 0}
         <p class="py-16 text-center text-sm text-gray-400">{m.audit_empty()}</p>
       {:else}

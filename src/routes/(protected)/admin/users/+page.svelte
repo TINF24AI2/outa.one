@@ -99,12 +99,6 @@
             </div>
             <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
               <div>
-                <p class="text-xs text-gray-400">{m.users_table_status()}</p>
-                <div class="pt-1">
-                  <UserStatusBadge status={user.status} />
-                </div>
-              </div>
-              <div>
                 <p class="text-xs text-gray-400">{m.users_table_licenses_held()}</p>
                 <p class="text-gray-700">0</p>
               </div>
@@ -113,7 +107,7 @@
                 <p class="text-gray-500">{formatDateTime(user.lastActive, locale)}</p>
               </div>
             </div>
-            <div class="">{@render userActions(user)}</div>
+            <div class="flex justify-end">{@render userActions(user)}</div>
           </li>
         {/each}
       </ul>

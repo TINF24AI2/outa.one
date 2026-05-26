@@ -127,13 +127,11 @@
 </aside>
 
 <!-- Mobile bottom nav -->
-<nav
-  class="bg-background fixed right-0 bottom-0 left-0 z-40 flex items-center justify-around border-t px-2 py-1 md:hidden"
->
+<nav class="bg-background fixed right-0 bottom-0 left-0 z-40 flex items-center border-t py-1 md:hidden">
   {@render children?.()}
 
   <!-- Account button -->
-  <div class="relative">
+  <div class="relative flex min-w-0 flex-1 justify-center">
     {#if accountOpen}
       <!-- Click-outside backdrop -->
       <button class="fixed inset-0 z-40" onclick={() => (accountOpen = false)} aria-label="Close account menu"></button>
@@ -154,6 +152,7 @@
               variant="ghost"
               class="h-9 w-full justify-start gap-2 px-2 text-gray-700"
               href={resolve("/admin/audit")}
+              onclick={() => (accountOpen = false)}
             >
               <ScrollText class="h-4 w-4" />
               {m.audit_title()}
@@ -175,7 +174,7 @@
 
     <button
       onclick={() => (accountOpen = !accountOpen)}
-      class="text-muted-foreground hover:text-foreground flex flex-col items-center gap-0.5 px-4 py-2 text-xs transition-colors"
+      class="text-muted-foreground hover:text-foreground flex flex-col items-center gap-0.5 py-2 text-xs transition-colors"
     >
       <CircleUserRound class="h-6 w-6" />
       <span>{m.navigation_account()}</span>

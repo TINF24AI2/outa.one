@@ -87,20 +87,20 @@
               <div class="min-w-0">
                 <p class="truncate font-semibold text-gray-900">{product.name}</p>
                 {#if product.description}
-                  <p class="mt-1 line-clamp-2 text-sm text-gray-500">{product.description}</p>
-                {/if}
-                {#if product.requiresApproval}
-                  <div class="pt-2">
-                    <StatusBadge variant="warning">{m.products_requires_approval_badge()}</StatusBadge>
-                  </div>
+                  <p class="mt-1 truncate text-sm text-gray-500">{product.description}</p>
                 {/if}
               </div>
             </div>
-            <span
-              class={`inline-flex shrink-0 items-center rounded px-2.5 py-1 text-xs font-medium ${availabilityClasses(product.availableSeats)}`}
-            >
-              {m.products_table_available_count({ count: product.availableSeats })}
-            </span>
+            <div class="flex shrink-0 flex-col items-end gap-2">
+              <span
+                class={`inline-flex items-center rounded px-2.5 py-1 text-xs font-medium ${availabilityClasses(product.availableSeats)}`}
+              >
+                {m.products_table_available_count({ count: product.availableSeats })}
+              </span>
+              {#if product.requiresApproval}
+                <StatusBadge variant="warning">{m.products_requires_approval_badge()}</StatusBadge>
+              {/if}
+            </div>
           </div>
 
           <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
@@ -116,17 +116,9 @@
               <p class="text-xs text-gray-400">{m.products_table_used_keys()}</p>
               <p class="text-gray-700">{product.assignedSeats}</p>
             </div>
-            <div>
-              <p class="text-xs text-gray-400">{m.products_table_available_keys()}</p>
-              <span
-                class={`inline-flex shrink-0 items-center rounded px-2.5 py-1 text-xs font-medium ${availabilityClasses(product.availableSeats)}`}
-              >
-                {product.availableSeats}
-              </span>
-            </div>
           </div>
 
-          <div>{@render productActions(product)}</div>
+          <div class="flex justify-end">{@render productActions(product)}</div>
         </li>
       {/each}
     </ul>
