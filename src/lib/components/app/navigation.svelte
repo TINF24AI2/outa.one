@@ -152,6 +152,7 @@
               variant="ghost"
               class="h-9 w-full justify-start gap-2 px-2 text-gray-700"
               href={resolve("/admin/audit")}
+              onclick={() => (accountOpen = false)}
             >
               <ScrollText class="h-4 w-4" />
               {m.audit_title()}
