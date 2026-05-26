@@ -40,6 +40,7 @@
   };
 
   let accountOpen = $state(false);
+  let popoverOpen = $state(false);
 </script>
 
 <!-- Desktop sidebar -->
@@ -64,7 +65,7 @@
 
   <!-- User footer -->
   <div class="border-t">
-    <Popover.Root>
+    <Popover.Root bind:open={popoverOpen}>
       <Popover.Trigger
         class="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 focus-visible:outline-none"
       >
@@ -88,7 +89,12 @@
           <Separator />
           {#if user.role === "admin"}
             <div class="px-1">
-              <Button variant="ghost" class="h-9 w-full justify-start gap-2 px-2 text-gray-700" href={switchViewLink()}>
+              <Button
+                variant="ghost"
+                class="h-9 w-full justify-start gap-2 px-2 text-gray-700"
+                href={switchViewLink()}
+                onclick={() => (popoverOpen = false)}
+              >
                 <ArrowRightLeft class="h-4 w-4" />
                 {isAdminView() ? m.navigation_switchToEmployee() : m.navigation_switchToAdmin()}
               </Button>
@@ -96,6 +102,7 @@
                 variant="ghost"
                 class="h-9 w-full justify-start gap-2 px-2 text-gray-700"
                 href={resolve("/admin/audit")}
+                onclick={() => (popoverOpen = false)}
               >
                 <ScrollText class="h-4 w-4" />
                 {m.audit_title()}

@@ -24,19 +24,13 @@
   let entityTypeFilter = $state<AuditEntityType | "">((data.filters.entityType as AuditEntityType | null) ?? "");
 
   $effect(() => {
-    // eslint-disable-next-line svelte/prefer-svelte-reactivity
-    const params = new URLSearchParams(page.url.searchParams);
+    const params = new URLSearchParams();
     if (actionFilter) {
       params.set("action", actionFilter);
-    } else {
-      params.delete("action");
     }
     if (entityTypeFilter) {
       params.set("entityType", entityTypeFilter);
-    } else {
-      params.delete("entityType");
     }
-    params.delete("page");
     // eslint-disable-next-line svelte/no-navigation-without-resolve
     void goto(`?${params.toString()}`, { replaceState: true, noScroll: true, keepFocus: true });
   });
