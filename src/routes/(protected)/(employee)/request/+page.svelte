@@ -63,8 +63,18 @@
         {@const canRequest = !atUserLimit && !noLicenses}
 
         <div class="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-5">
-          <div class="flex h-11 w-11 items-center justify-center rounded-md bg-blue-100">
-            <Box class="h-5 w-5 text-blue-500" />
+          <div class="flex items-start justify-between">
+            <div class="flex h-11 w-11 items-center justify-center rounded-md bg-blue-100">
+              <Box class="h-5 w-5 text-blue-500" />
+            </div>
+            {#if product.requiresApproval}
+              <div
+                class="flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700"
+              >
+                <Clock class="h-3 w-3" />
+                {m.request_requires_approval_badge()}
+              </div>
+            {/if}
           </div>
 
           <div class="flex-1">
@@ -75,15 +85,6 @@
           </div>
 
           <div class="flex flex-col gap-2">
-            {#if product.requiresApproval}
-              <div
-                class="flex w-fit items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700"
-              >
-                <Clock class="h-3 w-3" />
-                {m.request_requires_approval_badge()}
-              </div>
-            {/if}
-
             <div class="flex items-center justify-between gap-2">
               <div
                 class={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${availableBadgeClass(product.available)}`}
@@ -109,13 +110,19 @@
               {m.request_button()}
             </button>
           {:else if atUserLimit}
-            <p class="py-1 text-center text-sm font-medium text-gray-400">
+            <button
+              disabled
+              class="w-full cursor-not-allowed rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-400"
+            >
               {m.request_limit_reached()}
-            </p>
+            </button>
           {:else}
-            <p class="py-1 text-center text-sm font-medium text-gray-400">
+            <button
+              disabled
+              class="w-full cursor-not-allowed rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-400"
+            >
               {m.request_unavailable()}
-            </p>
+            </button>
           {/if}
         </div>
       {/each}
