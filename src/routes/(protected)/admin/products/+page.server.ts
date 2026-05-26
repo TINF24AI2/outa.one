@@ -5,6 +5,7 @@ import { zod4 as zod } from "sveltekit-superforms/adapters";
 
 import { m } from "$lib/paraglide/messages.js";
 import { createProductSchema, deleteProductSchema, updateProductSchema } from "$lib/schemas/products";
+import { createAuditLog } from "$lib/server/audit";
 import { requireAdminUser } from "$lib/server/auth/guards";
 import { db } from "$lib/server/db";
 import { license, licenseUser, product } from "$lib/server/db/schema";
@@ -104,7 +105,13 @@ export const actions: Actions = {
     if (!form.valid) return fail(400, { form });
 
     try {
-      await db.insert(product).values(form.data);
+      const [inserted] = await db.insert(product).values(form.data).returning({ id: product.id });
+      await createAuditLog(event, {
+        action: "product.created",
+        entityType: "product",
+        entityId: inserted?.id,
+        metadata: { name: form.data.name },
+      });
       return { form };
     } catch (error) {
       console.error("Error creating product:", error);
@@ -133,6 +140,12 @@ export const actions: Actions = {
         return message(form, m.products_error_not_found(), { status: 404 });
       }
 
+      await createAuditLog(event, {
+        action: "product.updated",
+        entityType: "product",
+        entityId: updatedProduct.id,
+        metadata: { name: form.data.name },
+      });
       return { form };
     } catch (error) {
       console.error("Error updating product:", error);
@@ -155,6 +168,7 @@ export const actions: Actions = {
         return message(form, m.products_error_not_found(), { status: 404 });
       }
 
+      await createAuditLog(event, { action: "product.deleted", entityType: "product", entityId: deletedProduct.id });
       return { form };
     } catch (error) {
       console.error("Error deleting product:", error);

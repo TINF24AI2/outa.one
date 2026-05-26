@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ArrowRightLeft, CircleUserRound, LogOut } from "@lucide/svelte";
+  import { ArrowRightLeft, ChevronsUpDown, CircleUserRound, LogOut, ScrollText } from "@lucide/svelte";
   import { browser } from "$app/environment";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
@@ -8,6 +8,8 @@
   import logo from "$lib/assets/logo.svg";
   import { authClient } from "$lib/authClient";
   import { Button } from "$lib/components/ui/button";
+  import * as Popover from "$lib/components/ui/popover";
+  import { Separator } from "$lib/components/ui/separator";
   import { m } from "$lib/paraglide/messages.js";
   import { getInitials } from "$lib/user-management";
 
@@ -38,6 +40,7 @@
   };
 
   let accountOpen = $state(false);
+  let popoverOpen = $state(false);
 </script>
 
 <!-- Desktop sidebar -->
@@ -61,34 +64,65 @@
   </nav>
 
   <!-- User footer -->
-  <div class="space-y-2 border-t px-4 py-4">
-    <div class="flex items-center gap-3">
-      <div
-        class="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+  <div class="border-t">
+    <Popover.Root bind:open={popoverOpen}>
+      <Popover.Trigger
+        class="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 focus-visible:outline-none"
       >
-        {getInitials(user.name)}
-      </div>
-      <div class="min-w-0">
-        <p class="truncate text-sm font-medium">{user.name}</p>
-        <p class="text-muted-foreground truncate text-xs">{user.email}</p>
-      </div>
-    </div>
-
-    <div class="mt-4 flex flex-col">
-      {#if user.role === "admin"}
-        <div class="flex flex-col items-start gap-2">
-          <Button variant="ghost" class="w-full justify-start gap-2 px-2 text-gray-700" href={switchViewLink()}>
-            <ArrowRightLeft class="h-4 w-4" />
-            {isAdminView() ? m.navigation_switchToEmployee() : m.navigation_switchToAdmin()}
-          </Button>
+        <div
+          class="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+        >
+          {getInitials(user.name)}
         </div>
-      {/if}
-
-      <Button variant="ghost" class="w-full justify-start gap-2 px-2 text-gray-700" onclick={signOut}>
-        <LogOut class="h-4 w-4" />
-        {m.navigation_logout()}
-      </Button>
-    </div>
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-sm font-medium">{user.name}</p>
+          <p class="text-muted-foreground truncate text-xs">{user.email}</p>
+        </div>
+        <ChevronsUpDown class="text-muted-foreground h-4 w-4 shrink-0" />
+      </Popover.Trigger>
+      <Popover.Content side="top" align="end" class="w-56 p-0">
+        <div class="flex flex-col gap-1.5 py-2.5">
+          <div class="px-3">
+            <p class="text-sm font-semibold">{user.name}</p>
+            <p class="text-muted-foreground text-xs">{user.email}</p>
+          </div>
+          <Separator />
+          {#if user.role === "admin"}
+            <div class="px-1">
+              <Button
+                variant="ghost"
+                class="h-9 w-full justify-start gap-2 px-2 text-gray-700"
+                href={switchViewLink()}
+                onclick={() => (popoverOpen = false)}
+              >
+                <ArrowRightLeft class="h-4 w-4" />
+                {isAdminView() ? m.navigation_switchToEmployee() : m.navigation_switchToAdmin()}
+              </Button>
+              <Button
+                variant="ghost"
+                class="h-9 w-full justify-start gap-2 px-2 text-gray-700"
+                href={resolve("/admin/audit")}
+                onclick={() => (popoverOpen = false)}
+              >
+                <ScrollText class="h-4 w-4" />
+                {m.audit_title()}
+              </Button>
+            </div>
+            <Separator />
+          {/if}
+          <div class="px-1">
+            <Button
+              variant="ghost"
+              class="text-destructive hover:text-destructive h-9 w-full justify-start gap-2 px-2"
+              onclick={signOut}
+            >
+              <LogOut class="h-4 w-4" />
+              {m.navigation_logout()}
+            </Button>
+          </div>
+        </div>
+      </Popover.Content>
+    </Popover.Root>
   </div>
 </aside>
 
@@ -110,12 +144,28 @@
           <p class="text-sm leading-tight font-semibold">{user.name}</p>
           <p class="text-muted-foreground text-xs">{user.email}</p>
         </div>
+        {#if user.role === "admin"}
+          <div class="border-t px-2 py-2">
+            <Button variant="ghost" class="h-9 w-full justify-start gap-2 px-2 text-gray-700" href={switchViewLink()}>
+              <ArrowRightLeft class="h-4 w-4" />
+              {isAdminView() ? m.navigation_switchToEmployee() : m.navigation_switchToAdmin()}
+            </Button>
+            <Button
+              variant="ghost"
+              class="h-9 w-full justify-start gap-2 px-2 text-gray-700"
+              href={resolve("/admin/audit")}
+            >
+              <ScrollText class="h-4 w-4" />
+              {m.audit_title()}
+            </Button>
+          </div>
+        {/if}
         <div class="border-t px-2 py-2">
-          <Button variant="ghost" class="w-full justify-start gap-2 px-2 text-gray-700" href={switchViewLink()}>
-            <ArrowRightLeft class="h-4 w-4" />
-            {isAdminView() ? m.navigation_switchToEmployee() : m.navigation_switchToAdmin()}
-          </Button>
-          <Button variant="ghost" class="h-9 w-full justify-start gap-2 px-2 text-gray-700" onclick={signOut}>
+          <Button
+            variant="ghost"
+            class="text-destructive hover:text-destructive h-9 w-full justify-start gap-2 px-2"
+            onclick={signOut}
+          >
             <LogOut class="h-4 w-4" />
             {m.navigation_logout()}
           </Button>

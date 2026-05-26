@@ -10,6 +10,7 @@ import {
   resendInviteSchema,
   updateUserRoleSchema,
 } from "$lib/schemas/users";
+import { createAuditLog } from "$lib/server/audit";
 import { requireAdminUser } from "$lib/server/auth/guards";
 import {
   cancelManagedInvite,
@@ -75,6 +76,11 @@ export const actions: Actions = {
     try {
       const { inviteUrl, emailSent } = await inviteManagedUser(email, form.data.role);
 
+      await createAuditLog(event, {
+        action: "user.invited",
+        entityType: "invite",
+        metadata: { email, role: form.data.role },
+      });
       return {
         form,
         inviteUrl,
@@ -101,6 +107,7 @@ export const actions: Actions = {
 
     try {
       const { emailSent } = await resendManagedInvite(form.data.inviteId);
+      await createAuditLog(event, { action: "user.invite_resent", entityType: "invite", entityId: form.data.inviteId });
       return { form, emailSent };
     } catch (error) {
       if (error instanceof ManagedUserError && error.code === "invite_not_found") {
@@ -118,6 +125,11 @@ export const actions: Actions = {
 
     try {
       await cancelManagedInvite(form.data.inviteId);
+      await createAuditLog(event, {
+        action: "user.invite_cancelled",
+        entityType: "invite",
+        entityId: form.data.inviteId,
+      });
       return { form };
     } catch (error) {
       if (error instanceof ManagedUserError && error.code === "invite_not_found") {
@@ -135,6 +147,12 @@ export const actions: Actions = {
 
     try {
       await updateManagedUserRole(event.request.headers, form.data.userId, form.data.role);
+      await createAuditLog(event, {
+        action: "user.role_updated",
+        entityType: "user",
+        entityId: form.data.userId,
+        metadata: { newRole: form.data.role },
+      });
       return { form };
     } catch (error) {
       if (error instanceof ManagedUserError) {
@@ -158,6 +176,7 @@ export const actions: Actions = {
 
     try {
       await removeManagedUser(event.request.headers, form.data.userId, event.locals.user?.id);
+      await createAuditLog(event, { action: "user.removed", entityType: "user", entityId: form.data.userId });
       return { form };
     } catch (error) {
       if (error instanceof ManagedUserError) {
