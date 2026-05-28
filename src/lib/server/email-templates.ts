@@ -110,6 +110,51 @@ export function inviteEmail(url: string, expiresInDays = 7) {
   );
 }
 
+export function licenseRequestNotificationEmail(requesterName: string, requesterEmail: string, productName: string) {
+  const content = `
+    <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#09090b;letter-spacing:-0.3px;">New license request</h1>
+    <p style="margin:0 0 24px;font-size:15px;color:#52525b;line-height:1.6;">
+      A new license request requires your approval.
+    </p>
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr>
+        <td style="background-color:${BRAND_LIGHT};border-radius:8px;padding:14px 16px;">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="padding-bottom:8px;">
+                <span style="font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:0.5px;">Product</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding-bottom:16px;">
+                <span style="font-size:15px;font-weight:600;color:#09090b;">${productName}</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding-bottom:8px;">
+                <span style="font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:0.5px;">Requested by</span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span style="font-size:15px;color:#09090b;">${requesterName}</span>
+                <span style="font-size:13px;color:#71717a;"> &lt;${requesterEmail}&gt;</span>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <p style="margin:0;font-size:13px;color:#a1a1aa;">
+      Log in to the admin dashboard to approve or reject this request.
+    </p>
+  `;
+
+  return base(content, "You received this email because a license request was submitted that requires admin approval.");
+}
+
 export function resetPasswordEmail(url: string) {
   const content = `
     <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#09090b;letter-spacing:-0.3px;">Reset your password</h1>
