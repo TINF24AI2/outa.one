@@ -8,8 +8,11 @@ import { requestLicenseSchema, type ProductItem } from "$lib/schemas/request-lic
 import { createAuditLog } from "$lib/server/audit";
 import { requireAuthenticatedUser } from "$lib/server/auth/guards";
 import { db } from "$lib/server/db";
+import { user as userTable } from "$lib/server/db/auth.schema";
 import { license, licenseRequest, licenseUser, product } from "$lib/server/db/schema";
+import { licenseRequestNotificationEmail } from "$lib/server/email-templates";
 import { assignUserToLicense } from "$lib/server/licenses";
+import { sendEmail } from "$lib/server/mail";
 
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -107,6 +110,24 @@ export const actions: Actions = {
         entityId: insertedRequest?.id,
         metadata: { productId: form.data.productId, productName: prod.name },
       });
+
+      const admins = await db
+        .select({ email: userTable.email, name: userTable.name })
+        .from(userTable)
+        .where(eq(userTable.role, "admin"));
+
+      await Promise.allSettled(
+        admins
+          .filter((admin) => !admin.email.endsWith("@company.com"))
+          .map((admin) =>
+            sendEmail({
+              to: admin.email,
+              subject: `License request for ${prod.name}`,
+              html: licenseRequestNotificationEmail(user.name, user.email, prod.name),
+            }),
+          ),
+      );
+
       return { form, pending: true, productName: prod.name };
     }
 
