@@ -3,6 +3,7 @@
 
   import PageHeader from "$lib/components/app/page-header.svelte";
   import RequestActions from "$lib/components/app/request-actions.svelte";
+  import StatusBadge from "$lib/components/app/status-badge.svelte";
   import * as Table from "$lib/components/ui/table";
   import { m } from "$lib/paraglide/messages";
   import { getLocale } from "$lib/paraglide/runtime";
@@ -11,14 +12,10 @@
 
   let { data }: { data: PageData } = $props();
 
-  function getClass(num: number) {
-    if (num === 0) {
-      return "text-red-500 bg-red-100 w-7 h-6 rounded py-1 px-[10px] flex items-center justify-center";
-    } else if (num <= 5) {
-      return "text-orange-500 bg-orange-100 w-7 h-6 rounded py-1 px-[10px] flex items-center justify-center";
-    } else {
-      return "text-green-500 bg-green-100 w-7 h-6 rounded py-1 px-[10px] flex items-center justify-center";
-    }
+  function availabilityVariant(n: number): "destructive" | "warning" | "success" {
+    if (n === 0) return "destructive";
+    if (n <= 5) return "warning";
+    return "success";
   }
 
   function formatDate(date: Date | string) {
@@ -42,8 +39,8 @@
   <PageHeader title={m.requests_page_header()} subtitle={m.requests_page_subheader()}></PageHeader>
 
   <div class="mx-auto w-full max-w-7xl flex-1 overflow-auto px-4 py-6 sm:px-6">
-    <div class="group mb-6 flex h-28 w-full flex-col rounded-lg border border-gray-200 bg-white p-4 transition-colors">
-      <p class="mb-1 text-xs text-gray-500 sm:text-sm">{m.requests_pending_requests()}</p>
+    <div class="mb-6 rounded-lg border bg-white p-3 sm:p-5">
+      <p class="text-xs text-gray-500 sm:text-sm">{m.requests_pending_requests()}</p>
       <p class="mt-1 text-2xl font-bold text-gray-900 sm:text-3xl">{data.requests.length}</p>
     </div>
 
@@ -84,7 +81,9 @@
                 </div>
                 <div>
                   <p class="text-xs text-gray-400">{m.requests_available()}</p>
-                  <div class={getClass(request.availableUsage)}>{request.availableUsage}</div>
+                  <StatusBadge variant={availabilityVariant(request.availableUsage)}>
+                    {request.availableUsage}
+                  </StatusBadge>
                 </div>
               </div>
               <RequestActions
@@ -126,7 +125,9 @@
                   </Table.Cell>
                   <Table.Cell class="text-gray-500">{formatDate(request.createdAt)}</Table.Cell>
                   <Table.Cell>
-                    <div class={getClass(request.availableUsage)}>{request.availableUsage}</div>
+                    <StatusBadge variant={availabilityVariant(request.availableUsage)}>
+                      {request.availableUsage}
+                    </StatusBadge>
                   </Table.Cell>
                   <Table.Cell>
                     <RequestActions

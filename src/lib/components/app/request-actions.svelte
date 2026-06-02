@@ -45,7 +45,7 @@
   <AppDialog
     title={m.requests_approve_confirm()}
     triggerDisabled={availableUsage === 0}
-    triggerClass="inline-flex min-w-26 items-center justify-center gap-2 rounded-lg bg-emerald-100 px-3 py-2 text-sm font-medium text-emerald-500 transition disabled:cursor-not-allowed disabled:bg-emerald-50 disabled:text-emerald-300"
+    triggerClass="inline-flex min-w-26 items-center justify-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 transition disabled:cursor-not-allowed disabled:opacity-40"
   >
     {#snippet trigger()}
       <CircleCheck class="h-4 w-4" />
