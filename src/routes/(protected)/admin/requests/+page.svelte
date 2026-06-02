@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { CircleCheck, CircleX } from "@lucide/svelte";
-
-  //import { resolve } from "$app/paths";
+  import { ClipboardList } from "@lucide/svelte";
 
   import PageHeader from "$lib/components/app/page-header.svelte";
+  import RequestActions from "$lib/components/app/request-actions.svelte";
   import * as Table from "$lib/components/ui/table";
   import { m } from "$lib/paraglide/messages";
   import { getLocale } from "$lib/paraglide/runtime";
@@ -20,10 +19,6 @@
     } else {
       return "text-green-500 bg-green-100 w-7 h-6 rounded py-1 px-[10px] flex items-center justify-center";
     }
-  }
-
-  function isEnabled(num: number): boolean {
-    return num === 0;
   }
 
   function formatDate(date: Date | string) {
@@ -58,100 +53,97 @@
         <p class="mb-1 text-xs text-gray-500 sm:text-sm">{data.requests.length} {m.requests_pending_requests_sub()}</p>
       </div>
 
-      <ul class="divide-y sm:hidden">
-        {#each data.requests as request (request.id)}
-          <li class="flex flex-col gap-3 p-4">
-            <div class="flex items-center justify-between gap-3">
+      {#if data.requests.length === 0}
+        <!-- Empty state -->
+        <div class="flex flex-col items-center gap-3 border-t py-16 text-center">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+            <ClipboardList class="h-6 w-6 text-gray-400" />
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-900">{m.requests_empty_title()}</p>
+            <p class="mt-1 text-sm text-gray-500">{m.requests_empty_subtitle()}</p>
+          </div>
+        </div>
+      {:else}
+        <!-- Mobile list -->
+        <ul class="divide-y border-t sm:hidden">
+          {#each data.requests as request, i (request.id)}
+            <li class="flex flex-col gap-3 p-4">
               <div class="min-w-0">
                 <p class="truncate font-semibold text-gray-900">{request.userName}</p>
                 <p class="truncate text-sm text-gray-500">{request.email}</p>
               </div>
-            </div>
-            <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-              <div>
-                <p class="text-xs text-gray-400">{m.requests_user()}</p>
-                <p class="text-gray-700">{request.productName}</p>
-              </div>
-              <div>
-                <p class="text-xs text-gray-400">{m.requests_date()}</p>
-                <p class="text-gray-700">{formatDate(request.createdAt)}</p>
-              </div>
-              <div>
-                <p class="text-xs text-gray-400">{m.requests_available()}</p>
-                <div class={getClass(request.availableUsage)}>{request.availableUsage}</div>
-              </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <button
-                disabled={isEnabled(request.availableUsage)}
-                type="button"
-                class="inline-flex min-w-26 items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-sm font-medium text-green-500 transition disabled:cursor-not-allowed disabled:bg-green-50 disabled:text-green-300"
-              >
-                <CircleCheck class="h-4 w-4" />
-                <span>{m.requests_approve()}</span>
-              </button>
-              <button
-                type="button"
-                class="inline-flex min-w-26 items-center justify-center gap-2 rounded-lg bg-red-100 px-3 py-2 text-sm font-medium text-red-500 transition"
-              >
-                <CircleX class="h-4 w-4" />
-                <span>{m.requests_deny()}</span>
-              </button>
-            </div>
-          </li>
-        {/each}
-      </ul>
-
-      <div class="hidden sm:block">
-        <Table.Root>
-          <Table.Header class="bg-slate-50">
-            <Table.Row class="[&>th]:text-neutral-500">
-              <Table.Head class="pl-6">{m.requests_user()}</Table.Head>
-              <Table.Head>{m.requests_product()}</Table.Head>
-              <Table.Head>{m.requests_date()}</Table.Head>
-              <Table.Head>{m.requests_available()}</Table.Head>
-              <Table.Head class="pr-6">{m.requests_actions()}</Table.Head>
-            </Table.Row>
-          </Table.Header>
-
-          <Table.Body>
-            {#each data.requests as request (request.id)}
-              <Table.Row>
-                <Table.Cell class="flex flex-col gap-1 py-3 pl-6">
-                  <p class="font-inter text-base leading-6 font-medium tracking-normal">{request.userName}</p>
-                  <p class="font-inter text-sm leading-5 font-normal tracking-normal text-gray-500">{request.email}</p>
-                </Table.Cell>
-                <Table.Cell class="font-inter text-base leading-6 font-medium tracking-normal">
-                  {request.productName}
-                </Table.Cell>
-                <Table.Cell class="text-gray-500">{formatDate(request.createdAt)}</Table.Cell>
-                <Table.Cell>
+              <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                <div>
+                  <p class="text-xs text-gray-400">{m.requests_product()}</p>
+                  <p class="text-gray-700">{request.productName}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-400">{m.requests_date()}</p>
+                  <p class="text-gray-700">{formatDate(request.createdAt)}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-400">{m.requests_available()}</p>
                   <div class={getClass(request.availableUsage)}>{request.availableUsage}</div>
-                </Table.Cell>
-                <Table.Cell class="text-gray-700">
-                  <div class="flex items-center gap-2">
-                    <button
-                      disabled={isEnabled(request.availableUsage)}
-                      type="button"
-                      class="inline-flex min-w-26 items-center justify-center gap-2 rounded-lg bg-emerald-100 px-3 py-2 text-sm font-medium text-emerald-500 transition disabled:cursor-not-allowed disabled:bg-emerald-50 disabled:text-emerald-300"
-                    >
-                      <CircleCheck class="h-4 w-4" />
-                      <span>{m.requests_approve()}</span>
-                    </button>
-                    <button
-                      type="button"
-                      class="inline-flex min-w-26 items-center justify-center gap-2 rounded-lg bg-red-100 px-3 py-2 text-sm font-medium text-red-500 transition"
-                    >
-                      <CircleX class="h-4 w-4" />
-                      <span>{m.requests_deny()}</span>
-                    </button>
-                  </div>
-                </Table.Cell>
+                </div>
+              </div>
+              <RequestActions
+                requestId={request.id}
+                userName={request.userName}
+                productName={request.productName}
+                availableUsage={request.availableUsage}
+                approveFormData={data.approveForms[i]}
+                rejectFormData={data.rejectForms[i]}
+              />
+            </li>
+          {/each}
+        </ul>
+
+        <!-- Desktop table -->
+        <div class="hidden border-t sm:block">
+          <Table.Root>
+            <Table.Header class="bg-slate-50">
+              <Table.Row class="[&>th]:text-neutral-500">
+                <Table.Head class="pl-6">{m.requests_user()}</Table.Head>
+                <Table.Head>{m.requests_product()}</Table.Head>
+                <Table.Head>{m.requests_date()}</Table.Head>
+                <Table.Head>{m.requests_available()}</Table.Head>
+                <Table.Head class="pr-6">{m.requests_actions()}</Table.Head>
               </Table.Row>
-            {/each}
-          </Table.Body>
-        </Table.Root>
-      </div>
+            </Table.Header>
+
+            <Table.Body>
+              {#each data.requests as request, i (request.id)}
+                <Table.Row>
+                  <Table.Cell class="flex flex-col gap-1 py-3 pl-6">
+                    <p class="font-inter text-base leading-6 font-medium tracking-normal">{request.userName}</p>
+                    <p class="font-inter text-sm leading-5 font-normal tracking-normal text-gray-500">
+                      {request.email}
+                    </p>
+                  </Table.Cell>
+                  <Table.Cell class="font-inter text-base leading-6 font-medium tracking-normal">
+                    {request.productName}
+                  </Table.Cell>
+                  <Table.Cell class="text-gray-500">{formatDate(request.createdAt)}</Table.Cell>
+                  <Table.Cell>
+                    <div class={getClass(request.availableUsage)}>{request.availableUsage}</div>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <RequestActions
+                      requestId={request.id}
+                      userName={request.userName}
+                      productName={request.productName}
+                      availableUsage={request.availableUsage}
+                      approveFormData={data.approveForms[i]}
+                      rejectFormData={data.rejectForms[i]}
+                    />
+                  </Table.Cell>
+                </Table.Row>
+              {/each}
+            </Table.Body>
+          </Table.Root>
+        </div>
+      {/if}
     </div>
   </div>
 </div>

@@ -1,0 +1,1 @@
+ALTER TABLE "license_request" ADD COLUMN "rejection_reason" text;

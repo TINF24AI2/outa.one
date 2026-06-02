@@ -155,6 +155,68 @@ export function licenseRequestNotificationEmail(requesterName: string, requester
   return base(content, "You received this email because a license request was submitted that requires admin approval.");
 }
 
+export function licenseApprovedEmail(userName: string, productName: string) {
+  const content = `
+    <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#09090b;letter-spacing:-0.3px;">Your license request was approved</h1>
+    <p style="margin:0 0 24px;font-size:15px;color:#52525b;line-height:1.6;">
+      Hi ${userName}, your request for a <strong style="color:#09090b;">${productName}</strong> license has been approved. You can now access the software through the portal.
+    </p>
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr>
+        <td style="background-color:${BRAND_LIGHT};border-radius:8px;padding:14px 16px;">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="padding-bottom:8px;">
+                <span style="font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:0.5px;">Approved product</span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span style="font-size:15px;font-weight:600;color:#09090b;">${productName}</span>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <p style="margin:0;font-size:13px;color:#a1a1aa;">
+      Log in to the portal to view your assigned license.
+    </p>
+  `;
+
+  return base(content, "You received this email because your license request was reviewed by an administrator.");
+}
+
+export function licenseRejectedEmail(userName: string, productName: string, reason?: string) {
+  const reasonBlock = reason
+    ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+        <tr>
+          <td style="background-color:#fef2f2;border-radius:8px;padding:14px 16px;border-left:3px solid #ef4444;">
+            <p style="margin:0 0 4px;font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:0.5px;">Reason</p>
+            <p style="margin:0;font-size:14px;color:#09090b;line-height:1.5;">${reason}</p>
+          </td>
+        </tr>
+      </table>`
+    : "";
+
+  const content = `
+    <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#09090b;letter-spacing:-0.3px;">Your license request was not approved</h1>
+    <p style="margin:0 0 24px;font-size:15px;color:#52525b;line-height:1.6;">
+      Hi ${userName}, unfortunately your request for a <strong style="color:#09090b;">${productName}</strong> license could not be approved at this time.
+    </p>
+
+    ${reasonBlock}
+
+    <p style="margin:0;font-size:13px;color:#a1a1aa;">
+      If you have any questions, please contact your administrator.
+    </p>
+  `;
+
+  return base(content, "You received this email because your license request was reviewed by an administrator.");
+}
+
 export function resetPasswordEmail(url: string) {
   const content = `
     <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#09090b;letter-spacing:-0.3px;">Reset your password</h1>

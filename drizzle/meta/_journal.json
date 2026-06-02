@@ -50,6 +50,13 @@
       "when": 1779628486454,
       "tag": "0006_pale_invaders",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1780423255455,
+      "tag": "0007_clear_reavers",
+      "breakpoints": true
     }
   ]
 }
