@@ -155,11 +155,11 @@ export function licenseRequestNotificationEmail(requesterName: string, requester
   return base(content, "You received this email because a license request was submitted that requires admin approval.");
 }
 
-export function licenseApprovedEmail(userName: string, productName: string) {
+export function licenseApprovedEmail(userName: string, productName: string, licenseKey: string) {
   const content = `
     <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#09090b;letter-spacing:-0.3px;">Your license request was approved</h1>
     <p style="margin:0 0 24px;font-size:15px;color:#52525b;line-height:1.6;">
-      Hi ${userName}, your request for a <strong style="color:#09090b;">${productName}</strong> license has been approved. You can now access the software through the portal.
+      Hi ${userName}, your request for a <strong style="color:#09090b;">${productName}</strong> license has been approved.
     </p>
 
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
@@ -168,12 +168,22 @@ export function licenseApprovedEmail(userName: string, productName: string) {
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
               <td style="padding-bottom:8px;">
-                <span style="font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:0.5px;">Approved product</span>
+                <span style="font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:0.5px;">Product</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding-bottom:16px;">
+                <span style="font-size:15px;font-weight:600;color:#09090b;">${productName}</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding-bottom:8px;">
+                <span style="font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:0.5px;">License key</span>
               </td>
             </tr>
             <tr>
               <td>
-                <span style="font-size:15px;font-weight:600;color:#09090b;">${productName}</span>
+                <code style="font-size:14px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#09090b;background:#e4e4e7;border-radius:4px;padding:3px 6px;word-break:break-all;">${licenseKey}</code>
               </td>
             </tr>
           </table>
@@ -182,7 +192,7 @@ export function licenseApprovedEmail(userName: string, productName: string) {
     </table>
 
     <p style="margin:0;font-size:13px;color:#a1a1aa;">
-      Log in to the portal to view your assigned license.
+      Keep this key safe. You can also view it at any time by logging in to the portal.
     </p>
   `;
 

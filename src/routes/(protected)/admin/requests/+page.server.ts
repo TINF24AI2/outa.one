@@ -91,7 +91,7 @@ export const actions: Actions = {
 
     // Find a license for this product with available capacity
     const [availableLicense] = await db
-      .select({ id: license.id })
+      .select({ id: license.id, key: license.key })
       .from(license)
       .leftJoin(licenseUser, eq(license.id, licenseUser.licenseId))
       .where(eq(license.productId, request.productId))
@@ -108,8 +108,6 @@ export const actions: Actions = {
 
     await db.update(licenseRequest).set({ status: "approved" }).where(eq(licenseRequest.id, form.data.requestId));
 
-    const result = { userName: request.userName, userEmail: request.userEmail, productName: request.productName };
-
     await createAuditLog(event, {
       action: "license_request.approved",
       entityType: "license_request",
@@ -117,9 +115,9 @@ export const actions: Actions = {
     });
 
     await sendEmail({
-      to: result.userEmail,
-      subject: `Your ${result.productName} license has been approved`,
-      html: licenseApprovedEmail(result.userName, result.productName),
+      to: request.userEmail,
+      subject: `Your ${request.productName} license has been approved`,
+      html: licenseApprovedEmail(request.userName, request.productName, availableLicense.key),
     });
 
     return { form };
