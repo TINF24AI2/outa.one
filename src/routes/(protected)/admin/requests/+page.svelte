@@ -6,24 +6,11 @@
   import PageHeader from "$lib/components/app/page-header.svelte";
   import * as Table from "$lib/components/ui/table";
   import { m } from "$lib/paraglide/messages";
+  import { getLocale } from "$lib/paraglide/runtime";
 
-  type RequestItem = {
-    userName: string;
-    email: string;
-    product: string;
-    date: string;
-    available: number;
-  };
+  import type { PageData } from "./$types";
 
-  const requests: RequestItem[] = [
-    {
-      userName: "name nachnname",
-      email: "email@test.de",
-      product: "Adobe Creative Cloud",
-      date: "Jan 1, 2003, 12:30 PM",
-      available: 5,
-    },
-  ];
+  let { data }: { data: PageData } = $props();
 
   function getClass(num: number) {
     if (num === 0) {
@@ -38,6 +25,17 @@
   function isEnabled(num: number): boolean {
     return num === 0;
   }
+
+  function formatDate(date: Date | string) {
+    return new Intl.DateTimeFormat(getLocale(), {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: getLocale().startsWith("en"),
+    }).format(new Date(date));
+  }
 </script>
 
 <svelte:head>
@@ -50,18 +48,18 @@
 
   <div class="mx-auto w-full max-w-7xl flex-1 overflow-auto px-4 py-6 sm:px-6">
     <div class="group mb-6 flex h-28 w-full flex-col rounded-lg border border-gray-200 bg-white p-4 transition-colors">
-      <p class="mb-1 text-xs text-gray-500 sm:text-sm">Pending Requests</p>
-      <p class="mt-1 text-2xl font-bold text-gray-900 sm:text-3xl">5 pending requests</p>
+      <p class="mb-1 text-xs text-gray-500 sm:text-sm">{m.requests_pending_requests()}</p>
+      <p class="mt-1 text-2xl font-bold text-gray-900 sm:text-3xl">{data.requests.length}</p>
     </div>
 
     <div class="overflow-hidden rounded-lg border bg-white">
-      <div class="border-b px-4 py-4 sm:px-6">
-        <p class="mt-1 text-xl font-bold text-gray-900 sm:text-3xl">5</p>
-        <p class="mb-1 text-xs text-gray-500 sm:text-sm">test</p>
+      <div class="mt-6 mb-6 hidden sm:block sm:px-6">
+        <p class="text-xl leading-7 font-semibold">{m.requests_pending_requests()}</p>
+        <p class="mb-1 text-xs text-gray-500 sm:text-sm">{data.requests.length} {m.requests_pending_requests_sub()}</p>
       </div>
 
       <ul class="divide-y sm:hidden">
-        {#each requests as request (request.email)}
+        {#each data.requests as request (request.id)}
           <li class="flex flex-col gap-3 p-4">
             <div class="flex items-center justify-between gap-3">
               <div class="min-w-0">
@@ -71,33 +69,33 @@
             </div>
             <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
               <div>
-                <p class="text-xs text-gray-400">Produkte</p>
-                <p class="text-gray-700">{request.product}</p>
+                <p class="text-xs text-gray-400">{m.requests_user()}</p>
+                <p class="text-gray-700">{request.productName}</p>
               </div>
               <div>
-                <p class="text-xs text-gray-400">Datum</p>
-                <p class="text-gray-700">{request.date}</p>
+                <p class="text-xs text-gray-400">{m.requests_date()}</p>
+                <p class="text-gray-700">{formatDate(request.createdAt)}</p>
               </div>
               <div>
-                <p class="text-xs text-gray-400">Verfügbare Lizenzen</p>
-                <div class={getClass(request.available)}>{request.available}</div>
+                <p class="text-xs text-gray-400">{m.requests_available()}</p>
+                <div class={getClass(request.availableUsage)}>{request.availableUsage}</div>
               </div>
             </div>
             <div class="flex items-center gap-2">
               <button
-                disabled={isEnabled(request.available)}
+                disabled={isEnabled(request.availableUsage)}
                 type="button"
-                class="inline-flex min-w-[104px] items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-sm font-medium text-green-500 transition disabled:cursor-not-allowed disabled:bg-green-50 disabled:text-green-300"
+                class="inline-flex min-w-26 items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-sm font-medium text-green-500 transition disabled:cursor-not-allowed disabled:bg-green-50 disabled:text-green-300"
               >
                 <CircleCheck class="h-4 w-4" />
-                <span>Akzeptieren</span>
+                <span>{m.requests_approve()}</span>
               </button>
               <button
                 type="button"
-                class="inline-flex min-w-[104px] items-center justify-center gap-2 rounded-lg bg-red-100 px-3 py-2 text-sm font-medium text-red-500 transition"
+                class="inline-flex min-w-26 items-center justify-center gap-2 rounded-lg bg-red-100 px-3 py-2 text-sm font-medium text-red-500 transition"
               >
                 <CircleX class="h-4 w-4" />
-                <span>Ablehnen</span>
+                <span>{m.requests_deny()}</span>
               </button>
             </div>
           </li>
@@ -108,44 +106,44 @@
         <Table.Root>
           <Table.Header class="bg-slate-50">
             <Table.Row class="[&>th]:text-neutral-500">
-              <Table.Head class="pl-6">Nutzer</Table.Head>
-              <Table.Head>Produkte</Table.Head>
-              <Table.Head>Datum</Table.Head>
-              <Table.Head>Verfügbare Lizenzen</Table.Head>
-              <Table.Head class="pr-6">Aktionen</Table.Head>
+              <Table.Head class="pl-6">{m.requests_user()}</Table.Head>
+              <Table.Head>{m.requests_product()}</Table.Head>
+              <Table.Head>{m.requests_date()}</Table.Head>
+              <Table.Head>{m.requests_available()}</Table.Head>
+              <Table.Head class="pr-6">{m.requests_actions()}</Table.Head>
             </Table.Row>
           </Table.Header>
 
           <Table.Body>
-            {#each requests as request (request.email)}
+            {#each data.requests as request (request.id)}
               <Table.Row>
                 <Table.Cell class="flex flex-col gap-1 py-3 pl-6">
                   <p class="font-inter text-base leading-6 font-medium tracking-normal">{request.userName}</p>
                   <p class="font-inter text-sm leading-5 font-normal tracking-normal text-gray-500">{request.email}</p>
                 </Table.Cell>
                 <Table.Cell class="font-inter text-base leading-6 font-medium tracking-normal">
-                  {request.product}
+                  {request.productName}
                 </Table.Cell>
-                <Table.Cell class="text-gray-500">{request.date}</Table.Cell>
+                <Table.Cell class="text-gray-500">{formatDate(request.createdAt)}</Table.Cell>
                 <Table.Cell>
-                  <div class={getClass(request.available)}>{request.available}</div>
+                  <div class={getClass(request.availableUsage)}>{request.availableUsage}</div>
                 </Table.Cell>
                 <Table.Cell class="text-gray-700">
                   <div class="flex items-center gap-2">
                     <button
-                      disabled={isEnabled(request.available)}
+                      disabled={isEnabled(request.availableUsage)}
                       type="button"
-                      class="inline-flex min-w-[104px] items-center justify-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-sm font-medium text-green-500 transition disabled:cursor-not-allowed disabled:bg-green-50 disabled:text-green-300"
+                      class="inline-flex min-w-26 items-center justify-center gap-2 rounded-lg bg-emerald-100 px-3 py-2 text-sm font-medium text-emerald-500 transition disabled:cursor-not-allowed disabled:bg-emerald-50 disabled:text-emerald-300"
                     >
                       <CircleCheck class="h-4 w-4" />
-                      <span>Akzeptieren</span>
+                      <span>{m.requests_approve()}</span>
                     </button>
                     <button
                       type="button"
-                      class="inline-flex min-w-[104px] items-center justify-center gap-2 rounded-lg bg-red-100 px-3 py-2 text-sm font-medium text-red-500 transition"
+                      class="inline-flex min-w-26 items-center justify-center gap-2 rounded-lg bg-red-100 px-3 py-2 text-sm font-medium text-red-500 transition"
                     >
                       <CircleX class="h-4 w-4" />
-                      <span>Ablehnen</span>
+                      <span>{m.requests_deny()}</span>
                     </button>
                   </div>
                 </Table.Cell>
