@@ -32,6 +32,7 @@ export const load: PageServerLoad = async (event) => {
     .innerJoin(product, eq(licenseRequest.productId, product.id))
     .leftJoin(license, eq(product.id, license.productId))
     .leftJoin(licenseUser, eq(license.id, licenseUser.licenseId))
+    .where(eq(licenseRequest.status, "pending"))
     .groupBy(
       licenseRequest.id,
       licenseRequest.createdAt,

@@ -312,6 +312,7 @@
   "requests_pending_requests": "Pending Requests",
   "requests_pending_requests_sub": "requests awaiting review",
   "requests_product": "Product",
+  "requests_title": "Requests",
   "requests_user": "User",
   "role_admin": "Admin",
   "role_employee": "Employee",

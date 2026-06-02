@@ -312,6 +312,7 @@
   "requests_pending_requests": "Ausstehende Anfragen",
   "requests_pending_requests_sub": "Anfragen warten auf Überprüfung",
   "requests_product": "Produkt",
+  "requests_title": "Lizenzanfragen",
   "requests_user": "Nutzer",
   "role_admin": "Admin",
   "role_employee": "Mitarbeiter",

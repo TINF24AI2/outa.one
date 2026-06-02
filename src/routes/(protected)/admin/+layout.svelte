@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FileKey, LayoutDashboard, Package, Users } from "@lucide/svelte";
+  import { ClipboardList, FileKey, LayoutDashboard, Package, Users } from "@lucide/svelte";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
 
@@ -12,6 +12,7 @@
     { name: m.dashboard_title(), href: resolve("/admin/dashboard"), icon: LayoutDashboard },
     { name: m.products_title(), href: resolve("/admin/products"), icon: Package },
     { name: m.licenses_title(), href: resolve("/admin/licenses"), icon: FileKey },
+    { name: m.requests_title(), href: resolve("/admin/requests"), icon: ClipboardList },
     { name: m.users_title(), href: resolve("/admin/users"), icon: Users },
   ];
 </script>
