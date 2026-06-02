@@ -1,12 +1,12 @@
-import { countDistinct, sql } from "drizzle-orm";
+import { countDistinct, eq, sql } from "drizzle-orm";
 
 import { db } from "$lib/server/db";
-import { license, licenseUser, product } from "$lib/server/db/schema";
+import { license, licenseRequest, licenseUser, product } from "$lib/server/db/schema";
 
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async () => {
-  const [totalLicenses, totalProducts, licensesInUse, availableLicenses] = await Promise.all([
+  const [totalLicenses, totalProducts, licensesInUse, availableLicenses, pendingRequests] = await Promise.all([
     db
       .select({ count: sql<number>`count(*)::int` })
       .from(license)
@@ -26,7 +26,12 @@ export const load: PageServerLoad = async () => {
       .groupBy(license.id, license.usageVolume)
       .having(sql`${license.usageVolume} = 0 OR count(${licenseUser.licenseId})::int < ${license.usageVolume}`)
       .then((rows) => rows.length),
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(licenseRequest)
+      .where(eq(licenseRequest.status, "pending"))
+      .then(([r]) => r.count),
   ]);
 
-  return { totalLicenses, totalProducts, licensesInUse, availableLicenses };
+  return { totalLicenses, totalProducts, licensesInUse, availableLicenses, pendingRequests };
 };
