@@ -57,6 +57,8 @@
     "user.role_updated": m.audit_action_user_role_updated,
     "user.removed": m.audit_action_user_removed,
     "license_request.submitted": m.audit_action_license_request_submitted,
+    "license_request.approved": m.audit_action_license_request_approved,
+    "license_request.rejected": m.audit_action_license_request_rejected,
   };
 
   const ACTION_VARIANTS: Record<AuditAction, "primary" | "secondary" | "success" | "warning" | "destructive"> = {
@@ -73,6 +75,8 @@
     "user.role_updated": "secondary",
     "user.removed": "destructive",
     "license_request.submitted": "primary",
+    "license_request.approved": "success",
+    "license_request.rejected": "destructive",
   };
 
   function getActionLabel(action: string) {

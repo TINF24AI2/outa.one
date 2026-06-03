@@ -94,6 +94,7 @@ export const licenseRequest = defineTableWithUpdate(
       .notNull()
       .references(() => product.id, { onDelete: "cascade" }),
     status: licenseRequestStatusEnum("status").notNull().default("pending"),
+    rejectionReason: text("rejection_reason"),
   },
   (table) => [
     index("license_request_user_id_idx").on(table.userId),

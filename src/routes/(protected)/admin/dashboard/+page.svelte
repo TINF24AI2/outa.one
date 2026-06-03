@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Activity, FileKey, Package, Plus, Upload } from "@lucide/svelte";
+  import { Activity, ClipboardList, FileKey, Package, Plus, Upload } from "@lucide/svelte";
   import { resolve } from "$app/paths";
 
   import PageHeader from "$lib/components/app/page-header.svelte";
@@ -16,7 +16,7 @@
 <div class="flex h-full w-full flex-col overflow-hidden">
   <PageHeader title={m.admin_dashboard()} subtitle={m.admin_dashboard_subtile()}></PageHeader>
   <div class="mx-auto w-full max-w-7xl flex-1 space-y-8 overflow-auto px-4 py-6 sm:px-6">
-    <div class="grid w-full grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+    <div class="grid w-full grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
       <a
         href={resolve("/admin/licenses")}
         class="group flex flex-col rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:border-blue-300 hover:bg-blue-50 sm:p-6"
@@ -69,14 +69,18 @@
         <p class="mt-1 text-2xl font-bold text-gray-900 sm:text-3xl">{data.totalProducts}</p>
       </a>
 
-      <!-- Pending requests — not yet implemented -->
-      <!-- <div class="flex flex-col rounded-lg border border-gray-200 bg-white p-6">
-        <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-orange-100">
-          <ClipboardList class="h-5 w-5 text-orange-400" />
+      <a
+        href={resolve("/admin/requests")}
+        class="group col-span-2 flex flex-col rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:border-orange-300 hover:bg-orange-50 sm:p-6 lg:col-span-1"
+      >
+        <div
+          class="mb-2 flex h-9 w-9 items-center justify-center rounded-md bg-orange-100 transition-colors group-hover:bg-orange-200 sm:mb-4 sm:h-10 sm:w-10"
+        >
+          <ClipboardList class="h-4 w-4 text-orange-500 sm:h-5 sm:w-5" />
         </div>
-        <p class="text-sm text-gray-500">{m.admin_dashboard_pending_requests()}</p>
-        <p class="mt-1 text-3xl font-bold text-gray-900">0</p>
-      </div> -->
+        <p class="text-xs text-gray-500 sm:text-sm">{m.admin_dashboard_pending_requests()}</p>
+        <p class="mt-1 text-2xl font-bold text-gray-900 sm:text-3xl">{data.pendingRequests}</p>
+      </a>
     </div>
 
     <div class="w-full">

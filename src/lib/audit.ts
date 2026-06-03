@@ -11,7 +11,9 @@ export type AuditAction =
   | "user.invite_cancelled"
   | "user.role_updated"
   | "user.removed"
-  | "license_request.submitted";
+  | "license_request.submitted"
+  | "license_request.approved"
+  | "license_request.rejected";
 
 export type AuditEntityType = "license" | "product" | "user" | "invite" | "license_request";
 
@@ -36,6 +38,8 @@ export const AUDIT_ACTIONS: AuditAction[] = [
   "user.role_updated",
   "user.removed",
   "license_request.submitted",
+  "license_request.approved",
+  "license_request.rejected",
 ];
 
 export const AUDIT_ENTITY_TYPES: AuditEntityType[] = ["license", "product", "user", "invite", "license_request"];
