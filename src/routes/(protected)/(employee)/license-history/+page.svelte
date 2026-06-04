@@ -1,7 +1,6 @@
 <script lang="ts">
   import { History } from "@lucide/svelte";
 
-  import LicenseKeyCell from "$lib/components/app/license-key-cell.svelte";
   import PageHeader from "$lib/components/app/page-header.svelte";
   import StatusBadge from "$lib/components/app/status-badge.svelte";
   import * as Table from "$lib/components/ui/table";
@@ -42,20 +41,10 @@
     }).format(new Date(date));
   }
 
-  function getLicenseKey(action: LicenseAction, metadata: Record<string, string> | null): string | null {
-    if (!metadata?.licenseKey) return null;
-    if (
-      action === "license_request.approved" ||
-      action === "license.user_assigned" ||
-      action === "license.user_unassigned"
-    ) {
-      return metadata.licenseKey;
-    }
-    return null;
-  }
-
-  function getRejectionReason(action: LicenseAction, metadata: Record<string, string> | null): string | null {
+  function getDetail(action: LicenseAction, metadata: Record<string, string> | null): string | null {
     if (action === "license_request.rejected" && metadata?.reason) return metadata.reason;
+    if (action === "license.user_assigned") return m.license_history_detail_assigned();
+    if (action === "license.user_unassigned") return m.license_history_detail_unassigned();
     return null;
   }
 </script>
@@ -90,8 +79,7 @@
         <!-- Mobile list -->
         <ul class="divide-y border-t sm:hidden">
           {#each data.events as event (event.id)}
-            {@const licenseKey = getLicenseKey(event.action, event.metadata)}
-            {@const reason = getRejectionReason(event.action, event.metadata)}
+            {@const detail = getDetail(event.action, event.metadata)}
             <li class="flex flex-col gap-2 p-4">
               <div class="flex items-start justify-between gap-3">
                 <p class="font-semibold text-gray-900">{event.metadata?.productName ?? "—"}</p>
@@ -99,10 +87,8 @@
                   {eventLabel[event.action]}
                 </StatusBadge>
               </div>
-              {#if licenseKey}
-                <LicenseKeyCell key={licenseKey} />
-              {:else if reason}
-                <p class="text-xs text-gray-500">{reason}</p>
+              {#if detail}
+                <p class="text-xs text-gray-500">{detail}</p>
               {/if}
               <p class="text-xs text-gray-400">{formatDate(event.createdAt)}</p>
             </li>
@@ -122,8 +108,7 @@
             </Table.Header>
             <Table.Body>
               {#each data.events as event (event.id)}
-                {@const licenseKey = getLicenseKey(event.action, event.metadata)}
-                {@const reason = getRejectionReason(event.action, event.metadata)}
+                {@const detail = getDetail(event.action, event.metadata)}
                 <Table.Row>
                   <Table.Cell class="py-3 pl-6">
                     <StatusBadge variant={eventVariant[event.action]}>
@@ -134,10 +119,8 @@
                     {event.metadata?.productName ?? "—"}
                   </Table.Cell>
                   <Table.Cell>
-                    {#if licenseKey}
-                      <LicenseKeyCell key={licenseKey} />
-                    {:else if reason}
-                      <span class="text-sm text-gray-500">{reason}</span>
+                    {#if detail}
+                      <span class="text-sm text-gray-500">{detail}</span>
                     {:else}
                       <span class="text-sm text-gray-400">—</span>
                     {/if}

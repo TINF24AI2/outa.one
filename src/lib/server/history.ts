@@ -36,14 +36,16 @@ export async function getUserLicenseHistory(userId: string) {
   const requestedProductIds = new Set(requests.map((r) => r.productId));
 
   return [
-    ...requests.map((r) => ({
-      id: r.id,
-      productName: r.productName,
-      licenceKey: assignmentByProduct.get(r.productId) ?? null,
-      requestedAt: r.requestedAt,
-      status: r.status,
-      rejectionReason: r.rejectionReason,
-    })),
+    ...requests
+      .filter((r) => r.status !== "approved" || assignmentByProduct.has(r.productId))
+      .map((r) => ({
+        id: r.id,
+        productName: r.productName,
+        licenceKey: assignmentByProduct.get(r.productId) ?? null,
+        requestedAt: r.requestedAt,
+        status: r.status,
+        rejectionReason: r.rejectionReason,
+      })),
     ...assignments
       .filter((a) => !requestedProductIds.has(a.productId))
       .map((a) => ({
