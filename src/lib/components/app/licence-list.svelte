@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { Eye, EyeOff } from "@lucide/svelte";
-  import { SvelteSet } from "svelte/reactivity";
-
   import { m } from "$lib/paraglide/messages";
   import { getLocale } from "$lib/paraglide/runtime";
 
   import * as Table from "../ui/table";
+  import LicenseKeyCell from "./license-key-cell.svelte";
   import StatusBadge from "./status-badge.svelte";
 
   type LicenseEntry = {
@@ -25,15 +23,6 @@
 
   const assigned = $derived(licenses.filter((l) => l.status === "active" || l.status === "approved"));
   const requests = $derived(licenses.filter((l) => l.status === "pending" || l.status === "rejected"));
-
-  let visibleKeys = $state(new Set<string>());
-
-  function toggleKey(id: string) {
-    const next = new SvelteSet(visibleKeys);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    visibleKeys = next;
-  }
 
   const statusVariant: Record<string, "success" | "warning" | "destructive" | "secondary"> = {
     active: "success",
@@ -137,25 +126,9 @@
                 {statusLabel[license.status] ?? license.status}
               </StatusBadge>
             </div>
-            <div class="flex items-center gap-2">
-              <p class="font-mono text-xs text-gray-500">
-                {visibleKeys.has(license.id) ? (license.licenceKey ?? "—") : "••••••••••••••••"}
-              </p>
-              {#if license.licenceKey}
-                <button
-                  type="button"
-                  onclick={() => toggleKey(license.id)}
-                  class="text-gray-400 hover:text-gray-600"
-                  aria-label={visibleKeys.has(license.id) ? m.licenses_key_hide() : m.licenses_key_show()}
-                >
-                  {#if visibleKeys.has(license.id)}
-                    <EyeOff class="h-3.5 w-3.5" />
-                  {:else}
-                    <Eye class="h-3.5 w-3.5" />
-                  {/if}
-                </button>
-              {/if}
-            </div>
+            {#if license.licenceKey}
+              <LicenseKeyCell key={license.licenceKey} />
+            {/if}
             <p class="text-xs text-gray-400">{formatDate(license.requestedAt)}</p>
           </li>
         {/each}
@@ -179,25 +152,11 @@
                   {license.productName}
                 </Table.Cell>
                 <Table.Cell>
-                  <div class="flex items-center gap-2">
-                    <span class="font-mono text-sm text-gray-500">
-                      {visibleKeys.has(license.id) ? (license.licenceKey ?? "—") : "••••••••••••••••"}
-                    </span>
-                    {#if license.licenceKey}
-                      <button
-                        type="button"
-                        onclick={() => toggleKey(license.id)}
-                        class="text-gray-400 hover:text-gray-600"
-                        aria-label={visibleKeys.has(license.id) ? m.licenses_key_hide() : m.licenses_key_show()}
-                      >
-                        {#if visibleKeys.has(license.id)}
-                          <EyeOff class="h-4 w-4" />
-                        {:else}
-                          <Eye class="h-4 w-4" />
-                        {/if}
-                      </button>
-                    {/if}
-                  </div>
+                  {#if license.licenceKey}
+                    <LicenseKeyCell key={license.licenceKey} />
+                  {:else}
+                    <span class="text-sm text-gray-400">—</span>
+                  {/if}
                 </Table.Cell>
                 <Table.Cell class="text-gray-500">{formatDate(license.requestedAt)}</Table.Cell>
                 <Table.Cell class="pr-6">

@@ -1,5 +1,5 @@
 import { fail, type Actions } from "@sveltejs/kit";
-import { and, eq, gt, sql } from "drizzle-orm";
+import { and, eq, gt, notInArray, sql } from "drizzle-orm";
 import { message, superValidate } from "sveltekit-superforms";
 import { zod4 as zod } from "sveltekit-superforms/adapters";
 
@@ -89,12 +89,25 @@ export const actions: Actions = {
     if (!request) return message(form, "Request not found", { status: 404 });
     if (request.status !== "pending") return message(form, "Request is no longer pending", { status: 400 });
 
-    // Find a license for this product with available capacity
+    // Find licenses the user is already assigned to for this product
+    const alreadyAssigned = await db
+      .select({ licenseId: licenseUser.licenseId })
+      .from(licenseUser)
+      .innerJoin(license, eq(license.id, licenseUser.licenseId))
+      .where(and(eq(licenseUser.userId, request.userId), eq(license.productId, request.productId)));
+
+    const excludeIds = alreadyAssigned.map((r) => r.licenseId);
+
+    // Find a license for this product with available capacity that the user doesn't already hold
     const [availableLicense] = await db
       .select({ id: license.id, key: license.key })
       .from(license)
       .leftJoin(licenseUser, eq(license.id, licenseUser.licenseId))
-      .where(eq(license.productId, request.productId))
+      .where(
+        excludeIds.length > 0
+          ? and(eq(license.productId, request.productId), notInArray(license.id, excludeIds))
+          : eq(license.productId, request.productId),
+      )
       .groupBy(license.id)
       .having(gt(sql`${license.usageVolume} - count(${licenseUser.userId})`, 0))
       .limit(1);
