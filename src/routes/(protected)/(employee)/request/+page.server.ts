@@ -1,5 +1,5 @@
 import { fail } from "@sveltejs/kit";
-import { and, eq } from "drizzle-orm";
+import { and, eq, notInArray } from "drizzle-orm";
 import { message, superValidate } from "sveltekit-superforms";
 import { zod4 as zod } from "sveltekit-superforms/adapters";
 
@@ -135,10 +135,22 @@ export const actions: Actions = {
       return { form, pending: true, productName: prod.name };
     }
 
+    const alreadyAssigned = await db
+      .select({ licenseId: licenseUser.licenseId })
+      .from(licenseUser)
+      .innerJoin(license, eq(license.id, licenseUser.licenseId))
+      .where(and(eq(licenseUser.userId, user.id), eq(license.productId, form.data.productId)));
+
+    const excludeIds = alreadyAssigned.map((r) => r.licenseId);
+
     const productLicenses = await db
       .select({ id: license.id, key: license.key })
       .from(license)
-      .where(eq(license.productId, form.data.productId));
+      .where(
+        excludeIds.length > 0
+          ? and(eq(license.productId, form.data.productId), notInArray(license.id, excludeIds))
+          : eq(license.productId, form.data.productId),
+      );
 
     for (const lic of productLicenses) {
       const result = await assignUserToLicense(lic.id, user.id);
