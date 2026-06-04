@@ -108,7 +108,11 @@ export const actions: Actions = {
         action: "license_request.submitted",
         entityType: "license_request",
         entityId: insertedRequest?.id,
-        metadata: { productId: form.data.productId, productName: prod.name },
+        metadata: {
+          targetUserId: user.id,
+          productId: form.data.productId,
+          productName: prod.name,
+        },
       });
 
       const admins = await db
@@ -143,7 +147,12 @@ export const actions: Actions = {
           action: "license.user_assigned",
           entityType: "license",
           entityId: lic.id,
-          metadata: { productId: form.data.productId, productName: prod.name },
+          metadata: {
+            targetUserId: user.id,
+            productId: form.data.productId,
+            productName: prod.name,
+            licenseKey: lic.key,
+          },
         });
         return { form, licenseKey: lic.key, productName: prod.name };
       }

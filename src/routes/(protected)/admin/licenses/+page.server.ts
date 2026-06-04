@@ -126,11 +126,26 @@ export const actions: Actions = {
       };
       return message(form, reasonToMessage[res.reason], { status: 409 });
     }
+    const [licInfo] = await db
+      .select({
+        licenseKey: license.key,
+        productId: product.id,
+        productName: product.name,
+      })
+      .from(license)
+      .innerJoin(product, eq(license.productId, product.id))
+      .where(eq(license.id, form.data.licenseId));
+
     await createAuditLog(event, {
       action: "license.user_assigned",
       entityType: "license",
       entityId: form.data.licenseId,
-      metadata: { assignedUserId: form.data.userId },
+      metadata: {
+        targetUserId: form.data.userId,
+        productId: licInfo?.productId,
+        productName: licInfo?.productName,
+        licenseKey: licInfo?.licenseKey,
+      },
     });
     return { form };
   },
@@ -141,12 +156,27 @@ export const actions: Actions = {
     if (!form.valid) return fail(400, { form });
 
     try {
+      const [licInfo] = await db
+        .select({
+          licenseKey: license.key,
+          productId: product.id,
+          productName: product.name,
+        })
+        .from(license)
+        .innerJoin(product, eq(license.productId, product.id))
+        .where(eq(license.id, form.data.licenseId));
+
       await unassignUserFromLicense(form.data.licenseId, form.data.userId);
       await createAuditLog(event, {
         action: "license.user_unassigned",
         entityType: "license",
         entityId: form.data.licenseId,
-        metadata: { removedUserId: form.data.userId },
+        metadata: {
+          targetUserId: form.data.userId,
+          productId: licInfo?.productId,
+          productName: licInfo?.productName,
+          licenseKey: licInfo?.licenseKey,
+        },
       });
       return { form };
     } catch (error) {

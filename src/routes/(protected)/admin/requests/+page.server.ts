@@ -112,6 +112,12 @@ export const actions: Actions = {
       action: "license_request.approved",
       entityType: "license_request",
       entityId: form.data.requestId,
+      metadata: {
+        targetUserId: request.userId,
+        productId: request.productId,
+        productName: request.productName,
+        licenseKey: availableLicense.key,
+      },
     });
 
     await sendEmail({
@@ -131,6 +137,8 @@ export const actions: Actions = {
     const [request] = await db
       .select({
         id: licenseRequest.id,
+        userId: licenseRequest.userId,
+        productId: licenseRequest.productId,
         status: licenseRequest.status,
         userName: user.name,
         userEmail: user.email,
@@ -154,7 +162,12 @@ export const actions: Actions = {
       action: "license_request.rejected",
       entityType: "license_request",
       entityId: form.data.requestId,
-      metadata: { reason: form.data.reason },
+      metadata: {
+        targetUserId: request.userId,
+        productId: request.productId,
+        productName: request.productName,
+        reason: form.data.reason,
+      },
     });
 
     await sendEmail({
