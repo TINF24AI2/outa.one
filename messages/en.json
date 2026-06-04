@@ -165,6 +165,7 @@
   "license_history_event_rejected": "Request Rejected",
   "license_history_event_submitted": "License Requested",
   "license_history_event_unassigned": "License Revoked",
+  "license_history_events_count": "{count} events",
   "license_history_meta_title": "Outa - License History",
   "license_history_subtitle": "A record of all license-related activity on your account.",
   "license_history_table_date": "Date",

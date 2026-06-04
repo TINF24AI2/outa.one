@@ -62,10 +62,10 @@
 
 <div class="flex flex-col gap-6">
   {#if requests.length > 0}
-    <div class="mt-6 hidden sm:block">
-      <p class="text-xl leading-7 font-semibold">{m.history_section_requests()}</p>
-    </div>
     <div class="overflow-hidden rounded-lg border bg-white">
+      <div class="mt-6 mb-6 hidden sm:block sm:px-6">
+        <p class="text-xl leading-7 font-semibold">{m.history_section_requests()}</p>
+      </div>
       <!-- Mobile cards -->
       <ul class="divide-y border-t sm:hidden">
         {#each requests as license (license.id)}
@@ -85,7 +85,7 @@
       </ul>
 
       <!-- Desktop table -->
-      <div class="hidden sm:block">
+      <div class="hidden border-t sm:block">
         <Table.Root>
           <Table.Header class="bg-slate-50">
             <Table.Row class="[&>th]:text-neutral-500">
@@ -118,17 +118,17 @@
   {/if}
 
   <!-- Assigned Licenses -->
-  <div class="mt-6 hidden sm:block">
-    <p class="text-xl leading-7 font-semibold">{m.history_section_assigned()}</p>
-  </div>
   <div class="overflow-hidden rounded-lg border bg-white">
+    <div class="mt-6 mb-6 hidden sm:block sm:px-6">
+      <p class="text-xl leading-7 font-semibold">{m.history_section_assigned()}</p>
+    </div>
     {#if assigned.length === 0}
-      <div class="flex flex-col items-center gap-3 py-16 text-center">
+      <div class="flex flex-col items-center gap-3 border-t py-16 text-center">
         <p class="text-sm text-gray-500">{m.history_empty_assigned()}</p>
       </div>
     {:else}
       <!-- Mobile cards -->
-      <ul class="divide-y sm:hidden">
+      <ul class="divide-y border-t sm:hidden">
         {#each assigned as license (license.id)}
           <li class="flex flex-col gap-2 p-4">
             <div class="flex items-start justify-between gap-3">
@@ -162,7 +162,7 @@
       </ul>
 
       <!-- Desktop table -->
-      <div class="hidden sm:block">
+      <div class="hidden border-t sm:block">
         <Table.Root>
           <Table.Header class="bg-slate-50">
             <Table.Row class="[&>th]:text-neutral-500">

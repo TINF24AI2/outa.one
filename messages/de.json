@@ -165,6 +165,7 @@
   "license_history_event_rejected": "Anfrage abgelehnt",
   "license_history_event_submitted": "Lizenz angefragt",
   "license_history_event_unassigned": "Lizenz entzogen",
+  "license_history_events_count": "{count} Ereignisse",
   "license_history_meta_title": "Outa - Lizenzverlauf",
   "license_history_subtitle": "Eine Übersicht aller lizenz-bezogenen Aktivitäten auf deinem Konto.",
   "license_history_table_date": "Datum",

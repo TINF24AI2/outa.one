@@ -1,6 +1,7 @@
 <script lang="ts">
   import { History } from "@lucide/svelte";
 
+  import LicenseKeyCell from "$lib/components/app/license-key-cell.svelte";
   import PageHeader from "$lib/components/app/page-header.svelte";
   import StatusBadge from "$lib/components/app/status-badge.svelte";
   import * as Table from "$lib/components/ui/table";
@@ -41,17 +42,20 @@
     }).format(new Date(date));
   }
 
-  function getDetails(action: LicenseAction, metadata: Record<string, string> | null): string | null {
-    if (!metadata) return null;
-    if (action === "license_request.rejected" && metadata.reason) return metadata.reason;
+  function getLicenseKey(action: LicenseAction, metadata: Record<string, string> | null): string | null {
+    if (!metadata?.licenseKey) return null;
     if (
-      (action === "license_request.approved" ||
-        action === "license.user_assigned" ||
-        action === "license.user_unassigned") &&
-      metadata.licenseKey
+      action === "license_request.approved" ||
+      action === "license.user_assigned" ||
+      action === "license.user_unassigned"
     ) {
       return metadata.licenseKey;
     }
+    return null;
+  }
+
+  function getRejectionReason(action: LicenseAction, metadata: Record<string, string> | null): string | null {
+    if (action === "license_request.rejected" && metadata?.reason) return metadata.reason;
     return null;
   }
 </script>
@@ -67,7 +71,9 @@
     <div class="overflow-hidden rounded-lg border bg-white">
       <div class="mt-6 mb-6 hidden sm:block sm:px-6">
         <p class="text-xl leading-7 font-semibold">{m.license_history_title()}</p>
-        <p class="mb-1 text-xs text-gray-500 sm:text-sm">{m.license_history_subtitle()}</p>
+        <p class="mb-1 text-xs text-gray-500 sm:text-sm">
+          {m.license_history_events_count({ count: data.events.length })}
+        </p>
       </div>
 
       {#if data.events.length === 0}
@@ -84,7 +90,8 @@
         <!-- Mobile list -->
         <ul class="divide-y border-t sm:hidden">
           {#each data.events as event (event.id)}
-            {@const details = getDetails(event.action, event.metadata)}
+            {@const licenseKey = getLicenseKey(event.action, event.metadata)}
+            {@const reason = getRejectionReason(event.action, event.metadata)}
             <li class="flex flex-col gap-2 p-4">
               <div class="flex items-start justify-between gap-3">
                 <p class="font-semibold text-gray-900">{event.metadata?.productName ?? "—"}</p>
@@ -92,8 +99,10 @@
                   {eventLabel[event.action]}
                 </StatusBadge>
               </div>
-              {#if details}
-                <p class="font-mono text-xs text-gray-500">{details}</p>
+              {#if licenseKey}
+                <LicenseKeyCell key={licenseKey} />
+              {:else if reason}
+                <p class="text-xs text-gray-500">{reason}</p>
               {/if}
               <p class="text-xs text-gray-400">{formatDate(event.createdAt)}</p>
             </li>
@@ -113,7 +122,8 @@
             </Table.Header>
             <Table.Body>
               {#each data.events as event (event.id)}
-                {@const details = getDetails(event.action, event.metadata)}
+                {@const licenseKey = getLicenseKey(event.action, event.metadata)}
+                {@const reason = getRejectionReason(event.action, event.metadata)}
                 <Table.Row>
                   <Table.Cell class="py-3 pl-6">
                     <StatusBadge variant={eventVariant[event.action]}>
@@ -123,8 +133,14 @@
                   <Table.Cell class="font-inter text-base leading-6 font-medium tracking-normal">
                     {event.metadata?.productName ?? "—"}
                   </Table.Cell>
-                  <Table.Cell class="font-mono text-sm text-gray-500">
-                    {details ?? "—"}
+                  <Table.Cell>
+                    {#if licenseKey}
+                      <LicenseKeyCell key={licenseKey} />
+                    {:else if reason}
+                      <span class="text-sm text-gray-500">{reason}</span>
+                    {:else}
+                      <span class="text-sm text-gray-400">—</span>
+                    {/if}
                   </Table.Cell>
                   <Table.Cell class="pr-6 text-gray-500">{formatDate(event.createdAt)}</Table.Cell>
                 </Table.Row>
