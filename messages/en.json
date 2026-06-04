@@ -158,6 +158,8 @@
   "home_meta_title": "Outa - Welcome",
   "home_subtitle": "A self-service software license keys portal is being created here",
   "home_title": "Welcome back",
+  "license_history_detail_assigned": "Assigned by administrator",
+  "license_history_detail_unassigned": "Access revoked by administrator",
   "license_history_empty_subtitle": "License-related events will appear here once you start requesting or receiving licenses.",
   "license_history_empty_title": "No activity yet",
   "license_history_event_approved": "Request Approved",

@@ -46,7 +46,9 @@ export const load: PageServerLoad = async (event) => {
         break;
       }
       const assigned = assignmentCounts.get(lic.id) ?? 0;
-      available += Math.max(0, lic.usageVolume - assigned);
+      if (!userLicenseIds.has(lic.id)) {
+        available += Math.max(0, lic.usageVolume - assigned);
+      }
       if (lic.usageVolume !== 1) licenseType = "volume";
     }
 
