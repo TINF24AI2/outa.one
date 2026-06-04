@@ -67,7 +67,7 @@
     <div class="overflow-hidden rounded-lg border bg-white">
       <div class="mt-6 mb-6 hidden sm:block sm:px-6">
         <p class="text-xl leading-7 font-semibold">{m.license_history_title()}</p>
-        <p class="mb-1 text-xs text-gray-500 sm:text-sm">{data.events.length} {m.license_history_subtitle()}</p>
+        <p class="mb-1 text-xs text-gray-500 sm:text-sm">{m.license_history_subtitle()}</p>
       </div>
 
       {#if data.events.length === 0}
