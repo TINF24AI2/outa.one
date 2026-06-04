@@ -29,6 +29,7 @@
     "ci:lint": "eslint .",
     "ci:translation": "jsonsort messages/*.json --ci",
     "auth:schema": "better-auth generate --config src/lib/server/auth.ts --output src/lib/server/db/auth.schema.ts --yes",
+    "db:seed": "tsx src/lib/scripts/seed-demo-products-and-licenses.ts",
     "db:seedDemoUsers": "tsx src/lib/scripts/seed-demo-users.server.ts",
     "db:seedDemoProductsAndLicenses": "tsx src/lib/scripts/seed-demo-products-and-licenses.ts"
   },

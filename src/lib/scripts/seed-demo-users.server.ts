@@ -56,10 +56,12 @@ async function seed() {
     console.log(`  added  ${demo.role === "admin" ? "admin  " : "employee"} → ${demo.email}`);
   }
 
-  console.log(`\nDemo credentials:`);
-  console.log(`  Employee : sarah.johnson@company.com`);
-  console.log(`  Admin    : emily.rodriguez@company.com`);
-  console.log(`  Password : ${DEMO_PASSWORD}`);
+  console.log(`\nDemo credentials (password: ${DEMO_PASSWORD}):`);
+  console.log(`  Employees : sarah.johnson@company.com`);
+  console.log(`            : marcus.chen@company.com`);
+  console.log(`            : priya.patel@company.com`);
+  console.log(`  Admins    : emily.rodriguez@company.com`);
+  console.log(`            : david.kim@company.com`);
 
   await client.end();
 }
