@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FileKey, LayoutDashboard } from "@lucide/svelte";
+  import { FileKey, History, LayoutDashboard } from "@lucide/svelte";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
 
@@ -11,6 +11,7 @@
   const pages = [
     { name: m.navigation_request_license(), href: resolve("/request"), icon: LayoutDashboard },
     { name: m.navigation_license_history(), href: resolve("/my-licenses"), icon: FileKey },
+    { name: m.navigation_license_events(), href: resolve("/license-history"), icon: History },
   ];
 </script>
 
