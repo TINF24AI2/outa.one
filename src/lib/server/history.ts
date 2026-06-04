@@ -1,24 +1,58 @@
-import { desc, eq, or, sql } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 import { db } from "$lib/server/db";
-import { auditLog } from "$lib/server/db/schema";
+import { license, licenseRequest, licenseUser, product } from "$lib/server/db/schema";
 
-/**
- * Retrieves the complete license history for a specific user from the audit logs.
- * Includes actions performed by the user (requests) and actions performed on the user (admin assignments/approvals).
- */
 export async function getUserLicenseHistory(userId: string) {
-  const logs = await db
-    .select()
-    .from(auditLog)
-    .where(or(eq(auditLog.userId, userId), sql`${auditLog.metadata}->>'targetUserId' = ${userId}`))
-    .orderBy(desc(auditLog.createdAt));
+  const [requests, assignments] = await Promise.all([
+    db
+      .select({
+        id: licenseRequest.id,
+        productName: product.name,
+        productId: licenseRequest.productId,
+        status: licenseRequest.status,
+        requestedAt: licenseRequest.createdAt,
+        rejectionReason: licenseRequest.rejectionReason,
+      })
+      .from(licenseRequest)
+      .innerJoin(product, eq(licenseRequest.productId, product.id))
+      .where(eq(licenseRequest.userId, userId))
+      .orderBy(desc(licenseRequest.createdAt)),
+    db
+      .select({
+        licenseId: licenseUser.licenseId,
+        licenceKey: license.key,
+        productName: product.name,
+        productId: license.productId,
+        assignedAt: licenseUser.createdAt,
+      })
+      .from(licenseUser)
+      .innerJoin(license, eq(licenseUser.licenseId, license.id))
+      .innerJoin(product, eq(license.productId, product.id))
+      .where(eq(licenseUser.userId, userId)),
+  ]);
 
-  return logs.map((log) => {
-    const metadata = log.metadata as Record<string, unknown> | null;
-    return {
-      ...log,
-      ...metadata,
-    };
-  });
+  const assignmentByProduct = new Map(assignments.map((a) => [a.productId, a.licenceKey]));
+  const requestedProductIds = new Set(requests.map((r) => r.productId));
+
+  return [
+    ...requests.map((r) => ({
+      id: r.id,
+      productName: r.productName,
+      licenceKey: assignmentByProduct.get(r.productId) ?? null,
+      requestedAt: r.requestedAt,
+      status: r.status,
+      rejectionReason: r.rejectionReason,
+    })),
+    ...assignments
+      .filter((a) => !requestedProductIds.has(a.productId))
+      .map((a) => ({
+        id: a.licenseId,
+        productName: a.productName,
+        licenceKey: a.licenceKey,
+        requestedAt: a.assignedAt,
+        status: "active" as const,
+        rejectionReason: null,
+      })),
+  ].sort((a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime());
 }
