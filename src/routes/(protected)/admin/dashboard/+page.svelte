@@ -1,11 +1,14 @@
 <script lang="ts">
-  import { Activity, ClipboardList, FileKey, Package, Plus, Upload } from "@lucide/svelte";
+  import { Activity, BarChart2, ClipboardList, FileKey, Package, Plus, Upload } from "@lucide/svelte";
   import { resolve } from "$app/paths";
 
   import PageHeader from "$lib/components/app/page-header.svelte";
   import { m } from "$lib/paraglide/messages";
+  import { getLocale } from "$lib/paraglide/runtime";
+  import { formatDateTime } from "$lib/user-management";
 
   let { data } = $props();
+  const locale = getLocale();
 </script>
 
 <svelte:head>
@@ -85,7 +88,7 @@
 
     <div class="w-full">
       <p class="mb-4 text-xl font-semibold">{m.admin_dashboard_quick_actions()}</p>
-      <div class="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+      <div class="grid w-full grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
         <a
           href={resolve("/admin/licenses?add=1")}
           class="flex gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:border-blue-300 hover:bg-blue-50 sm:p-5"
@@ -112,22 +115,51 @@
           </div>
         </a>
 
-        <!-- View reports — not yet implemented -->
-        <!-- <div class="flex gap-3 rounded-lg border border-gray-200 bg-white p-4 sm:p-5">
+        <a
+          href={resolve("/admin/reports")}
+          class="flex gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:border-blue-300 hover:bg-blue-50 sm:p-5"
+        >
           <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-100">
-            <ChartColumn class="h-5 w-5 text-blue-400" />
+            <BarChart2 class="h-5 w-5 text-blue-500" />
           </div>
           <div>
             <p class="text-base font-medium text-gray-900">{m.admin_dashboard_view_reports()}</p>
             <p class="text-sm text-gray-500">{m.admin_dashboard_view_reports_subtitle()}</p>
           </div>
-        </div> -->
+        </a>
       </div>
     </div>
 
-    <!-- Recent activity — not yet implemented -->
-    <!-- <div>
-      <p class="mb-4 text-xl font-semibold">{m.admin_dashboard_recent_activity()}</p>
-    </div> -->
+    {#if data.recentActivity.length > 0}
+      <div class="w-full">
+        <div class="mb-4 flex items-center justify-between">
+          <p class="text-xl font-semibold">{m.admin_dashboard_recent_activity()}</p>
+          <a href={resolve("/admin/reports")} class="text-sm text-blue-600 hover:underline">
+            {m.admin_dashboard_view_reports()} →
+          </a>
+        </div>
+        <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
+          {#each data.recentActivity as activity, i (activity.id)}
+            <div
+              class={`flex items-center gap-3 px-5 py-4 ${i < data.recentActivity.length - 1 ? "border-b border-gray-100" : ""}`}
+            >
+              <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-blue-50">
+                <Activity class="h-4 w-4 text-blue-400" />
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm">
+                  <span class="font-medium text-gray-900">{activity.userName}</span>
+                  <span class="text-gray-400">retrieved a license for</span>
+                  {#if activity.productName}
+                    <span class="font-semibold text-gray-900">{activity.productName}</span>
+                  {/if}
+                </p>
+                <p class="mt-0.5 text-xs text-gray-400">{formatDateTime(activity.createdAt, locale)}</p>
+              </div>
+            </div>
+          {/each}
+        </div>
+      </div>
+    {/if}
   </div>
 </div>
