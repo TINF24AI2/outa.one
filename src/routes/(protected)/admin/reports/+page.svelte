@@ -173,7 +173,7 @@
             {@const barCount = data.chartData.length}
             {@const svgPaddingLeft = 36}
             {@const svgPaddingBottom = 40}
-            {@const svgPaddingTop = 10}
+            {@const svgPaddingTop = 24}
 
             <svg
               viewBox="0 0 800 {chartHeight + svgPaddingBottom + svgPaddingTop}"
