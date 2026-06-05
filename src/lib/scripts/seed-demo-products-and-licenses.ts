@@ -3,13 +3,13 @@
  * Run with: pnpm db:seed
  * Requires DATABASE_URL to be set (loaded from .env automatically).
  */
-import { and, eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
 import { DEMO_PASSWORD, DEMO_USERS } from "$lib/demo-users";
 import { account, user as userTable } from "$lib/server/db/auth.schema";
-import { license, licenseRequest, licenseUser, product } from "$lib/server/db/schema";
+import { auditLog, license, licenseRequest, licenseUser, product } from "$lib/server/db/schema";
 
 import { loadEnv } from "./utils";
 
@@ -170,13 +170,25 @@ const REQUESTS: {
 // Seed
 // ---------------------------------------------------------------------------
 
+// Returns a Date n days ago with a random minute offset for realism
+function daysAgo(days: number): Date {
+  const d = new Date();
+  d.setDate(d.getDate() - days);
+  d.setHours(8 + Math.floor(Math.random() * 10), Math.floor(Math.random() * 60), 0, 0);
+  return d;
+}
+
 async function seed() {
   // ── 1. Users ──────────────────────────────────────────────────────────────
   console.log("── Users ────────────────────────────────────");
   const hashedPassword = await hashPassword(DEMO_PASSWORD);
+  const newlyAddedUserEmails: string[] = [];
 
   for (const demo of DEMO_USERS) {
-    const [existing] = await db.select({ id: userTable.id }).from(userTable).where(eq(userTable.email, demo.email));
+    const [existing] = await db
+      .select({ id: userTable.id })
+      .from(userTable)
+      .where(or(eq(userTable.email, demo.email), eq(userTable.id, demo.id)));
     if (existing) {
       console.log(`  skip    ${demo.role === "admin" ? "admin   " : "employee"} ${demo.email}`);
       continue;
@@ -199,19 +211,43 @@ async function seed() {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+    newlyAddedUserEmails.push(demo.email);
     console.log(`  added   ${demo.role === "admin" ? "admin   " : "employee"} ${demo.email}`);
   }
 
-  // Build email → actual DB id map (handles users seeded with old IDs)
-  const userRows = await db.select({ id: userTable.id, email: userTable.email }).from(userTable);
-  const userByEmail = new Map(userRows.map((u) => [u.email, u.id]));
+  // Build email → { id, name } map (handles users seeded with old IDs)
+  const userRows = await db.select({ id: userTable.id, email: userTable.email, name: userTable.name }).from(userTable);
+  const userByEmail = new Map(userRows.map((u) => [u.email, { id: u.id, name: u.name }]));
+
+  const adminId = userByEmail.get("emily.rodriguez@company.com")?.id ?? "demo-admin-1";
+  const adminName = userByEmail.get("emily.rodriguez@company.com")?.name ?? "Emily Rodriguez";
+  const davidId = userByEmail.get("david.kim@company.com")?.id ?? "demo-admin-2";
+  const davidName = userByEmail.get("david.kim@company.com")?.name ?? "David Kim";
+
+  // Audit: user.invited for each newly added user (admins invited employees ~7 weeks ago)
+  for (let i = 0; i < newlyAddedUserEmails.length; i++) {
+    const email = newlyAddedUserEmails[i];
+    const u = userByEmail.get(email!);
+    if (!u) continue;
+    const actor = i % 2 === 0 ? { id: adminId, name: adminName } : { id: davidId, name: davidName };
+    await db.insert(auditLog).values({
+      userId: actor.id,
+      userName: actor.name,
+      action: "user.invited",
+      entityType: "invite",
+      entityId: u.id,
+      metadata: { invitedEmail: email },
+      createdAt: daysAgo(49 - i),
+    });
+  }
 
   // ── 2. Products & licenses ────────────────────────────────────────────────
   console.log("\n── Products & licenses ──────────────────────");
   const productIdByName = new Map<string, string>();
   const licenseIdByKey = new Map<string, string>(); // "productName::key" → licenseId
 
-  for (const p of DEMO_PRODUCTS) {
+  for (let pi = 0; pi < DEMO_PRODUCTS.length; pi++) {
+    const p = DEMO_PRODUCTS[pi]!;
     const [existing] = await db.select().from(product).where(eq(product.name, p.name));
     let productId: string;
 
@@ -229,10 +265,21 @@ async function seed() {
         })
         .returning({ id: product.id });
       productId = created.id;
+      const actor = pi % 2 === 0 ? { id: adminId, name: adminName } : { id: davidId, name: davidName };
+      await db.insert(auditLog).values({
+        userId: actor.id,
+        userName: actor.name,
+        action: "product.created",
+        entityType: "product",
+        entityId: productId,
+        metadata: { productName: p.name },
+        createdAt: daysAgo(60 - pi),
+      });
       console.log(`  added   ${p.name}`);
     }
     productIdByName.set(p.name, productId);
 
+    let licIdx = 0;
     for (const lic of p.licenses) {
       const [existingLic] = await db
         .select()
@@ -248,19 +295,31 @@ async function seed() {
           .values({ key: lic.key, usageVolume: lic.usageVolume, productId })
           .returning({ id: license.id });
         licenseId = created.id;
+        const actor = licIdx % 2 === 0 ? { id: adminId, name: adminName } : { id: davidId, name: davidName };
+        await db.insert(auditLog).values({
+          userId: actor.id,
+          userName: actor.name,
+          action: "license.created",
+          entityType: "license",
+          entityId: licenseId,
+          metadata: { productName: p.name },
+          createdAt: daysAgo(59 - pi - licIdx),
+        });
         console.log(`    added   ${lic.key}`);
       }
       licenseIdByKey.set(`${p.name}::${lic.key}`, licenseId);
+      licIdx++;
     }
   }
 
   // ── 3. Assignments ────────────────────────────────────────────────────────
   console.log("\n── Assignments ──────────────────────────────");
-  for (const a of ASSIGNMENTS) {
-    const userId = userByEmail.get(a.email);
+  for (let ai = 0; ai < ASSIGNMENTS.length; ai++) {
+    const a = ASSIGNMENTS[ai]!;
+    const user = userByEmail.get(a.email);
     const licenseId = licenseIdByKey.get(`${a.productName}::${a.licenseKey}`);
 
-    if (!userId || !licenseId) {
+    if (!user || !licenseId) {
       console.log(`  skip    ${a.email} → ${a.licenseKey} (missing user or license)`);
       continue;
     }
@@ -268,23 +327,34 @@ async function seed() {
     const [existing] = await db
       .select()
       .from(licenseUser)
-      .where(and(eq(licenseUser.licenseId, licenseId), eq(licenseUser.userId, userId)));
+      .where(and(eq(licenseUser.licenseId, licenseId), eq(licenseUser.userId, user.id)));
 
     if (existing) {
       console.log(`  skip    ${a.email} → ${a.productName}`);
     } else {
-      await db.insert(licenseUser).values({ licenseId, userId });
+      await db.insert(licenseUser).values({ licenseId, userId: user.id });
+      const actor = ai % 2 === 0 ? { id: adminId, name: adminName } : { id: davidId, name: davidName };
+      await db.insert(auditLog).values({
+        userId: actor.id,
+        userName: actor.name,
+        action: "license.user_assigned",
+        entityType: "license",
+        entityId: licenseId,
+        metadata: { assignedUserId: user.id, assignedUserName: user.name, productName: a.productName },
+        createdAt: daysAgo(35 - ai),
+      });
       console.log(`  assigned ${a.email} → ${a.productName}`);
     }
   }
 
   // ── 4. License requests ───────────────────────────────────────────────────
   console.log("\n── License requests ─────────────────────────");
-  for (const r of REQUESTS) {
-    const userId = userByEmail.get(r.email);
+  for (let ri = 0; ri < REQUESTS.length; ri++) {
+    const r = REQUESTS[ri]!;
+    const user = userByEmail.get(r.email);
     const productId = productIdByName.get(r.productName);
 
-    if (!userId || !productId) {
+    if (!user || !productId) {
       console.log(`  skip    ${r.email} → ${r.productName} (missing user or product)`);
       continue;
     }
@@ -294,7 +364,7 @@ async function seed() {
       .from(licenseRequest)
       .where(
         and(
-          eq(licenseRequest.userId, userId),
+          eq(licenseRequest.userId, user.id),
           eq(licenseRequest.productId, productId),
           eq(licenseRequest.status, r.status),
         ),
@@ -303,9 +373,43 @@ async function seed() {
     if (existing) {
       console.log(`  skip    ${r.email} → ${r.productName} (${r.status})`);
     } else {
-      await db
+      const [created] = await db
         .insert(licenseRequest)
-        .values({ userId, productId, status: r.status, rejectionReason: r.rejectionReason ?? null });
+        .values({ userId: user.id, productId, status: r.status, rejectionReason: r.rejectionReason ?? null })
+        .returning({ id: licenseRequest.id });
+      const submittedAt = daysAgo(28 - ri * 2);
+      await db.insert(auditLog).values({
+        userId: user.id,
+        userName: user.name,
+        action: "license_request.submitted",
+        entityType: "license_request",
+        entityId: created.id,
+        metadata: { productName: r.productName, productId },
+        createdAt: submittedAt,
+      });
+      if (r.status === "approved") {
+        const actor = ri % 2 === 0 ? { id: adminId, name: adminName } : { id: davidId, name: davidName };
+        await db.insert(auditLog).values({
+          userId: actor.id,
+          userName: actor.name,
+          action: "license_request.approved",
+          entityType: "license_request",
+          entityId: created.id,
+          metadata: { productName: r.productName, requestedBy: user.name },
+          createdAt: daysAgo(25 - ri * 2),
+        });
+      } else if (r.status === "rejected") {
+        const actor = ri % 2 === 0 ? { id: adminId, name: adminName } : { id: davidId, name: davidName };
+        await db.insert(auditLog).values({
+          userId: actor.id,
+          userName: actor.name,
+          action: "license_request.rejected",
+          entityType: "license_request",
+          entityId: created.id,
+          metadata: { productName: r.productName, requestedBy: user.name, reason: r.rejectionReason },
+          createdAt: daysAgo(25 - ri * 2),
+        });
+      }
       console.log(`  added   ${r.email} → ${r.productName} (${r.status})`);
     }
   }
