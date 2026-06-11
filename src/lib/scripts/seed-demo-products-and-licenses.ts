@@ -106,32 +106,110 @@ const DEMO_PRODUCTS = [
 ];
 
 // ---------------------------------------------------------------------------
-// Assignments: which employee gets which license key
+// Assignments
 // ---------------------------------------------------------------------------
 
-const ASSIGNMENTS: { email: string; productName: string; licenseKey: string }[] = [
-  // Sarah Johnson
-  { email: "sarah.johnson@company.com", productName: "Microsoft 365", licenseKey: "M365-TXKQP-7H2RN-BVCJ4-WY9DM" },
+const ASSIGNMENTS: {
+  email: string;
+  productName: string;
+  licenseKey: string;
+  selfService: boolean; // true = employee obtained it directly, false = admin assigned after approval
+}[] = [
+  // Sarah Johnson — developer, grabbed common tools herself; JetBrains was approved
+  {
+    email: "sarah.johnson@company.com",
+    productName: "Microsoft 365",
+    licenseKey: "M365-TXKQP-7H2RN-BVCJ4-WY9DM",
+    selfService: true,
+  },
   {
     email: "sarah.johnson@company.com",
     productName: "JetBrains All Products Pack",
     licenseKey: "JB-K7X2MP9R-4NHQ3CBL5",
+    selfService: false,
   },
-  { email: "sarah.johnson@company.com", productName: "GitHub Copilot", licenseKey: "GHC-4KXRM2-N7BPWQ-T9FDJY" },
-  { email: "sarah.johnson@company.com", productName: "Slack Business+", licenseKey: "SLK-TEAM-ENT-2024-XKQR7BMNPZ" },
-  { email: "sarah.johnson@company.com", productName: "Zoom Workplace", licenseKey: "ZM-WP-9FJTK-2BXQRN-7DMYVC" },
+  {
+    email: "sarah.johnson@company.com",
+    productName: "GitHub Copilot",
+    licenseKey: "GHC-4KXRM2-N7BPWQ-T9FDJY",
+    selfService: true,
+  },
+  {
+    email: "sarah.johnson@company.com",
+    productName: "Slack Business+",
+    licenseKey: "SLK-TEAM-ENT-2024-XKQR7BMNPZ",
+    selfService: true,
+  },
+  {
+    email: "sarah.johnson@company.com",
+    productName: "Zoom Workplace",
+    licenseKey: "ZM-WP-9FJTK-2BXQRN-7DMYVC",
+    selfService: true,
+  },
 
-  // Marcus Chen
-  { email: "marcus.chen@company.com", productName: "Microsoft 365", licenseKey: "M365-RPLJ8-KD4NX-CFMQ3-SZ7WB" },
-  { email: "marcus.chen@company.com", productName: "Adobe Creative Cloud", licenseKey: "ADB-7X2K-P9MR-4NHQ-C3BL" },
-  { email: "marcus.chen@company.com", productName: "GitHub Copilot", licenseKey: "GHC-8ZVCT6-W3HNPK-M5RJQL" },
-  { email: "marcus.chen@company.com", productName: "Slack Business+", licenseKey: "SLK-TEAM-ENT-2024-XKQR7BMNPZ" },
-  { email: "marcus.chen@company.com", productName: "Zoom Workplace", licenseKey: "ZM-WP-9FJTK-2BXQRN-7DMYVC" },
+  // Marcus Chen — designer/developer hybrid; Adobe was approved
+  {
+    email: "marcus.chen@company.com",
+    productName: "Microsoft 365",
+    licenseKey: "M365-RPLJ8-KD4NX-CFMQ3-SZ7WB",
+    selfService: true,
+  },
+  {
+    email: "marcus.chen@company.com",
+    productName: "Adobe Creative Cloud",
+    licenseKey: "ADB-7X2K-P9MR-4NHQ-C3BL",
+    selfService: false,
+  },
+  {
+    email: "marcus.chen@company.com",
+    productName: "GitHub Copilot",
+    licenseKey: "GHC-8ZVCT6-W3HNPK-M5RJQL",
+    selfService: true,
+  },
+  {
+    email: "marcus.chen@company.com",
+    productName: "Figma Professional",
+    licenseKey: "FIG-DV4T-8YFN-GWQZ-K6LP",
+    selfService: true,
+  },
+  {
+    email: "marcus.chen@company.com",
+    productName: "Slack Business+",
+    licenseKey: "SLK-TEAM-ENT-2024-XKQR7BMNPZ",
+    selfService: true,
+  },
+  {
+    email: "marcus.chen@company.com",
+    productName: "Zoom Workplace",
+    licenseKey: "ZM-WP-9FJTK-2BXQRN-7DMYVC",
+    selfService: true,
+  },
 
-  // Priya Patel
-  { email: "priya.patel@company.com", productName: "Microsoft 365", licenseKey: "M365-GNVH6-2YT9A-XMPKE-QR1CL" },
-  { email: "priya.patel@company.com", productName: "Figma Professional", licenseKey: "FIG-HQ7K-3NRX-BPMC-Z2WJ" },
-  { email: "priya.patel@company.com", productName: "Slack Business+", licenseKey: "SLK-TEAM-ENT-2024-XKQR7BMNPZ" },
+  // Priya Patel — product/UX focus
+  {
+    email: "priya.patel@company.com",
+    productName: "Microsoft 365",
+    licenseKey: "M365-GNVH6-2YT9A-XMPKE-QR1CL",
+    selfService: true,
+  },
+  {
+    email: "priya.patel@company.com",
+    productName: "Figma Professional",
+    licenseKey: "FIG-HQ7K-3NRX-BPMC-Z2WJ",
+    selfService: true,
+  },
+  {
+    email: "priya.patel@company.com",
+    productName: "Slack Business+",
+    licenseKey: "SLK-TEAM-ENT-2024-XKQR7BMNPZ",
+    selfService: true,
+  },
+  {
+    email: "priya.patel@company.com",
+    productName: "Zoom Workplace",
+    licenseKey: "ZM-WP-9FJTK-2BXQRN-7DMYVC",
+    selfService: true,
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -144,13 +222,13 @@ const REQUESTS: {
   status: "pending" | "approved" | "rejected";
   rejectionReason?: string;
 }[] = [
-  // Approved requests — matching the assignments above
+  // Approved — matching assignments above
   { email: "sarah.johnson@company.com", productName: "JetBrains All Products Pack", status: "approved" },
   { email: "marcus.chen@company.com", productName: "Adobe Creative Cloud", status: "approved" },
-  // Pending requests
+  // Pending
   { email: "sarah.johnson@company.com", productName: "Adobe Creative Cloud", status: "pending" },
   { email: "priya.patel@company.com", productName: "Adobe Creative Cloud", status: "pending" },
-  // Rejected requests
+  // Rejected
   {
     email: "priya.patel@company.com",
     productName: "JetBrains All Products Pack",
@@ -167,16 +245,58 @@ const REQUESTS: {
 ];
 
 // ---------------------------------------------------------------------------
-// Seed
+// Helpers
 // ---------------------------------------------------------------------------
 
-// Returns a Date n days ago with a random minute offset for realism
-function daysAgo(days: number): Date {
+// Returns a Date at a realistic work-hour time the given number of days ago.
+// Spreads events across 09:00–18:00; jitter keeps consecutive events distinct.
+let _jitter = 0;
+function workTs(daysAgo: number, hourOffset = 0): Date {
+  _jitter = (_jitter + 7) % 53; // deterministic but non-repeating minute offset
   const d = new Date();
-  d.setDate(d.getDate() - days);
-  d.setHours(8 + Math.floor(Math.random() * 10), Math.floor(Math.random() * 60), 0, 0);
+  d.setDate(d.getDate() - daysAgo);
+  d.setHours(9 + hourOffset, _jitter, Math.floor(_jitter / 2), 0);
   return d;
 }
+
+const OFFICE_IPS = [
+  "10.0.1.42",
+  "10.0.1.17",
+  "10.0.1.88",
+  "10.0.1.55",
+  "10.0.1.103",
+  "10.0.1.71",
+  "10.0.1.29",
+  "10.0.1.64",
+];
+const REMOTE_IPS = ["85.214.132.117", "176.9.24.58", "78.46.91.203", "95.216.14.72", "46.4.68.139", "135.181.55.34"];
+const USER_AGENTS = [
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0",
+];
+
+// Deterministic picks so the output is consistent across re-runs.
+let _pick = 0;
+function pick<T>(arr: T[]): T {
+  return arr[_pick++ % arr.length]!;
+}
+
+function officeIp() {
+  return pick(OFFICE_IPS);
+}
+function remoteIp() {
+  return pick(REMOTE_IPS);
+}
+function ua() {
+  return pick(USER_AGENTS);
+}
+
+// ---------------------------------------------------------------------------
+// Seed
+// ---------------------------------------------------------------------------
 
 async function seed() {
   // ── 1. Users ──────────────────────────────────────────────────────────────
@@ -215,29 +335,35 @@ async function seed() {
     console.log(`  added   ${demo.role === "admin" ? "admin   " : "employee"} ${demo.email}`);
   }
 
-  // Build email → { id, name } map (handles users seeded with old IDs)
+  // Build email → { id, name } map
   const userRows = await db.select({ id: userTable.id, email: userTable.email, name: userTable.name }).from(userTable);
   const userByEmail = new Map(userRows.map((u) => [u.email, { id: u.id, name: u.name }]));
 
-  const adminId = userByEmail.get("emily.rodriguez@company.com")?.id ?? "demo-admin-1";
-  const adminName = userByEmail.get("emily.rodriguez@company.com")?.name ?? "Emily Rodriguez";
-  const davidId = userByEmail.get("david.kim@company.com")?.id ?? "demo-admin-2";
-  const davidName = userByEmail.get("david.kim@company.com")?.name ?? "David Kim";
+  const emily = {
+    id: userByEmail.get("emily.rodriguez@company.com")?.id ?? "demo-admin-1",
+    name: userByEmail.get("emily.rodriguez@company.com")?.name ?? "Emily Rodriguez",
+  };
+  const david = {
+    id: userByEmail.get("david.kim@company.com")?.id ?? "demo-admin-2",
+    name: userByEmail.get("david.kim@company.com")?.name ?? "David Kim",
+  };
 
-  // Audit: user.invited for each newly added user (admins invited employees ~7 weeks ago)
+  // Audit: user.invited — admins sent invites ~7 weeks ago, a few days apart
   for (let i = 0; i < newlyAddedUserEmails.length; i++) {
-    const email = newlyAddedUserEmails[i];
-    const u = userByEmail.get(email!);
+    const email = newlyAddedUserEmails[i]!;
+    const u = userByEmail.get(email);
     if (!u) continue;
-    const actor = i % 2 === 0 ? { id: adminId, name: adminName } : { id: davidId, name: davidName };
+    const actor = i % 2 === 0 ? emily : david;
     await db.insert(auditLog).values({
       userId: actor.id,
       userName: actor.name,
       action: "user.invited",
       entityType: "invite",
       entityId: u.id,
-      metadata: { invitedEmail: email },
-      createdAt: daysAgo(49 - i),
+      metadata: { invitedEmail: email, invitedName: u.name },
+      ipAddress: officeIp(),
+      userAgent: ua(),
+      createdAt: workTs(49 - i, 1),
     });
   }
 
@@ -264,8 +390,8 @@ async function seed() {
           maxLicensesPerUser: p.maxLicensesPerUser,
         })
         .returning({ id: product.id });
-      productId = created.id;
-      const actor = pi % 2 === 0 ? { id: adminId, name: adminName } : { id: davidId, name: davidName };
+      productId = created!.id;
+      const actor = pi % 2 === 0 ? emily : david;
       await db.insert(auditLog).values({
         userId: actor.id,
         userName: actor.name,
@@ -273,7 +399,9 @@ async function seed() {
         entityType: "product",
         entityId: productId,
         metadata: { productName: p.name },
-        createdAt: daysAgo(60 - pi),
+        ipAddress: officeIp(),
+        userAgent: ua(),
+        createdAt: workTs(60 - pi, 2),
       });
       console.log(`  added   ${p.name}`);
     }
@@ -294,16 +422,18 @@ async function seed() {
           .insert(license)
           .values({ key: lic.key, usageVolume: lic.usageVolume, productId })
           .returning({ id: license.id });
-        licenseId = created.id;
-        const actor = licIdx % 2 === 0 ? { id: adminId, name: adminName } : { id: davidId, name: davidName };
+        licenseId = created!.id;
+        const actor = licIdx % 2 === 0 ? emily : david;
         await db.insert(auditLog).values({
           userId: actor.id,
           userName: actor.name,
           action: "license.created",
           entityType: "license",
           entityId: licenseId,
-          metadata: { productName: p.name },
-          createdAt: daysAgo(59 - pi - licIdx),
+          metadata: { productName: p.name, licenseKey: lic.key },
+          ipAddress: officeIp(),
+          userAgent: ua(),
+          createdAt: workTs(59 - pi, 2 + licIdx),
         });
         console.log(`    added   ${lic.key}`);
       }
@@ -312,36 +442,75 @@ async function seed() {
     }
   }
 
+  // Admin tweaked JetBrains approval setting a week after initial upload
+  const jetbrainsId = productIdByName.get("JetBrains All Products Pack");
+  if (jetbrainsId) {
+    await db.insert(auditLog).values({
+      userId: emily.id,
+      userName: emily.name,
+      action: "product.updated",
+      entityType: "product",
+      entityId: jetbrainsId,
+      metadata: {
+        productName: "JetBrains All Products Pack",
+        field: "requiresApproval",
+        oldValue: "false",
+        newValue: "true",
+      },
+      ipAddress: officeIp(),
+      userAgent: ua(),
+      createdAt: workTs(52, 3),
+    });
+  }
+
   // ── 3. Assignments ────────────────────────────────────────────────────────
   console.log("\n── Assignments ──────────────────────────────");
+
+  // Timestamps spread across days 35 → 10, earliest first, work hours
+  const assignmentDays = [35, 34, 33, 31, 30, 29, 28, 27, 26, 24, 22, 20, 18, 16, 14];
+
   for (let ai = 0; ai < ASSIGNMENTS.length; ai++) {
     const a = ASSIGNMENTS[ai]!;
-    const user = userByEmail.get(a.email);
+    const u = userByEmail.get(a.email);
     const licenseId = licenseIdByKey.get(`${a.productName}::${a.licenseKey}`);
+    const productId = productIdByName.get(a.productName);
 
-    if (!user || !licenseId) {
-      console.log(`  skip    ${a.email} → ${a.licenseKey} (missing user or license)`);
+    if (!u || !licenseId || !productId) {
+      console.log(`  skip    ${a.email} → ${a.licenseKey} (missing data)`);
       continue;
     }
 
     const [existing] = await db
       .select()
       .from(licenseUser)
-      .where(and(eq(licenseUser.licenseId, licenseId), eq(licenseUser.userId, user.id)));
+      .where(and(eq(licenseUser.licenseId, licenseId), eq(licenseUser.userId, u.id)));
 
     if (existing) {
       console.log(`  skip    ${a.email} → ${a.productName}`);
     } else {
-      await db.insert(licenseUser).values({ licenseId, userId: user.id });
-      const actor = ai % 2 === 0 ? { id: adminId, name: adminName } : { id: davidId, name: davidName };
+      await db.insert(licenseUser).values({ licenseId, userId: u.id });
+
+      // Self-service: the employee is the actor; approval: admin is the actor
+      const actor = a.selfService ? u : ai % 2 === 0 ? emily : david;
+      const ip = a.selfService ? (ai % 4 === 0 ? remoteIp() : officeIp()) : officeIp();
+      const daysBack = assignmentDays[ai % assignmentDays.length]!;
+
       await db.insert(auditLog).values({
         userId: actor.id,
         userName: actor.name,
         action: "license.user_assigned",
         entityType: "license",
         entityId: licenseId,
-        metadata: { assignedUserId: user.id, assignedUserName: user.name, productName: a.productName },
-        createdAt: daysAgo(35 - ai),
+        metadata: {
+          targetUserId: u.id,
+          targetUserName: u.name,
+          productId,
+          productName: a.productName,
+          licenseKey: a.licenseKey,
+        },
+        ipAddress: ip,
+        userAgent: ua(),
+        createdAt: workTs(daysBack, ai % 7),
       });
       console.log(`  assigned ${a.email} → ${a.productName}`);
     }
@@ -349,13 +518,18 @@ async function seed() {
 
   // ── 4. License requests ───────────────────────────────────────────────────
   console.log("\n── License requests ─────────────────────────");
+
+  // Request days: submitted several days before any admin action
+  const requestDays = [32, 29, 15, 12, 38, 36];
+  const reviewOffsets = [3, 2, 0, 0, 2, 1]; // days after submission until admin reviewed
+
   for (let ri = 0; ri < REQUESTS.length; ri++) {
     const r = REQUESTS[ri]!;
-    const user = userByEmail.get(r.email);
+    const u = userByEmail.get(r.email);
     const productId = productIdByName.get(r.productName);
 
-    if (!user || !productId) {
-      console.log(`  skip    ${r.email} → ${r.productName} (missing user or product)`);
+    if (!u || !productId) {
+      console.log(`  skip    ${r.email} → ${r.productName} (missing data)`);
       continue;
     }
 
@@ -364,7 +538,7 @@ async function seed() {
       .from(licenseRequest)
       .where(
         and(
-          eq(licenseRequest.userId, user.id),
+          eq(licenseRequest.userId, u.id),
           eq(licenseRequest.productId, productId),
           eq(licenseRequest.status, r.status),
         ),
@@ -372,46 +546,64 @@ async function seed() {
 
     if (existing) {
       console.log(`  skip    ${r.email} → ${r.productName} (${r.status})`);
-    } else {
-      const [created] = await db
-        .insert(licenseRequest)
-        .values({ userId: user.id, productId, status: r.status, rejectionReason: r.rejectionReason ?? null })
-        .returning({ id: licenseRequest.id });
-      const submittedAt = daysAgo(28 - ri * 2);
-      await db.insert(auditLog).values({
-        userId: user.id,
-        userName: user.name,
-        action: "license_request.submitted",
-        entityType: "license_request",
-        entityId: created.id,
-        metadata: { productName: r.productName, productId },
-        createdAt: submittedAt,
-      });
-      if (r.status === "approved") {
-        const actor = ri % 2 === 0 ? { id: adminId, name: adminName } : { id: davidId, name: davidName };
-        await db.insert(auditLog).values({
-          userId: actor.id,
-          userName: actor.name,
-          action: "license_request.approved",
-          entityType: "license_request",
-          entityId: created.id,
-          metadata: { productName: r.productName, requestedBy: user.name },
-          createdAt: daysAgo(25 - ri * 2),
-        });
-      } else if (r.status === "rejected") {
-        const actor = ri % 2 === 0 ? { id: adminId, name: adminName } : { id: davidId, name: davidName };
-        await db.insert(auditLog).values({
-          userId: actor.id,
-          userName: actor.name,
-          action: "license_request.rejected",
-          entityType: "license_request",
-          entityId: created.id,
-          metadata: { productName: r.productName, requestedBy: user.name, reason: r.rejectionReason },
-          createdAt: daysAgo(25 - ri * 2),
-        });
-      }
-      console.log(`  added   ${r.email} → ${r.productName} (${r.status})`);
+      continue;
     }
+
+    const [created] = await db
+      .insert(licenseRequest)
+      .values({ userId: u.id, productId, status: r.status, rejectionReason: r.rejectionReason ?? null })
+      .returning({ id: licenseRequest.id });
+
+    const submittedDaysAgo = requestDays[ri]!;
+    const reviewedDaysAgo = submittedDaysAgo - reviewOffsets[ri]!;
+
+    await db.insert(auditLog).values({
+      userId: u.id,
+      userName: u.name,
+      action: "license_request.submitted",
+      entityType: "license_request",
+      entityId: created!.id,
+      metadata: { targetUserId: u.id, productId, productName: r.productName },
+      ipAddress: ri % 3 === 0 ? remoteIp() : officeIp(),
+      userAgent: ua(),
+      createdAt: workTs(submittedDaysAgo, 1),
+    });
+
+    if (r.status === "approved") {
+      const actor = ri % 2 === 0 ? emily : david;
+      await db.insert(auditLog).values({
+        userId: actor.id,
+        userName: actor.name,
+        action: "license_request.approved",
+        entityType: "license_request",
+        entityId: created!.id,
+        metadata: { targetUserId: u.id, targetUserName: u.name, productId, productName: r.productName },
+        ipAddress: officeIp(),
+        userAgent: ua(),
+        createdAt: workTs(reviewedDaysAgo, 4),
+      });
+    } else if (r.status === "rejected") {
+      const actor = ri % 2 === 0 ? emily : david;
+      await db.insert(auditLog).values({
+        userId: actor.id,
+        userName: actor.name,
+        action: "license_request.rejected",
+        entityType: "license_request",
+        entityId: created!.id,
+        metadata: {
+          targetUserId: u.id,
+          targetUserName: u.name,
+          productId,
+          productName: r.productName,
+          rejectionReason: r.rejectionReason,
+        },
+        ipAddress: officeIp(),
+        userAgent: ua(),
+        createdAt: workTs(reviewedDaysAgo, 4),
+      });
+    }
+
+    console.log(`  added   ${r.email} → ${r.productName} (${r.status})`);
   }
 
   console.log(`\n── Done ─────────────────────────────────────`);
