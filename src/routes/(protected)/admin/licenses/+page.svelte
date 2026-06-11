@@ -112,7 +112,9 @@
 
   const totalCount = $derived(filteredLicenses.length);
   const assignedCount = $derived(filteredLicenses.filter((lic) => lic.assignedUsers.length > 0).length);
-  const availableCount = $derived(totalCount - assignedCount);
+  const availableCount = $derived(
+    filteredLicenses.reduce((sum, lic) => sum + Math.max(0, lic.usageVolume - lic.assignedUsers.length), 0),
+  );
 
   function licenseTypeLabel(usageVolume: number): string {
     return usageVolume === 1 ? m.licenses_table_type_single() : m.licenses_table_type_volume();
