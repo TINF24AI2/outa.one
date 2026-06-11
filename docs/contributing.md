@@ -1,153 +1,222 @@
 # Collaboration Guidelines
 
-This is the documentation for what conventions we use, how to get the project running locally and the workflow we prefer for Collaboration.
+This is the documentation for what conventions we use, how to get the project running locally and the workflow we prefer for collaboration.
 
 ## Table of contents
 
-- [Collaboration Guidelines](#collaboration-guidelines)
-  - [Table of contents](#table-of-contents)
-  - [Development setup](#development-setup)
-    - [Prerequisites](#prerequisites)
-    - [Setting up the project](#setting-up-the-project)
-    - [Running the development server](#running-the-development-server)
-  - [Branching \& PR workflow](#branching--pr-workflow)
-  - [Commit messages](#commit-messages)
-  - [Pull request checklist](#pull-request-checklist)
-  - [Reviews \& merging](#reviews--merging)
-  - [Coding style](#coding-style)
-  - [Naming conventions](#naming-conventions)
-  - [Code Structure](#code-structure)
+- [Development setup](#development-setup)
+- [Branching & PR workflow](#branching--pr-workflow)
+- [Commit messages](#commit-messages)
+- [Pull request checklist](#pull-request-checklist)
+- [Reviews & merging](#reviews--merging)
+- [Coding style](#coding-style)
+- [Naming conventions](#naming-conventions)
+- [Code structure](#code-structure)
 
 ---
-
-<a id="development-setup"></a>
 
 ## Development setup
 
 ### Prerequisites
 
-First of all, make sure you have the latest Node.js LTS version installed. Currently, that is Node.js 24.x LTS. If you haven't, download it from the [official website](https://nodejs.org/en/download/) or using a node version manager like [nvm](https://github.com/nvm-sh/nvm) (for Linux and macOS) or [fnm](https://github.com/Schniz/fnm) (for Windows).
+Make sure you have the latest Node.js LTS version installed. Currently, that is Node.js 24.x LTS. Download it from the [official website](https://nodejs.org/en/download/) or use [nvm](https://github.com/nvm-sh/nvm) (Linux/macOS) or [fnm](https://github.com/Schniz/fnm) (Windows).
 
-As we are using [pnpm](https://pnpm.io/) as our package manager, you also need to have it installed globally. If you haven't yet, you can install it with npm:
+We use [pnpm](https://pnpm.io/) as our package manager. Install it globally:
 
 ```bash
 npm install -g pnpm
 ```
 
-In order to run the provided Docker Compose setup, make sure you have [Docker](https://www.docker.com/get-started) installed and running on your machine. You can also install [Docker Desktop](https://www.docker.com/products/docker-desktop), if you are using Windows or macOS and prefer a graphical user interface for managing your Docker containers.
-
-> [!NOTE]
-> On macOS, you might want to install [OrbStack](https://orbstack.dev/) instead of Docker Desktop. It's an alternative GUI for managing Docker containers on macOS and [offers better performance](https://docs.orbstack.dev/compare/docker-desktop).
+For running the Docker Compose setup, install [Docker](https://www.docker.com/get-started). On macOS, [OrbStack](https://orbstack.dev/) is recommended over Docker Desktop for better performance.
 
 ### Setting up the project
-
-To clone the project locally, first clone the repository:
 
 ```bash
 git clone https://github.com/TINF24AI2/outa.one.git
 cd outa.one
-```
-
-Then, install the dependencies using the following command:
-
-```bash
 pnpm i
-```
-
-After successfully installing the dependencies, make sure to set up the environment variables. You can do that by copying the `.env.example` file to `.env` and filling in the required values (see comments in the `.env.example` file for more details):
-
-```bash
 cp .env.example .env
 ```
 
+The `.env.example` file contains all required variables with working local defaults. No changes needed for local development.
+
 ### Running the development server
 
-Before starting the actual development server, make sure to start the database and mail server locally. You can do that by running the following command in the root of the project:
-
 ```bash
+# Start Postgres (port 5432) and Mailpit SMTP (port 1025, web UI: http://localhost:8025)
 docker compose up -d
-```
 
-To start the development server, run:
-
-```bash
+# Start the dev server (http://localhost:5173)
+# Migrations and demo data seeding run automatically on first start
 pnpm dev
 ```
 
-You can access the application at `http://localhost:5173`.
+### Demo accounts
 
-<a id="branching-pr-workflow"></a>
+After first startup the database is seeded with:
+
+| Name            | Email                       | Password   | Role     |
+| --------------- | --------------------------- | ---------- | -------- |
+| Sarah Johnson   | sarah.johnson@company.com   | `password` | Employee |
+| Emily Rodriguez | emily.rodriguez@company.com | `password` | Admin    |
+
+---
 
 ## Branching & PR workflow
 
-We use a feature-branch workflow targeting `main`. Work happens on separate branches categorized by topic. The `main` branch has a linear history and every change requires a Pull Request (which is enforced via GitHub).
+We use a feature-branch workflow targeting `main`. The `main` branch has a linear history; every change requires a Pull Request enforced via GitHub.
 
-- Branch from `main`:
-  - `git switch main`
-  - `git switch -c <type>/<short-description>`
-- Frequently rebase onto `main` to keep your branch up to date.
-  - `git fetch origin/main`
-  - `git rebase origin/main`
+```bash
+# Start from main
+git switch main
+git switch -c <type>/<short-description>
 
-Suggested branch name prefixes with example branch names:
+# Keep your branch up to date
+git fetch origin
+git rebase origin/main
+```
 
-- feat/login-page
-- fix/login-button-not-working
-- refactor/db-connection
-- docs/update-branch-naming
-- chore/update-dependencies
+Branch name prefixes:
 
-<a id="commit-messages"></a>
+| Prefix      | Use for                               |
+| ----------- | ------------------------------------- |
+| `feat/`     | New features                          |
+| `fix/`      | Bug fixes                             |
+| `refactor/` | Code changes with no behaviour change |
+| `docs/`     | Documentation only                    |
+| `chore/`    | Dependency updates, config, tooling   |
+
+Examples: `feat/login-page`, `fix/license-capacity-check`, `docs/update-database-schema`
+
+---
 
 ## Commit messages
 
-Write clear, concise commit messages. Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) like in the following examples:
+Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/):
 
-- feat: add new trail feature
-- fix: crash when opening saved trail
-- docs: update CONTRIBUTING.md
-- refactor: simplify trail data model
-- test: add unit tests for trail parser
-- chore: update Gradle dependencies
+```
+feat: add CSV export for audit log
+fix: prevent double-assignment under concurrent requests
+docs: document license capacity model
+refactor: extract assignUserToLicense into server module
+chore: update drizzle-orm to 0.45
+```
 
-Format: `<type>: <short summary>`
+Format: `<type>: <short summary>` — present tense, no period at the end.
 
-<a id="pull-request-checklist"></a>
+---
 
 ## Pull request checklist
 
-Before requesting review, ensure:
+Before requesting review:
 
-- [ ] Branch is up-to-date with `main`. (If not rebase)
-- [ ] Code compiles and the app builds.
-- [ ] Formatting checks pass.
-- [ ] Updated relevant docs (if applicable).
-- [ ] Includes description of changes.
+- [ ] Branch is rebased onto `main`
+- [ ] Code compiles (`pnpm build`) and type-checks (`pnpm check`)
+- [ ] Linting passes (`pnpm lint`)
+- [ ] i18n files are sorted (`pnpm messages:sort`) — run if you added/changed any strings
+- [ ] Relevant documentation updated (especially `docs/` if schema or flows changed)
+- [ ] PR description explains what changed and why
 
-<a id="reviews-merging"></a>
+---
 
 ## Reviews & merging
 
 The following requirements are enforced via GitHub:
 
 - At least one approving review from a maintainer is required.
-- Code Checks are required to pass.
-- Only fast forward merges (i.e. only pulling via rebase) are possible to keep `main` linear.
+- All CI checks must pass (lint, type-check, format).
+- Only fast-forward merges (rebase) are allowed to keep `main` linear.
 
-<a id="coding-style"></a>
+---
 
 ## Coding style
 
-> TBD
+See [development.md](development.md) for the full coding style guide. Summary:
 
-<a id="naming-conventions"></a>
+- TypeScript strict mode — no implicit `any`
+- `const` by default, `let` only when reassignment is needed
+- Named exports preferred over default exports (except Svelte components and SvelteKit page files)
+- Svelte 5 runes only — no `$:` reactive statements
+- All forms use `sveltekit-superforms` + Zod — no ad-hoc FormData parsing
+- All user-visible strings go through Paraglide (`m.key()`) — no hardcoded English in components
+- Audit log required for every action that mutates persistent data
+
+---
 
 ## Naming conventions
 
-> TBD
+| Thing                            | Convention                                                  |
+| -------------------------------- | ----------------------------------------------------------- |
+| Files                            | `kebab-case`                                                |
+| Svelte components                | `PascalCase` (matching the filename)                        |
+| Variables / functions            | `camelCase`                                                 |
+| TypeScript types / interfaces    | `PascalCase`                                                |
+| Zod schemas                      | `camelCase` + `Schema` suffix (e.g. `requestLicenseSchema`) |
+| Database column names in Drizzle | `camelCase` (mapped to `snake_case` in SQL automatically)   |
+| Environment variables            | `SCREAMING_SNAKE_CASE`                                      |
+| Route group folders              | `(groupName)` — parentheses are SvelteKit syntax            |
 
-<a id="code-structure"></a>
+---
 
-## Code Structure
+## Code structure
 
-> TBD
+```
+src/
+├── lib/
+│   ├── components/
+│   │   ├── app/          Application-specific components (dialogs, tables, forms)
+│   │   ├── auth/         Auth-specific UI (auth panel shell, password input)
+│   │   └── ui/           shadcn-svelte primitives (button, card, dialog, etc.)
+│   ├── schemas/          Zod validation schemas — one file per domain
+│   ├── server/           Server-only modules (cannot be imported in browser code)
+│   │   ├── db/
+│   │   │   ├── schema.ts        Application table definitions
+│   │   │   ├── auth.schema.ts   Better Auth table definitions
+│   │   │   └── utils/           Table factory helpers
+│   │   ├── auth.ts        Better Auth config
+│   │   ├── auth/
+│   │   │   └── guards.ts  requireAuthenticatedUser, requireAdminUser, etc.
+│   │   ├── licenses.ts    License assignment (transactional, capacity-checked)
+│   │   ├── users.ts       User CRUD + invite management
+│   │   ├── invites.ts     Invite token primitives
+│   │   ├── audit.ts       Audit log writer
+│   │   ├── mail.ts        Nodemailer singleton
+│   │   └── email-templates.ts  All HTML email templates
+│   ├── scripts/           Node.js seed scripts (run outside SvelteKit)
+│   ├── paraglide/         Generated i18n runtime (do not edit manually)
+│   ├── audit.ts           AuditAction / AuditEntityType type definitions
+│   ├── user-management.ts Shared role utilities and formatters (runs in browser + server)
+│   ├── authClient.ts      Better Auth client-side helpers
+│   └── demo-users.ts      Demo account definitions (single source of truth)
+├── routes/
+│   ├── +page.svelte/.ts              Public landing page
+│   ├── (auth)/                       Login, signup, password reset
+│   └── (protected)/
+│       ├── (employee)/               Employee portal
+│       │   ├── request/              Request a license
+│       │   ├── my-licenses/          View assigned licenses
+│       │   └── license-history/      Personal audit history
+│       └── admin/                    Admin section
+│           ├── dashboard/            Metrics overview
+│           ├── products/             Product CRUD
+│           ├── licenses/             License CRUD + user assignment
+│           ├── requests/             Approve / reject pending requests
+│           ├── users/                User management + invites
+│           ├── audit/                Full audit log viewer
+│           └── reports/              CSV / PDF export
+├── hooks.server.ts        Request middleware (Paraglide + Better Auth)
+└── app.d.ts               TypeScript augmentation for event.locals
+```
+
+### Where to put new code
+
+| Type of code               | Location                                                                |
+| -------------------------- | ----------------------------------------------------------------------- |
+| New page                   | `src/routes/(protected)/...` or `src/routes/(auth)/...`                 |
+| New shadcn component       | Run `pnpm shadcn-svelte add <name>` → lands in `src/lib/components/ui/` |
+| New app-specific component | `src/lib/components/app/`                                               |
+| New form schema            | `src/lib/schemas/<domain>.ts`                                           |
+| New server business logic  | `src/lib/server/<domain>.ts`                                            |
+| New DB table               | `src/lib/server/db/schema.ts`, then `pnpm db:generate`                  |
+| New i18n string            | `messages/en.json` + `messages/de.json`, then `pnpm messages:sort`      |
+| New email template         | `src/lib/server/email-templates.ts` (add a new exported function)       |

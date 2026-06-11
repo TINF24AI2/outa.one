@@ -18,6 +18,7 @@ Authentication is handled by [Better Auth](https://better-auth.dev) using email 
 | Session storage   | PostgreSQL via Drizzle ORM                          |
 | Cookie handling   | `sveltekitCookies` plugin (Better Auth ↔ SvelteKit) |
 | Session injection | `src/hooks.server.ts`                               |
+| Route guards      | `src/lib/server/auth/guards.ts`                     |
 
 ---
 
@@ -37,16 +38,50 @@ interface Locals {
 }
 ```
 
-Protected routes read `event.locals.user` to check authentication and role.
+Protected routes read `event.locals.user` to check authentication and role. There is no client-side auth check — all access control is server-side.
+
+---
+
+## Route Guards
+
+`src/lib/server/auth/guards.ts` exposes three helpers called at the top of every load function and action:
+
+```ts
+// Redirects to /login if not authenticated; returns the user object
+requireAuthenticatedUser(event, location?)
+
+// Same as above, but also redirects to /request if role !== 'admin'
+requireAdminUser(event)
+
+// Redirects to /request if the user IS already logged in (used on auth pages)
+redirectAuthenticated(event, location?)
+```
+
+Usage in a load function:
+
+```ts
+export const load: PageServerLoad = async (event) => {
+  const user = requireAuthenticatedUser(event);
+  // user is now non-null
+};
+
+export const actions: Actions = {
+  someAction: async (event) => {
+    requireAdminUser(event);
+    // ...
+  },
+};
+```
 
 ---
 
 ## Route Groups
 
-| Group         | Path                                                       | Access                                                  |
-| ------------- | ---------------------------------------------------------- | ------------------------------------------------------- |
-| `(auth)`      | `/login`, `/signup`, `/forgot-password`, `/reset-password` | Public — redirects to `/dashboard` if already logged in |
-| `(protected)` | `/dashboard`, …                                            | Requires session — see `(protected)/+layout.server.ts`  |
+| Group         | Path                                                       | Access                                                 |
+| ------------- | ---------------------------------------------------------- | ------------------------------------------------------ |
+| `(auth)`      | `/login`, `/signup`, `/forgot-password`, `/reset-password` | Public — redirects to `/request` if already logged in  |
+| `(protected)` | `/request`, `/my-licenses`, `/license-history`, `/admin/*` | Requires session — see `(protected)/+layout.server.ts` |
+| `admin`       | `/admin/*`                                                 | Requires `user.role === 'admin'`                       |
 
 The protected layout redirects to `/login` when `event.locals.user` is absent:
 
@@ -58,6 +93,21 @@ return { user: event.locals.user };
 
 ---
 
+## Roles
+
+Better Auth's `admin` plugin extends the `user` table with a `role` column.
+
+| Role     | DB value           | Access                                        |
+| -------- | ------------------ | --------------------------------------------- |
+| Employee | `null` or `'user'` | Employee portal: request/view licenses        |
+| Admin    | `'admin'`          | Full admin dashboard + employee portal access |
+
+The `asManagedRole()` helper in `src/lib/user-management.ts` normalises both `null` and `'user'` to `'user'`, and handles the comma-separated role string Better Auth can produce.
+
+There must always be at least one admin — `updateManagedUserRole` and `removeManagedUser` in `src/lib/server/users.ts` enforce this by counting admins before downgrading or removing.
+
+---
+
 ## Login
 
 **Route:** `GET/POST /login`  
@@ -65,7 +115,7 @@ return { user: event.locals.user };
 
 ### Load
 
-- Redirects to `/dashboard` if the user is already logged in.
+- Redirects to `/request` if the user is already logged in.
 - Queries the database for both demo user emails and returns `hasDemoUsers: boolean`. The demo credentials section is only rendered when this is `true`.
 
 ### Form action
@@ -73,7 +123,7 @@ return { user: event.locals.user };
 1. Reads `email` and `password` from `FormData`.
 2. Calls `auth.api.signInEmail({ body: { email, password } })`.
 3. On `APIError` → returns `fail(400, { fieldErrors: { password: 'Invalid email or password' } })`.
-4. On success → `redirect(302, '/dashboard')`.
+4. On success → `redirect(302, '/request')`.
 
 ### Client-side validation
 
@@ -133,18 +183,13 @@ email link → /reset-password?token=<token>
 
 ### Forgot password (`/forgot-password`)
 
-**Load** — Redirects to `/dashboard` if already logged in.
+**Load** — Redirects to `/request` if already logged in.
 
 **Form action**
 
 1. Validates email format; returns `fail(400, { fieldError })` on invalid input.
 2. Calls `auth.api.requestPasswordReset({ body: { email, redirectTo: origin + '/reset-password' } })`.
 3. Always returns `{ success: true, email }` — even for unknown addresses — to prevent email enumeration.
-
-The page renders two states via `{#if form?.success}`:
-
-- **Initial** — email input + "Send reset instructions" button + back to login link.
-- **Success** — "Check your email" card showing the submitted address, a fallback note about spam, and a "Use a different email address" link that reloads the page.
 
 ### Reset password (`/reset-password?token=<token>`)
 
@@ -159,28 +204,14 @@ The page renders two states via `{#if form?.success}`:
 
 The page renders two states:
 
-- **Form** — new password + confirm password fields (show/hide toggle), inline validation errors, "Reset password" button, and back to login link.
+- **Form** — new password + confirm password fields (show/hide toggle), inline validation errors.
 - **Success** — "Password reset!" card with a 3-second `$effect` timer that calls `goto('/login')`.
 
-### Email
+---
 
-Template (`resetPasswordEmail(url)` in `email-templates.ts`) renders a branded HTML email with:
+## Sign-out
 
-- outa.one logo + wordmark header
-- "Reset password" CTA button
-- Fallback plain-text URL in a highlighted box
-- 1-hour expiry notice
-- Footer disclaimer
-
-**Environment variables required:**
-
-| Variable        | Local default             | Notes                              |
-| --------------- | ------------------------- | ---------------------------------- |
-| `SMTP_HOST`     | `localhost`               | Mailpit / production SMTP host     |
-| `SMTP_PORT`     | `1025`                    | Mailpit / production SMTP port     |
-| `SMTP_USER`     | `test`                    | SMTP credentials                   |
-| `SMTP_PASSWORD` | `test`                    | SMTP credentials                   |
-| `MAIL_FROM`     | `outa.one <hey@outa.one>` | `From` header on all outgoing mail |
+The sidebar contains a form that POSTs to `?/signOut`. The action calls `auth.api.signOut` and redirects to `/login`.
 
 ---
 
@@ -188,7 +219,7 @@ Template (`resetPasswordEmail(url)` in `email-templates.ts`) renders a branded H
 
 **File:** `src/lib/server/invites.ts`
 
-Admins generate invite links from the dashboard. Each invite is a UUID token stored in the `invite` table.
+Admins generate invite links from `/admin/users`. Each invite is a UUID token stored in the `invite` table.
 
 ### Database table (`invite`)
 
@@ -225,28 +256,14 @@ consumeInvite(token);
 
 - Sets `usedAt = NOW()` to mark the token as used.
 
-### Generating invites (dashboard)
+### User Management (`src/lib/server/users.ts`)
 
-Admins submit an email address and an optional "Grant admin rights" checkbox from `/dashboard`. The `generateInvite` form action calls `createInvite` and returns the full invite URL to display in the UI.
+The higher-level `users.ts` module wraps the invite primitives:
 
----
-
-## Roles
-
-Better Auth's `admin` plugin extends the `user` table with a `role` column.
-
-| Role     | Value             | Access                    |
-| -------- | ----------------- | ------------------------- |
-| Employee | `null` / `'user'` | Standard portal access    |
-| Admin    | `'admin'`         | Can generate invite links |
-
-Role is checked in components and server actions via `event.locals.user.role === 'admin'`.
-
----
-
-## Sign-out
-
-The sidebar (`src/lib/components/app/sidebar.svelte`) contains a form that POSTs to `?/signOut`. The dashboard's `signOut` action calls `auth.api.signOut` and redirects to `/login`.
+- `inviteManagedUser(email, role)` — creates the invite and sends the email (email failure is caught and ignored; the invite URL is always returned).
+- `resendManagedInvite(inviteId)` — refreshes the expiry and resends the email.
+- `cancelManagedInvite(inviteId)` — deletes the invite row.
+- `listManagedUsers(headers)` — returns active users merged with pending invites as a unified list, sorted by name/email.
 
 ---
 
@@ -273,6 +290,8 @@ This is the single source of truth — the seed script and the login page both i
 
 ### Seeding
 
+Demo users are seeded automatically on first app startup (via the `init` hook). To reseed manually:
+
 ```sh
 pnpm db:seedDemoUsers
 ```
@@ -287,3 +306,7 @@ Script: `src/lib/scripts/seed-demo-users.server.ts`
 ### Login page visibility
 
 The login page queries the database on load to check whether both demo accounts exist. The "Demo Credentials" card footer is only rendered when `hasDemoUsers` is `true` — it does not appear on a clean database.
+
+### Email filter
+
+When sending admin notifications for license requests, emails ending in `@company.com` are filtered out to avoid spamming demo accounts.
