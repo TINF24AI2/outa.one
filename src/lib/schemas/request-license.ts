@@ -15,4 +15,5 @@ export type ProductItem = {
   available: number;
   userHeld: number;
   licenseType: "single" | "volume";
+  userHasVolumeWithCapacity: boolean;
 };

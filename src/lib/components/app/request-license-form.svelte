@@ -17,6 +17,7 @@
     pending?: boolean;
     licenseKey?: string;
     productName?: string;
+    sameVolumeLicense?: boolean;
   };
 
   let {
@@ -32,6 +33,7 @@
   type Step = "confirm" | "pending" | "assigned";
   let step = $state<Step>("confirm");
   let licenseKey = $state<string | null>(null);
+  let sameVolumeLicense = $state(false);
   let copied = $state(false);
 
   // svelte-ignore state_referenced_locally
@@ -45,6 +47,7 @@
         step = "pending";
       } else if (data?.licenseKey) {
         licenseKey = data.licenseKey;
+        sameVolumeLicense = data.sameVolumeLicense ?? false;
         step = "assigned";
         invalidateAll();
       }
@@ -66,6 +69,7 @@
     if (!open) {
       step = "confirm";
       licenseKey = null;
+      sameVolumeLicense = false;
       copied = false;
       sf.reset();
     }
@@ -124,6 +128,8 @@
           >
             {#if product.requiresApproval}
               {m.request_dialog_notice_approval({ product: product.name })}
+            {:else if product.userHasVolumeWithCapacity}
+              {m.request_dialog_notice_same_volume({ product: product.name })}
             {:else}
               {m.request_dialog_notice_direct({ product: product.name })}
             {/if}
@@ -179,7 +185,9 @@
             <p class="text-lg font-semibold">{m.request_assigned_success()}</p>
             {#if product}
               <p class="text-muted-foreground mt-1 text-sm">
-                {m.request_assigned_subtitle({ product: product.name })}
+                {sameVolumeLicense
+                  ? m.request_assigned_subtitle_same_volume({ product: product.name })
+                  : m.request_assigned_subtitle({ product: product.name })}
               </p>
             {/if}
           </div>
@@ -197,7 +205,9 @@
               {/if}
             </Button>
           </div>
-          <p class="text-muted-foreground text-xs">{m.request_assigned_save_hint()}</p>
+          <p class="text-muted-foreground text-xs">
+            {sameVolumeLicense ? m.request_assigned_same_volume_hint() : m.request_assigned_save_hint()}
+          </p>
         </div>
 
         <Button onclick={() => (open = false)}>{m.request_assigned_go_back()}</Button>

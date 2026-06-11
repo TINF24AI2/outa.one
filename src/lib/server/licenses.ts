@@ -19,12 +19,6 @@ export async function assignUserToLicense(licenseId: string, userId: string): Pr
     const [u] = await tx.select({ id: user.id }).from(user).where(eq(user.id, userId));
     if (!u) return { ok: false, reason: "user_not_found" };
 
-    const [existing] = await tx
-      .select({ licenseId: licenseUser.licenseId })
-      .from(licenseUser)
-      .where(and(eq(licenseUser.licenseId, licenseId), eq(licenseUser.userId, userId)));
-    if (existing) return { ok: true };
-
     if (lic.usageVolume > 0) {
       const [{ count }] = await tx
         .select({ count: sql<number>`count(*)::int` })
