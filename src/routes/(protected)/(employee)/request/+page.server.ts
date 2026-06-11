@@ -33,26 +33,40 @@ export const load: PageServerLoad = async (event) => {
 
   const userLicenseIds = new Set(userAssignments.map((a) => a.licenseId));
 
+  const userActivationCounts = new Map<string, number>();
+  for (const a of userAssignments) {
+    userActivationCounts.set(a.licenseId, (userActivationCounts.get(a.licenseId) ?? 0) + 1);
+  }
+
   const enrichedProducts: ProductItem[] = products.map((p) => {
     const pLicenses = licenses.filter((l) => l.productId === p.id);
 
     let available = 0;
     let licenseType: "single" | "volume" = "single";
+    let userHasVolumeWithCapacity = false;
 
     for (const lic of pLicenses) {
       if (lic.usageVolume === 0) {
         available = -1;
         licenseType = "volume";
+        if (userLicenseIds.has(lic.id)) userHasVolumeWithCapacity = true;
         break;
       }
       const assigned = assignmentCounts.get(lic.id) ?? 0;
-      if (!userLicenseIds.has(lic.id)) {
-        available += Math.max(0, lic.usageVolume - assigned);
-      }
+      const remaining = Math.max(0, lic.usageVolume - assigned);
       if (lic.usageVolume !== 1) licenseType = "volume";
+
+      if (userLicenseIds.has(lic.id)) {
+        if (lic.usageVolume > 1 && remaining > 0) {
+          userHasVolumeWithCapacity = true;
+          available += remaining;
+        }
+      } else {
+        available += remaining;
+      }
     }
 
-    const userHeld = pLicenses.filter((l) => userLicenseIds.has(l.id)).length;
+    const userHeld = pLicenses.reduce((sum, l) => sum + (userActivationCounts.get(l.id) ?? 0), 0);
 
     return {
       id: p.id,
@@ -63,6 +77,7 @@ export const load: PageServerLoad = async (event) => {
       available,
       userHeld,
       licenseType,
+      userHasVolumeWithCapacity,
     };
   });
 
@@ -138,12 +153,36 @@ export const actions: Actions = {
     }
 
     const alreadyAssigned = await db
-      .select({ licenseId: licenseUser.licenseId })
+      .select({ licenseId: licenseUser.licenseId, key: license.key, usageVolume: license.usageVolume })
       .from(licenseUser)
       .innerJoin(license, eq(license.id, licenseUser.licenseId))
       .where(and(eq(licenseUser.userId, user.id), eq(license.productId, form.data.productId)));
 
-    const excludeIds = alreadyAssigned.map((r) => r.licenseId);
+    const seenLicenseIds = new Set<string>();
+    for (const held of alreadyAssigned) {
+      if (held.usageVolume === 1 || seenLicenseIds.has(held.licenseId)) continue;
+      seenLicenseIds.add(held.licenseId);
+      const result = await assignUserToLicense(held.licenseId, user.id);
+      if (result.ok) {
+        await createAuditLog(event, {
+          action: "license.user_assigned",
+          entityType: "license",
+          entityId: held.licenseId,
+          metadata: {
+            targetUserId: user.id,
+            productId: form.data.productId,
+            productName: prod.name,
+            licenseKey: held.key,
+          },
+        });
+        return { form, licenseKey: held.key, productName: prod.name, sameVolumeLicense: true };
+      }
+      if (result.reason === "user_at_product_cap") {
+        return message(form, m.request_error_at_cap(), { status: 409 });
+      }
+    }
+
+    const excludeIds = [...new Set(alreadyAssigned.map((r) => r.licenseId))];
 
     const productLicenses = await db
       .select({ id: license.id, key: license.key })

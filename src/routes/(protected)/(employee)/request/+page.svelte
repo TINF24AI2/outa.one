@@ -59,7 +59,7 @@
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {#each filteredProducts as product (product.id)}
         {@const atUserLimit = product.maxLicensesPerUser > 0 && product.userHeld >= product.maxLicensesPerUser}
-        {@const noLicenses = product.available === 0}
+        {@const noLicenses = product.available === 0 && !product.userHasVolumeWithCapacity}
         {@const canRequest = !atUserLimit && !noLicenses}
 
         <div class="flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-5">
@@ -107,7 +107,7 @@
               onclick={() => openRequest(product)}
               class="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
             >
-              {m.request_button()}
+              {product.requiresApproval ? m.request_button() : m.request_button_obtain()}
             </button>
           {:else if atUserLimit}
             <button

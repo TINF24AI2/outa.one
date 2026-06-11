@@ -6,7 +6,6 @@ import {
   jsonb,
   pgEnum,
   pgTable,
-  primaryKey,
   serial,
   text,
   timestamp,
@@ -58,6 +57,7 @@ export const licenseRelations = relations(license, ({ one, many }) => ({
 export const licenseUser = pgTable(
   "license_user",
   {
+    id: serial("id").primaryKey(),
     licenseId: uuid("license_id")
       .notNull()
       .references(() => license.id, { onDelete: "cascade" }),
@@ -67,7 +67,7 @@ export const licenseUser = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [
-    primaryKey({ columns: [table.licenseId, table.userId] }),
+    index("license_user_license_user_idx").on(table.licenseId, table.userId),
     index("license_user_user_id_idx").on(table.userId),
   ],
 );
